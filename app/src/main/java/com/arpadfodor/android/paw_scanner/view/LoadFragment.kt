@@ -46,8 +46,12 @@ class LoadFragment : Fragment(), View.OnClickListener {
         textView = view.findViewById(R.id.tvRecognitionData)
         floatingActionButtonUpload = view.findViewById(R.id.fabUpload)
 
-        viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
-        viewModel.loadClassifier()
+        activity?.let {
+            /**
+             *  create view model in activity scope
+             */
+            viewModel = ViewModelProviders.of(it).get(MainViewModel::class.java)
+        }
         subscribeUi()
 
     }

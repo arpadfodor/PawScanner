@@ -8,6 +8,15 @@
     android:layout_height="match_parent"
     tools:context=".view.CameraFragment">
 
+    <TextView
+        android:id="@+id/tvLiveRecognitionData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorButtonText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <com.arpadfodor.android.paw_scanner.view.additional.AutoFitTextureView
         android:id="@+id/textureView"
         android:layout_width="match_parent"

@@ -14,9 +14,9 @@
 
     <fragment
         android:id="@+id/navigation_live"
-        android:name="com.arpadfodor.android.paw_scanner.view.ClassifierFragment"
+        android:name="com.arpadfodor.android.paw_scanner.view.CameraFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/classifier_fragment" />
+        tools:layout="@layout/camera_fragment" />
 
     <fragment
         android:id="@+id/navigation_load"
