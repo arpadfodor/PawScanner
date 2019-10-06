@@ -82,7 +82,7 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
     private val surfaceTextureListener = object : TextureView.SurfaceTextureListener {
 
         override fun onSurfaceTextureAvailable(texture: SurfaceTexture, width: Int, height: Int) {
-            prepareToOpenCamera(textureView.width, textureView.height)
+            openCamera(width, height)
         }
 
         override fun onSurfaceTextureSizeChanged(texture: SurfaceTexture, width: Int, height: Int) {
@@ -303,13 +303,12 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
     override fun onResume() {
 
         super.onResume()
-
         startBackgroundThread()
 
         // When the screen is turned off and turned back on, the SurfaceTexture is already available, and onSurfaceTextureAvailable will not be called
         // In that case, open a camera and start preview from here (otherwise, wait until the surface is ready in the SurfaceTextureListener)
         if (textureView.isAvailable) {
-            prepareToOpenCamera(textureView.width, textureView.height)
+            openCamera(textureView.width, textureView.height)
         } else {
             textureView.surfaceTextureListener = surfaceTextureListener
         }
@@ -355,18 +354,17 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
     }
 
     /**
-     * Prepares to open the camera
-     */
-    private fun prepareToOpenCamera(width: Int, height: Int) {
-        onPreviewSizeChosen()
-        configureTransform(width, height)
-        openCamera()
-    }
-
-    /**
      * Open the camera specified by cameraId
      */
-    private fun openCamera(){
+    private fun openCamera(width: Int, height: Int){
+
+        if(viewModel.cameraOpened){
+            return
+        }
+
+        viewModel.setUpCameras()
+        textureView.setAspectRatio(viewModel.textureViewSize)
+        configureTransform(width, height)
 
         val manager = viewModel.app.getSystemService(Context.CAMERA_SERVICE) as CameraManager
 
@@ -377,6 +375,8 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
             if(viewModel.app.applicationContext.checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED){
                 manager.openCamera(viewModel.availableCameras[viewModel.currentCameraIndex.value!!]!!, stateCallback, backgroundHandler)
             }
+
+            viewModel.cameraOpened = true
 
         } catch (e: CameraAccessException) {
         } catch (e: InterruptedException) {
@@ -403,6 +403,9 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
                 previewReader!!.close()
                 previewReader = null
             }
+
+            viewModel.cameraOpened = false
+
         } catch (e: InterruptedException) {
             throw RuntimeException("Interrupted while trying to lock camera closing", e)
         } finally {
@@ -415,6 +418,7 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
      */
     private fun startBackgroundThread() {
         backgroundThread = HandlerThread("ImageListener")
+        backgroundThread?: return
         backgroundThread!!.start()
         backgroundHandler = Handler(backgroundThread!!.looper)
     }

@@ -24,7 +24,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/kenBurnsView"
         app:layout_constraintStart_toStartOf="@+id/kenBurnsView"
         app:layout_constraintTop_toTopOf="@+id/kenBurnsView"
-        app:srcCompat="@drawable/paw_logo_small" />
+        app:srcCompat="@drawable/paw_scanner_small" />
 
     <TextView
         android:layout_width="match_parent"

@@ -2,6 +2,7 @@ package com.arpadfodor.android.paw_scanner.view.additional
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Size
 import android.view.TextureView
 import android.view.View
 
@@ -21,13 +22,12 @@ class AutoFitTextureView @JvmOverloads constructor(
      * calculated from the parameters. Note that the actual sizes of parameters don't matter, that is,
      * calling setAspectRatio(2, 3) and setAspectRatio(4, 6) make the same result.
      *
-     * @param width Relative horizontal size
-     * @param height Relative vertical size
+     * @param dimensions     Relative horizontal and vertical size
      */
-    fun setAspectRatio(width: Int, height: Int) {
-        require(!(width < 0 || height < 0)) { "Size cannot be negative." }
-        ratioWidth = width
-        ratioHeight = height
+    fun setAspectRatio(dimensions: Size) {
+        require(!(dimensions.width < 0 || dimensions.height < 0)) { "Size cannot be negative." }
+        ratioWidth = dimensions.width
+        ratioHeight = dimensions.height
         requestLayout()
     }
 

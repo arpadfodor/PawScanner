@@ -58,9 +58,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         setContentView(R.layout.main_activity)
 
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
         viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
         viewModel.init(windowManager.defaultDisplay.rotation)
-        subscribeUi()
+        //subscribeUi()
+
+        requestPermission()
 
         val navView: BottomNavigationView = findViewById(R.id.bottom_nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
@@ -91,7 +95,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             // Replace whatever is in the fragment_container view with this fragment,
             // and add the transaction to the back stack if needed
             transaction.replace(R.id.nav_host_fragment, newFragment)
-            transaction.addToBackStack(null)
             // Commit the transaction
             transaction.commit()
 
@@ -168,7 +171,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
      */
     private fun exitDialog(){
 
-        val exitDialog = CustomDialog(this, getString(R.string.confirm_exit), getString(R.string.confirm_exit_description), resources.getDrawable(R.drawable.warning))
+        val exitDialog = CustomDialog(this, getString(R.string.confirm_exit), getString(R.string.confirm_exit_description), resources.getDrawable(R.drawable.paw_icon))
         exitDialog.setPositiveButton {
             //showing the home screen - app is not visible but running
             val intent = Intent(Intent.ACTION_MAIN)

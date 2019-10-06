@@ -43,11 +43,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val DESIRED_PREVIEW_SIZE = Size(640, 480)
     var textureViewSize = Size(0,0)
     val MAINTAIN_ASPECT = true
-
     /**
      * The rotation in degrees of the camera sensor from the display
      */
     var sensorOrientation = 0
+    /**
+     * Is camera opened flag
+     */
+    var cameraOpened = false
 
     var availableCameras = arrayOfNulls<String>(0)
     var previewSize = Size(0,0)
@@ -116,14 +119,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         isInferenceFinished.value = true
         currentCameraIndex.value = 0
 
-        setUpCameras()
-
     }
 
     /**
      * Sets up member variables related to camera
      */
-    private fun setUpCameras() {
+    fun setUpCameras() {
 
         val manager = app.getSystemService(Context.CAMERA_SERVICE) as CameraManager
         availableCameras = manager.cameraIdList
@@ -262,8 +263,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 internal class CompareSizesByArea : Comparator<Size> {
     override fun compare(lhs: Size, rhs: Size): Int {
         //Cast to ensure the multiplications won't overflow
-        return java.lang.Long.signum(
-            lhs.width.toLong() * lhs.height - rhs.width.toLong() * rhs.height
-        )
+        return java.lang.Long.signum(lhs.width.toLong() * lhs.height - rhs.width.toLong() * rhs.height)
     }
 }

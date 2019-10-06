@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PawScanner</string>
+    <string name="app_name">Paw Scanner</string>
     <string name="title_home">Live</string>
     <string name="title_history">History</string>
     <string name="title_load">Load</string>
