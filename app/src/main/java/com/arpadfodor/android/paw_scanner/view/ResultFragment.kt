@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.arpadfodor.android.paw_scanner.R
-import com.arpadfodor.android.paw_scanner.viewmodel.ResultViewModel
+import com.arpadfodor.android.paw_scanner.viewmodel.MainViewModel
 
 class ResultFragment : Fragment() {
 
@@ -16,7 +16,7 @@ class ResultFragment : Fragment() {
         fun newInstance() = ResultFragment()
     }
 
-    private lateinit var viewModel: ResultViewModel
+    private lateinit var viewModel: MainViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -25,9 +25,17 @@ class ResultFragment : Fragment() {
         return inflater.inflate(R.layout.result_fragment, container, false)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(ResultViewModel::class.java)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        super.onViewCreated(view, savedInstanceState)
+
+        activity?.let {
+            /**
+             *  create view model in activity scope
+             */
+            viewModel = ViewModelProviders.of(it).get(MainViewModel::class.java)
+        }
+
         // TODO: Use the ViewModel
     }
 

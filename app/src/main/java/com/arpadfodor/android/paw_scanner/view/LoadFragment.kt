@@ -64,6 +64,7 @@ class LoadFragment : Fragment(), View.OnClickListener {
     }
 
     private fun subscribeUi() {
+
         // Create the image observer which updates the UI in case of an image change
         val imageObserver = Observer<Bitmap> { newImage ->
             // Update the UI, in this case, the ImageView
@@ -84,20 +85,21 @@ class LoadFragment : Fragment(), View.OnClickListener {
         }
         // Observe the LiveData, passing in this viewLifeCycleOwner as the LifecycleOwner and the observer
         viewModel.result.observe(viewLifecycleOwner, recognitionObserver)
+
     }
 
     private fun loadImage(){
-        //Create an Intent with action as ACTION_PICK
+        // Create an Intent with action as ACTION_PICK
         val intent = Intent(Intent.ACTION_PICK)
         // Sets the type as image/*. This ensures only components of type image are selected
         intent.type = "image/*"
-        //We pass an extra array with the accepted mime types. This will ensure only components with these MIME types as targeted.
+        // Pass an extra array with the accepted mime types. This will ensure only components with these MIME types as targeted.
         var mimeTypes = ArrayList<String>()
         mimeTypes.add("image/jpeg")
         mimeTypes.add("image/png")
 
         intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
-        // Launching the Intent
+        // Launch the Intent
         startActivityForResult(intent, GALLERY_REQUEST_CODE)
     }
 

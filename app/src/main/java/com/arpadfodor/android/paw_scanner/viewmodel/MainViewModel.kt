@@ -2,35 +2,28 @@ package com.arpadfodor.android.paw_scanner.viewmodel
 
 import android.app.Application
 import android.graphics.Bitmap
-import android.os.SystemClock
 import android.util.Size
 import android.view.Surface
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.arpadfodor.android.paw_scanner.model.Classifier
 import com.arpadfodor.android.paw_scanner.model.ClassifierFloatMobileNet
 import com.arpadfodor.android.paw_scanner.model.Device
 import com.arpadfodor.android.paw_scanner.model.Recognition
-import kotlinx.coroutines.launch
-import android.os.AsyncTask
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import android.os.Handler
-import android.os.Looper
-import androidx.annotation.UiThread
-import android.R
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.res.Configuration
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
-import android.widget.TextView
-import com.arpadfodor.android.paw_scanner.view.CameraFragment
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import java.io.ByteArrayOutputStream
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.max
 import kotlin.math.min
-
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -43,24 +36,31 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val DESIRED_PREVIEW_SIZE = Size(640, 480)
     var textureViewSize = Size(0,0)
     val MAINTAIN_ASPECT = true
+
     /**
      * The rotation in degrees of the camera sensor from the display
      */
     var sensorOrientation = 0
+
     /**
      * Is camera opened flag
      */
     var cameraOpened = false
 
+    /*
+     * Whether inference has finished or not
+     */
+    var isInferenceFinished = true
+
     var availableCameras = arrayOfNulls<String>(0)
     var previewSize = Size(0,0)
+
+    lateinit var recognitionResultReceiver: BroadcastReceiver
 
     /*
      * The Classifier
      */
-    val classifier: MutableLiveData<Classifier> by lazy {
-        MutableLiveData<Classifier>()
-    }
+    lateinit var classifier: Classifier
 
     /*
      * The classifier input size
@@ -74,13 +74,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      */
     val result: MutableLiveData<List<Recognition>> by lazy {
         MutableLiveData<List<Recognition>>()
-    }
-
-    /*
-     * Whether inference has finished or not
-     */
-    val isInferenceFinished: MutableLiveData<Boolean> by lazy {
-        MutableLiveData<Boolean>()
     }
 
     /*
@@ -113,11 +106,41 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun init(parentScreenOrientation: Int){
 
-        classifier.value = ClassifierFloatMobileNet(app.assets, Device.CPU, 1)
-        classifierInputSize.value = Size(classifier.value ?.getImageSizeX() ?: 0, classifier.value?. getImageSizeY() ?: 0)
+        classifier = ClassifierFloatMobileNet(app.assets, Device.CPU, 1)
+        classifierInputSize.value = Size(classifier .getImageSizeX(), classifier. getImageSizeY())
         rotation.value = parentScreenOrientation
-        isInferenceFinished.value = true
+        isInferenceFinished = true
         currentCameraIndex.value = 0
+
+        recognitionResultReceiver = object : BroadcastReceiver(){
+
+            override fun onReceive(context: Context, intent: Intent) {
+
+                inferenceTime.value = intent.getLongExtra("inferenceTime", 0)
+                val sizeOfResults = intent.getIntExtra("numberOfRecognitions", 0)
+
+                val results = arrayListOf<Recognition>()
+
+                for(index in 0 until sizeOfResults){
+
+                    val id = intent.getStringExtra("recognition-id-$index")
+                    val title = intent.getStringExtra("recognition-title-$index")
+                    val confidence = intent.getFloatExtra("recognition-confidence-$index", 0f)
+
+                    results.add(Recognition(id, title, confidence, null))
+
+                }
+
+                result.value = results
+                isInferenceFinished = true
+
+            }
+
+        }
+
+        LocalBroadcastManager.getInstance(app.applicationContext).registerReceiver(
+            recognitionResultReceiver, IntentFilter("InferenceResult")
+        )
 
     }
 
@@ -140,10 +163,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         //Fit the aspect ratio of TextureView to the size of preview picked
         val orientation = app.resources.configuration.orientation
 
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            textureViewSize = Size(previewSize.width, previewSize.height)
+        textureViewSize = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            Size(previewSize.width, previewSize.height)
         } else {
-            textureViewSize = Size(previewSize.height, previewSize.width)
+            Size(previewSize.height, previewSize.width)
         }
 
     }
@@ -215,31 +238,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun recognizeLiveImage(bitmap: Bitmap?){
         bitmap?: return
-        //recognizeImage(bitmap)
+        recognizeImage(bitmap)
     }
 
     private fun recognizeImage(bitmap: Bitmap){
 
-        if(isInferenceFinished.value == false){
+        if(isInferenceFinished == false){
             return
         }
 
-        // Get a handler that can be used to post to the main thread
-        val mainHandler = Handler(Looper.getMainLooper())
+        isInferenceFinished = false
 
-        val myRunnable = Runnable {
-
-            isInferenceFinished.value = false
-
-            val startTime = SystemClock.uptimeMillis()
-            result.value = classifier.value?.recognizeImage(bitmap)
-            inferenceTime.value = SystemClock.uptimeMillis() - startTime
-
-            isInferenceFinished.value = true
-
-        }
-
-        mainHandler.post(myRunnable)
+        val intent = Intent(app.applicationContext, InferenceService::class.java)
+        val bs = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 50, bs)
+        intent.putExtra("byteArray", bs.toByteArray())
+        app.applicationContext.startService(intent)
 
     }
 

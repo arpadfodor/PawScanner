@@ -541,14 +541,9 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
     fun processImage() {
 
         rgbFrameBitmap?.setPixels(getRgbBytes(), 0, viewModel.previewSize.width, 0, 0, viewModel.previewSize.width, viewModel.previewSize.height)
-
         val canvas = Canvas(croppedBitmap!!)
         canvas.drawBitmap(rgbFrameBitmap!!, frameToCropTransform!!, null)
-
-        if(viewModel.isInferenceFinished.value == true){
-            viewModel.recognizeLiveImage(croppedBitmap)
-        }
-
+        viewModel.recognizeLiveImage(croppedBitmap)
         readyForNextImage()
 
     }

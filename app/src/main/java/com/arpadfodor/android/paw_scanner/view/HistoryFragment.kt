@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.arpadfodor.android.paw_scanner.R
-import com.arpadfodor.android.paw_scanner.viewmodel.HistoryViewModel
+import com.arpadfodor.android.paw_scanner.viewmodel.MainViewModel
 
 class HistoryFragment : Fragment() {
 
@@ -16,7 +16,7 @@ class HistoryFragment : Fragment() {
         fun newInstance() = HistoryFragment()
     }
 
-    private lateinit var viewModel: HistoryViewModel
+    private lateinit var viewModel: MainViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -25,9 +25,17 @@ class HistoryFragment : Fragment() {
         return inflater.inflate(R.layout.history_fragment, container, false)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(HistoryViewModel::class.java)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        super.onViewCreated(view, savedInstanceState)
+
+        activity?.let {
+            /**
+             *  create view model in activity scope
+             */
+            viewModel = ViewModelProviders.of(it).get(MainViewModel::class.java)
+        }
+
         // TODO: Use the ViewModel
     }
 

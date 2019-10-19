@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val navView: BottomNavigationView = findViewById(R.id.bottom_nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
-        //Passing each menu Id as a set of Ids because each menu should be considered as top level destinations
+        //Passing each menu Id as a set of Ids because each menu should be considered as top level destination
         val appBarConfiguration = AppBarConfiguration(
             setOf(R.id.navigation_history, R.id.navigation_live, R.id.navigation_load)
         )
