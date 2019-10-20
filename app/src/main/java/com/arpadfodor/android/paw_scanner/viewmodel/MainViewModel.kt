@@ -18,6 +18,7 @@ import android.content.res.Configuration
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
+import android.os.SystemClock
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import java.io.ByteArrayOutputStream
 import java.util.*
@@ -28,6 +29,11 @@ import kotlin.math.min
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     var app: Application = application
+
+    /**
+     * The rotation in degrees of the camera sensor from the display
+     */
+    val SAVE_IMAGE_BASENAME = app.applicationInfo.name
 
     /**
      * The camera preview size will be chosen to be the smallest frame by pixel size capable of containing a DESIRED_SIZE x DESIRED_SIZE square
@@ -43,6 +49,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     var sensorOrientation = 0
 
     /**
+     * Whether the current camera device supports Flash or not
+     */
+    var flashSupported = false
+
+    /**
      * Is camera opened flag
      */
     var cameraOpened = false
@@ -51,6 +62,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      * Whether inference has finished or not
      */
     var isInferenceFinished = true
+
+    /*
+     * Whether live inference is enabled or not
+     */
+    var liveInferenceEnabled = false
+
+    /*
+     * Whether load inference is enabled or not
+     */
+    var loadInferenceEnabled = false
 
     var availableCameras = arrayOfNulls<String>(0)
     var previewSize = Size(0,0)
@@ -70,9 +91,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /*
-     * Last classification result
+     * Last live classification result
      */
-    val result: MutableLiveData<List<Recognition>> by lazy {
+    val liveResult: MutableLiveData<List<Recognition>> by lazy {
+        MutableLiveData<List<Recognition>>()
+    }
+
+    /*
+     * Last LOAD classification result
+     */
+    val loadResult: MutableLiveData<List<Recognition>> by lazy {
         MutableLiveData<List<Recognition>>()
     }
 
@@ -131,7 +159,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
                 }
 
-                result.value = results
+                liveResult.value = results
                 isInferenceFinished = true
 
             }
@@ -155,6 +183,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val characteristics = manager.getCameraCharacteristics(availableCameras[currentCameraIndex.value!!]!!)
         val map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
         sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION)!!
+
+        // Check if the flash is supported
+        flashSupported = characteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE) == true
+
 
         // Attempting to use too large a preview size could exceed camera bus bandwidth limitation
         // Can result in gorgeous previews but the storage of garbage capture data
@@ -232,18 +264,34 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun recognizeLoadedImage(){
+
+        if(!loadInferenceEnabled){
+            return
+        }
         loadedImage.value?: return
-        recognizeImage(loadedImage.value!!)
+
+        //recognizeImage(loadedImage.value!!)
+
+        val startTime = SystemClock.uptimeMillis()
+        loadResult.value = classifier.recognizeImage(loadedImage.value!!)
+        inferenceTime.value = SystemClock.uptimeMillis() - startTime
+
     }
 
     fun recognizeLiveImage(bitmap: Bitmap?){
+
+        if(!liveInferenceEnabled){
+            return
+        }
         bitmap?: return
+
         recognizeImage(bitmap)
+
     }
 
     private fun recognizeImage(bitmap: Bitmap){
 
-        if(isInferenceFinished == false){
+        if(!isInferenceFinished){
             return
         }
 
@@ -267,6 +315,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             Surface.ROTATION_90 -> 90
             else -> 0
         }
+    }
+
+    fun activateLiveMode(){
+        loadInferenceEnabled = false
+        liveInferenceEnabled = true
+        isInferenceFinished = true
+    }
+
+    fun activateLoadMode(){
+        liveInferenceEnabled = false
+        loadInferenceEnabled = true
+        isInferenceFinished = true
+    }
+
+    fun disableInference(){
+        liveInferenceEnabled = false
+        loadInferenceEnabled = false
+        isInferenceFinished = false
     }
 
 }

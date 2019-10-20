@@ -18,6 +18,7 @@ import android.view.MenuItem
 import android.view.Surface
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.annotation.NonNull
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.Toolbar
@@ -45,6 +46,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private lateinit var viewModel: MainViewModel
 
+    val cameraFragment = CameraFragment.newInstance()
+    val loadFragment = LoadFragment.newInstance()
+    val historyFragment = HistoryFragment.newInstance()
+    lateinit var activeFragment: Fragment
+    val fm = supportFragmentManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -66,14 +73,45 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         requestPermission()
 
+        activeFragment = cameraFragment
+        viewModel.activateLiveMode()
         val navView: BottomNavigationView = findViewById(R.id.bottom_nav_view)
-        val navController = findNavController(R.id.nav_host_fragment)
-        //Passing each menu Id as a set of Ids because each menu should be considered as top level destination
-        val appBarConfiguration = AppBarConfiguration(
-            setOf(R.id.navigation_history, R.id.navigation_live, R.id.navigation_load)
-        )
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
+
+        fm.beginTransaction().add(R.id.nav_host_layout, historyFragment, "3").hide(historyFragment).commit()
+        fm.beginTransaction().add(R.id.nav_host_layout, loadFragment, "2").hide(loadFragment).commit()
+        fm.beginTransaction().add(R.id.nav_host_layout, cameraFragment, "1").commit()
+
+        navView.setOnNavigationItemSelectedListener {
+
+            when(it.itemId) {
+
+                R.id.navigation_live -> {
+                    fm.beginTransaction().hide(activeFragment).show(cameraFragment).commit()
+                    activeFragment = cameraFragment
+                    viewModel.activateLiveMode()
+                    true
+                }
+
+                R.id.navigation_load -> {
+                    fm.beginTransaction().hide(activeFragment).show(loadFragment).commit()
+                    activeFragment = loadFragment
+                    viewModel.activateLoadMode()
+                    true
+                }
+
+                R.id.navigation_history -> {
+                    fm.beginTransaction().hide(activeFragment).show(historyFragment).commit()
+                    activeFragment = historyFragment
+                    viewModel.disableInference()
+                    true
+                }
+
+                else -> {
+                    false
+                }
+            }
+
+        }
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         val toggle = ActionBarDrawerToggle(this, mainActivityDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
@@ -94,7 +132,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             val transaction = supportFragmentManager.beginTransaction()
             // Replace whatever is in the fragment_container view with this fragment,
             // and add the transaction to the back stack if needed
-            transaction.replace(R.id.nav_host_fragment, newFragment)
+            transaction.replace(R.id.nav_host_layout, newFragment)
             // Commit the transaction
             transaction.commit()
 
@@ -148,7 +186,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
         val transaction = supportFragmentManager.beginTransaction().apply {
-            replace(R.id.nav_host_fragment, fragmentToStart)
+            replace(R.id.nav_host_layout, fragmentToStart)
         }
         // Commit the transaction
         transaction.commit()

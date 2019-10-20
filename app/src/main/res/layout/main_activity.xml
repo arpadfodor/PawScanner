@@ -19,13 +19,10 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:openDrawer="start">
 
-        <fragment
-            android:id="@+id/nav_host_fragment"
-            android:name="androidx.navigation.fragment.NavHostFragment"
+        <include
+            layout="@layout/nav_host_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:defaultNavHost="true"
-            app:navGraph="@navigation/mobile_navigation" />
+            android:layout_height="match_parent"/>
 
         <com.google.android.material.navigation.NavigationView
             android:id="@+id/dashboard_navigation"
@@ -50,7 +47,7 @@
         android:layout_marginEnd="0dp"
         app:itemIconTint="@color/colorButtonText"
         app:itemTextColor="@color/colorButtonText"
-        app:itemBackground="@color/colorPrimary"
+        app:itemBackground="@color/colorGray"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

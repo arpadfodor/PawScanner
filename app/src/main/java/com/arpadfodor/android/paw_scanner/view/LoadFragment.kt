@@ -84,7 +84,7 @@ class LoadFragment : Fragment(), View.OnClickListener {
             textView.text = resultText
         }
         // Observe the LiveData, passing in this viewLifeCycleOwner as the LifecycleOwner and the observer
-        viewModel.result.observe(viewLifecycleOwner, recognitionObserver)
+        viewModel.loadResult.observe(viewLifecycleOwner, recognitionObserver)
 
     }
 

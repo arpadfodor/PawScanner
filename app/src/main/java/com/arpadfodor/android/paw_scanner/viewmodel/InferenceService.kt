@@ -14,17 +14,13 @@ class InferenceService : IntentService("InferenceService") {
     lateinit var classifier: ClassifierFloatMobileNet
 
     override fun onCreate() {
-
         super.onCreate()
         classifier = ClassifierFloatMobileNet(application.assets, Device.CPU, 1)
-
     }
 
     override fun onHandleIntent(intent: Intent?) {
 
         intent?: return
-
-        classifier = ClassifierFloatMobileNet(application.assets, Device.CPU, 1)
 
         if (intent.hasExtra("byteArray")) {
 
