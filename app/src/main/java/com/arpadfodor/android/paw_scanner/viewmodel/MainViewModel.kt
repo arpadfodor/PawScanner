@@ -20,6 +20,7 @@ import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import android.os.SystemClock
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.arpadfodor.android.paw_scanner.R
 import java.io.ByteArrayOutputStream
 import java.util.*
 import kotlin.collections.ArrayList
@@ -33,7 +34,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * The rotation in degrees of the camera sensor from the display
      */
-    val SAVE_IMAGE_BASENAME = app.applicationInfo.name
+    val SAVE_IMAGE_BASENAME = app.resources.getString(R.string.app_name)
 
     /**
      * The camera preview size will be chosen to be the smallest frame by pixel size capable of containing a DESIRED_SIZE x DESIRED_SIZE square

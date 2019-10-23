@@ -28,8 +28,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="16dp"
-        android:src="@drawable/paw_icon"
         android:backgroundTint="@color/colorAccent"
+        android:src="@drawable/paw_icon"
+        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/glCenter"
         app:layout_constraintStart_toStartOf="parent" />
@@ -42,6 +43,7 @@
         android:layout_margin="16dp"
         android:backgroundTint="@color/colorSecondaryButton"
         android:src="@drawable/logo_load"
+        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/glCenter" />

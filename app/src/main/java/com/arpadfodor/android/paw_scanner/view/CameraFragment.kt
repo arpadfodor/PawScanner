@@ -26,6 +26,8 @@ import com.arpadfodor.android.paw_scanner.viewmodel.ImageSaver
 import com.arpadfodor.android.paw_scanner.viewmodel.MainViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
@@ -722,12 +724,17 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
 
         try {
 
-            if (activity == null || cameraDevice == null){
+            if (activity == null || cameraDevice == null) {
                 return
             }
 
-            val imageToSaveName = viewModel.SAVE_IMAGE_BASENAME + System.currentTimeMillis() + Random(123).nextInt(5)
-            file = File(activity?.getExternalFilesDir(null), imageToSaveName)
+            val df = SimpleDateFormat("yyyy-MM-dd_HH:mm:ss")
+            val formattedDate = df.format(Calendar.getInstance().time)
+
+            val imagesToSaveDir = Environment.DIRECTORY_DCIM + File.separator + viewModel.SAVE_IMAGE_BASENAME
+            val imageToSaveName = viewModel.SAVE_IMAGE_BASENAME + "_" + formattedDate + "_" + Random(123).nextInt(3)
+
+            file = File(imagesToSaveDir, imageToSaveName)
 
             // This is the CaptureRequest.Builder that is used to take a picture
             val captureBuilder = cameraDevice?.createCaptureRequest(
@@ -748,8 +755,7 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
             val captureCallback = object : CameraCaptureSession.CaptureCallback() {
 
                 override fun onCaptureCompleted(session: CameraCaptureSession, request: CaptureRequest, result: TotalCaptureResult) {
-                    //viewModel.imageSaveEvent.value = true
-                    Toast.makeText(viewModel.app.applicationContext, imageToSaveName + " saved.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(viewModel.app.applicationContext, "$imageToSaveName saved to $imagesToSaveDir", Toast.LENGTH_LONG).show()
                     unlockFocus()
                 }
 
