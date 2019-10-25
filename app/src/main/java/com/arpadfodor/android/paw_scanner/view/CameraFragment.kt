@@ -336,7 +336,7 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
             classifierInputSize.width,
             classifierInputSize.height,
             viewModel.sensorOrientation,
-            viewModel.MAINTAIN_ASPECT
+            MainViewModel.MAINTAIN_ASPECT
         )
 
         cropToFrameTransform = Matrix()
@@ -731,8 +731,8 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
             val df = SimpleDateFormat("yyyy-MM-dd_HH:mm:ss")
             val formattedDate = df.format(Calendar.getInstance().time)
 
-            val imagesToSaveDir = Environment.DIRECTORY_DCIM + File.separator + viewModel.SAVE_IMAGE_BASENAME
-            val imageToSaveName = viewModel.SAVE_IMAGE_BASENAME + "_" + formattedDate + "_" + Random(123).nextInt(3)
+            val imagesToSaveDir = Environment.DIRECTORY_DCIM + File.separator + viewModel.saveImageBasename
+            val imageToSaveName = viewModel.saveImageBasename + "_" + formattedDate + "_" + Random(123).nextInt(3)
 
             file = File(imagesToSaveDir, imageToSaveName)
 

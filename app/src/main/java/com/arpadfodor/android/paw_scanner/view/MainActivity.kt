@@ -75,13 +75,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         activeFragment = cameraFragment
         viewModel.activateLiveMode()
-        val navView: BottomNavigationView = findViewById(R.id.bottom_nav_view)
+
+        val bottomNavView: BottomNavigationView = findViewById(R.id.bottom_nav_view)
+
+        //due to an Android bug, setting clip to outline cannot be done from XML
+        bottomNavView.clipToOutline = true
 
         fm.beginTransaction().add(R.id.nav_host_layout, historyFragment, "3").hide(historyFragment).commit()
         fm.beginTransaction().add(R.id.nav_host_layout, loadFragment, "2").hide(loadFragment).commit()
         fm.beginTransaction().add(R.id.nav_host_layout, cameraFragment, "1").commit()
 
-        navView.setOnNavigationItemSelectedListener {
+        bottomNavView.setOnNavigationItemSelectedListener {
 
             when(it.itemId) {
 
@@ -120,25 +124,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         dashboard_navigation.setNavigationItemSelectedListener(this)
         val navigationView = findViewById<NavigationView>(R.id.dashboard_navigation)
         val header = navigationView?.getHeaderView(0)
-
-    }
-
-    private fun subscribeUi() {
-
-        // Create the camera index observer
-        val cameraIndexObserver = Observer<Int> { result ->
-
-            val newFragment = CameraFragment()
-            val transaction = supportFragmentManager.beginTransaction()
-            // Replace whatever is in the fragment_container view with this fragment,
-            // and add the transaction to the back stack if needed
-            transaction.replace(R.id.nav_host_layout, newFragment)
-            // Commit the transaction
-            transaction.commit()
-
-        }
-        // Observe the LiveData, passing in this viewLifeCycleOwner as the LifecycleOwner and the observer
-        viewModel.currentCameraIndex.observe(this, cameraIndexObserver)
 
     }
 
@@ -209,7 +194,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
      */
     private fun exitDialog(){
 
-        val exitDialog = CustomDialog(this, getString(R.string.confirm_exit), getString(R.string.confirm_exit_description), resources.getDrawable(R.drawable.paw_icon))
+        val exitDialog = CustomDialog(this, getString(R.string.confirm_exit), getString(R.string.confirm_exit_description), resources.getDrawable(R.drawable.paw))
         exitDialog.setPositiveButton {
             //showing the home screen - app is not visible but running
             val intent = Intent(Intent.ACTION_MAIN)

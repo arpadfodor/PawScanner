@@ -29,20 +29,27 @@ import kotlin.math.min
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
+    companion object{
+        const val MINIMUM_PREVIEW_SIZE = 320
+        const val MAINTAIN_ASPECT = true
+    }
+
     var app: Application = application
 
     /**
      * The rotation in degrees of the camera sensor from the display
      */
-    val SAVE_IMAGE_BASENAME = app.resources.getString(R.string.app_name)
+    val saveImageBasename = app.resources.getString(R.string.app_name)
 
     /**
      * The camera preview size will be chosen to be the smallest frame by pixel size capable of containing a DESIRED_SIZE x DESIRED_SIZE square
      */
-    val MINIMUM_PREVIEW_SIZE = 320
-    val DESIRED_PREVIEW_SIZE = Size(640, 480)
     var textureViewSize = Size(0,0)
-    val MAINTAIN_ASPECT = true
+
+    /**
+     * The desired camera preview size
+     */
+    val desiredPreviewSize = Size(640, 480)
 
     /**
      * The rotation in degrees of the camera sensor from the display
@@ -342,8 +349,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
  * Compares two Sizes based on their areas
  */
 internal class CompareSizesByArea : Comparator<Size> {
+
     override fun compare(lhs: Size, rhs: Size): Int {
         //Cast to ensure the multiplications won't overflow
         return java.lang.Long.signum(lhs.width.toLong() * lhs.height - rhs.width.toLong() * rhs.height)
     }
+
 }

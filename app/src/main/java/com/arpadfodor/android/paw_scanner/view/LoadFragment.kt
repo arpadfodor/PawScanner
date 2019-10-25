@@ -46,6 +46,9 @@ class LoadFragment : Fragment(), View.OnClickListener {
         textView = view.findViewById(R.id.tvRecognitionData)
         floatingActionButtonUpload = view.findViewById(R.id.fabUpload)
 
+        //due to an Android bug, setting clip to outline cannot be done from XML
+        imageView.clipToOutline = true
+
         activity?.let {
             /**
              *  create view model in activity scope
@@ -89,23 +92,28 @@ class LoadFragment : Fragment(), View.OnClickListener {
     }
 
     private fun loadImage(){
+
         // Create an Intent with action as ACTION_PICK
         val intent = Intent(Intent.ACTION_PICK)
         // Sets the type as image/*. This ensures only components of type image are selected
         intent.type = "image/*"
+
         // Pass an extra array with the accepted mime types. This will ensure only components with these MIME types as targeted.
-        var mimeTypes = ArrayList<String>()
+        val mimeTypes = ArrayList<String>()
         mimeTypes.add("image/jpeg")
         mimeTypes.add("image/png")
 
         intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
         // Launch the Intent
         startActivityForResult(intent, GALLERY_REQUEST_CODE)
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
         // Result code is RESULT_OK only if the user has selected an Image
-        if (resultCode == Activity.RESULT_OK)
+        if (resultCode == Activity.RESULT_OK) {
+
             when (requestCode) {
                 GALLERY_REQUEST_CODE -> {
                     //data.getData returns the content URI for the selected Image
@@ -115,14 +123,19 @@ class LoadFragment : Fragment(), View.OnClickListener {
                     viewModel.recognizeLoadedImage()
                 }
             }
+
+        }
+
     }
 
     override fun onClick(v: View) {
+
         when(v.id){
             R.id.fabUpload ->{
                 loadImage()
             }
         }
+
     }
 
 }
