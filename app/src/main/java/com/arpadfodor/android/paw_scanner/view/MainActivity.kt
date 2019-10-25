@@ -17,6 +17,7 @@ import android.util.Size
 import android.view.MenuItem
 import android.view.Surface
 import android.view.WindowManager
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.NonNull
 import androidx.appcompat.app.ActionBar
@@ -31,10 +32,12 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.arpadfodor.android.paw_scanner.R
+import com.arpadfodor.android.paw_scanner.model.Recognition
 import com.arpadfodor.android.paw_scanner.view.additional.CustomDialog
 import com.arpadfodor.android.paw_scanner.viewmodel.MainViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
+import kotlinx.android.synthetic.main.custom_app_bar.*
 import kotlinx.android.synthetic.main.main_activity.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -52,6 +55,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     lateinit var activeFragment: Fragment
     val fm = supportFragmentManager
 
+    private lateinit var textViewGreatestProbability: TextView
+    private lateinit var textViewSmallerProbabilities: TextView
+    private lateinit var textViewInferenceDuration: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -59,17 +66,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         //Remove notification bar
         this.window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
 
-        supportActionBar?.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
-        supportActionBar?.setDisplayShowCustomEnabled(true)
-        supportActionBar?.setCustomView(R.layout.custom_app_bar)
-
         setContentView(R.layout.main_activity)
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
         viewModel.init(windowManager.defaultDisplay.rotation)
-        //subscribeUi()
+        subscribeToViewModel()
 
         requestPermission()
 
@@ -106,7 +109,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 R.id.navigation_history -> {
                     fm.beginTransaction().hide(activeFragment).show(historyFragment).commit()
                     activeFragment = historyFragment
-                    viewModel.disableInference()
+                    viewModel.activateHistoryMode()
                     true
                 }
 
@@ -118,12 +121,34 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+
+        textViewGreatestProbability = findViewById(R.id.tvGreatestProbability)
+        textViewSmallerProbabilities = findViewById(R.id.tvSmallerProbabilities)
+        textViewInferenceDuration = findViewById(R.id.tvInferenceDuration)
+
         val toggle = ActionBarDrawerToggle(this, mainActivityDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         mainActivityDrawerLayout.addDrawerListener(toggle)
         toggle.syncState()
         dashboard_navigation.setNavigationItemSelectedListener(this)
         val navigationView = findViewById<NavigationView>(R.id.dashboard_navigation)
         val header = navigationView?.getHeaderView(0)
+
+    }
+
+    private fun subscribeToViewModel() {
+
+        // Create the text observer which updates the UI in case of an inference result
+        val liveRecognitionObserver = Observer<List<String>> { result ->
+            // Update the UI, in this case, the TextViews
+            textViewInferenceDuration.text = result[0]
+            textViewGreatestProbability.text = result[1]
+            textViewSmallerProbabilities.text = result[2]
+        }
+        // Observe the LiveData
+        viewModel.currentDataToShow.observe(this, liveRecognitionObserver)
 
     }
 

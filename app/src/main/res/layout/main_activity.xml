@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/mainActivityLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_below= "@+id/valami"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     android:background="@color/colorPrimaryDark"
     tools:context=".view.MainActivity">
+
+    <TextureView
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:id="@+id/toolbarPlaceholder"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/mainActivityDrawerLayout"
@@ -16,7 +26,7 @@
         app:layout_constraintBottom_toTopOf="@+id/bottom_nav_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbarPlaceholder"
         tools:openDrawer="start">
 
         <include
@@ -54,5 +64,19 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:menu="@menu/bottom_nav_menu" />
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/mainActivityLayout"
+            android:fitsSystemWindows="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <include
+                layout="@layout/custom_app_bar"
+                android:id="@+id/valami"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

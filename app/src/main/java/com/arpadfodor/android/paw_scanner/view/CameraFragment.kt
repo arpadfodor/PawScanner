@@ -248,10 +248,7 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
      * An AutoFitTextureView for camera preview
      */
     private lateinit var textureView: AutoFitTextureView
-    /**
-     * A TextView to display live inference data
-     */
-    private lateinit var textView: TextView
+
     /**
      * A FloatingActionButton to switch camera
      */
@@ -290,10 +287,8 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
              */
             viewModel = ViewModelProviders.of(it).get(MainViewModel::class.java)
         }
-        subscribeUi()
 
         textureView = view.findViewById<TextureView>(R.id.textureView) as AutoFitTextureView
-        textView = view.findViewById(R.id.tvLiveRecognitionData)
         floatingActionButtonSwitch = view.findViewById(R.id.fabSwitch)
         floatingActionButtonSave = view.findViewById(R.id.fabSave)
 
@@ -303,23 +298,6 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
         floatingActionButtonSave.setOnClickListener {
             this.onClick(floatingActionButtonSave)
         }
-
-    }
-
-    private fun subscribeUi() {
-
-        // Create the text observer which updates the UI in case of text change
-        val recognitionObserver = Observer<List<Recognition>> { result ->
-            // Update the UI, in this case, the TextView
-            var resultText = ""
-            for(recognition in result){
-                resultText += recognition
-                resultText += "\n"
-            }
-            textView.text = resultText
-        }
-        // Observe the LiveData, passing in this viewLifeCycleOwner as the LifecycleOwner and the observer
-        viewModel.liveResult.observe(viewLifecycleOwner, recognitionObserver)
 
     }
 

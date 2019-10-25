@@ -8,6 +8,9 @@
     <string name="title_tips">Tips</string>
     <string name="title_breeds">Breeds</string>
 
+    <string name="predictions">Predictions\n</string>
+    <string name="inference_duration">Duration\n%1$d [ms]</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 

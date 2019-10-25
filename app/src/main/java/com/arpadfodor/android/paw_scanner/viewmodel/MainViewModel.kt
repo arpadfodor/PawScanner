@@ -81,6 +81,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      */
     var loadInferenceEnabled = false
 
+    /*
+     * Whether history inference is enabled or not
+     */
+    var historyInferenceEnabled = false
+
     var availableCameras = arrayOfNulls<String>(0)
     var previewSize = Size(0,0)
 
@@ -92,10 +97,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     lateinit var classifier: Classifier
 
     /*
-     * The classifier input size
+     * Current data to show
+     * [0]: inference duration
+     * [1]: most probable recognition info
+     * [2]: whole prediction info
      */
-    val classifierInputSize: MutableLiveData<Size> by lazy {
-        MutableLiveData<Size>()
+    val currentDataToShow: MutableLiveData<List<String>> by lazy {
+        MutableLiveData<List<String>>()
     }
 
     /*
@@ -106,16 +114,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /*
-     * Last LOAD classification result
+     * Last load classification result
      */
     val loadResult: MutableLiveData<List<Recognition>> by lazy {
         MutableLiveData<List<Recognition>>()
     }
 
     /*
-     * Last inference time in milliseconds
+     * Last live inference time in milliseconds
      */
-    val inferenceTime: MutableLiveData<Long> by lazy {
+    val lastLiveInferenceDuration: MutableLiveData<Long> by lazy {
+        MutableLiveData<Long>()
+    }
+
+    /*
+     * Last load inference time in milliseconds
+     */
+    val lastLoadInferenceDuration: MutableLiveData<Long> by lazy {
         MutableLiveData<Long>()
     }
 
@@ -124,6 +139,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      */
     val loadedImage: MutableLiveData<Bitmap> by lazy {
         MutableLiveData<Bitmap>()
+    }
+
+    /*
+     * The classifier input size
+     */
+    val classifierInputSize: MutableLiveData<Size> by lazy {
+        MutableLiveData<Size>()
     }
 
     /*
@@ -152,7 +174,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
             override fun onReceive(context: Context, intent: Intent) {
 
-                inferenceTime.value = intent.getLongExtra("inferenceTime", 0)
+                lastLiveInferenceDuration.value = intent.getLongExtra("inferenceTime", 0)
                 val sizeOfResults = intent.getIntExtra("numberOfRecognitions", 0)
 
                 val results = arrayListOf<Recognition>()
@@ -169,6 +191,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
                 liveResult.value = results
                 isInferenceFinished = true
+
+                //notify the activity to show results
+                updateCurrentInfo(lastLiveInferenceDuration.value, liveResult.value)
 
             }
 
@@ -282,7 +307,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         val startTime = SystemClock.uptimeMillis()
         loadResult.value = classifier.recognizeImage(loadedImage.value!!)
-        inferenceTime.value = SystemClock.uptimeMillis() - startTime
+        lastLoadInferenceDuration.value = SystemClock.uptimeMillis() - startTime
+
+        //notify the activity to show results
+        updateCurrentInfo(lastLoadInferenceDuration.value, loadResult.value)
 
     }
 
@@ -313,6 +341,37 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     }
 
+    private fun updateCurrentInfo(duration: Long?, result: List<Recognition>?){
+
+        val dataToInsert = arrayListOf<String>()
+
+        if(duration == null || result == null || result.isEmpty()){
+            dataToInsert.add("")
+            dataToInsert.add("")
+            dataToInsert.add("")
+            currentDataToShow.value = dataToInsert
+            return
+        }
+
+        //inference duration
+        dataToInsert.add(app.getString(R.string.inference_duration, duration))
+
+        //most possible result
+        dataToInsert.add(result[0].toString())
+
+        var predictions = app.getString(R.string.predictions)
+
+        //other results
+        for(i in (result.size-1) downTo 0){
+            predictions += result[i].toString() + "\n"
+        }
+
+        dataToInsert.add(predictions)
+
+        currentDataToShow.value = dataToInsert
+
+    }
+
     /**
      * Conversion from screen rotation to JPEG orientation
      */
@@ -327,20 +386,38 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun activateLiveMode(){
         loadInferenceEnabled = false
+        historyInferenceEnabled = false
         liveInferenceEnabled = true
         isInferenceFinished = true
+        //notify the activity to show results
+        updateCurrentInfo(lastLiveInferenceDuration.value, liveResult.value)
     }
 
     fun activateLoadMode(){
         liveInferenceEnabled = false
+        historyInferenceEnabled = false
         loadInferenceEnabled = true
         isInferenceFinished = true
+        //notify the activity to show results
+        updateCurrentInfo(lastLoadInferenceDuration.value, loadResult.value)
+    }
+
+    fun activateHistoryMode(){
+        liveInferenceEnabled = false
+        loadInferenceEnabled = false
+        historyInferenceEnabled = true
+        isInferenceFinished = true
+        //notify the activity to show results
+        updateCurrentInfo(0, emptyList())
     }
 
     fun disableInference(){
         liveInferenceEnabled = false
         loadInferenceEnabled = false
+        historyInferenceEnabled = false
         isInferenceFinished = false
+        //notify the activity to show results
+        updateCurrentInfo(0, emptyList())
     }
 
 }

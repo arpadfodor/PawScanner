@@ -31,7 +31,7 @@ class LoadFragment : Fragment(), View.OnClickListener {
     * Views of the Fragment
     */
     private lateinit var imageView: ImageView
-    private lateinit var textView: TextView
+
     private lateinit var floatingActionButtonUpload: FloatingActionButton
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -43,7 +43,6 @@ class LoadFragment : Fragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
 
         imageView = view.findViewById(R.id.ivLoadedImage)
-        textView = view.findViewById(R.id.tvRecognitionData)
         floatingActionButtonUpload = view.findViewById(R.id.fabUpload)
 
         //due to an Android bug, setting clip to outline cannot be done from XML
@@ -55,7 +54,7 @@ class LoadFragment : Fragment(), View.OnClickListener {
              */
             viewModel = ViewModelProviders.of(it).get(MainViewModel::class.java)
         }
-        subscribeUi()
+        subscribeToViewModel()
 
     }
 
@@ -66,7 +65,7 @@ class LoadFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    private fun subscribeUi() {
+    private fun subscribeToViewModel() {
 
         // Create the image observer which updates the UI in case of an image change
         val imageObserver = Observer<Bitmap> { newImage ->
@@ -75,19 +74,6 @@ class LoadFragment : Fragment(), View.OnClickListener {
         }
         // Observe the LiveData, passing in this viewLifeCycleOwner as the LifecycleOwner and the observer
         viewModel.loadedImage.observe(viewLifecycleOwner, imageObserver)
-
-        // Create the text observer which updates the UI in case of an image change
-        val recognitionObserver = Observer<List<Recognition>> { result ->
-            // Update the UI, in this case, the TextView
-            var resultText = ""
-            for(recognition in result){
-                resultText += recognition
-                resultText += "\n"
-            }
-            textView.text = resultText
-        }
-        // Observe the LiveData, passing in this viewLifeCycleOwner as the LifecycleOwner and the observer
-        viewModel.loadResult.observe(viewLifecycleOwner, recognitionObserver)
 
     }
 

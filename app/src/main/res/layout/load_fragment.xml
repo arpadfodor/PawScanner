@@ -20,15 +20,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <TextView
-        android:id="@+id/tvRecognitionData"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/colorButtonText"
-        app:layout_constraintEnd_toEndOf="@+id/ivLoadedImage"
-        app:layout_constraintStart_toStartOf="@+id/ivLoadedImage"
-        app:layout_constraintTop_toBottomOf="@+id/ivLoadedImage" />
-
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabPawUploaded"
         android:layout_width="wrap_content"
