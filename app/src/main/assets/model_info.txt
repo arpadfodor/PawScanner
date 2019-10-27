@@ -1,0 +1,3 @@
+Model: mobilenet_v2_saved_at_2019-10-27-12_26_26_accuracy_07830
+Input: (224, 224, 3), type: DT_FLOAT
+Output: (122), type: DT_FLOAT

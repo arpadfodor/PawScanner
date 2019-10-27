@@ -35,6 +35,20 @@ class Recognition(
     override fun toString(): String {
 
         var resultString = ""
+        resultString += "$title "
+        resultString += String.format("(%.1f%%) ", confidence * 100.0f)
+
+        if (location != null) {
+            resultString += location!!.toString() + " "
+        }
+
+        return resultString.trim { it <= ' ' }
+
+    }
+
+    fun toDetailedString(): String {
+
+        var resultString = ""
         resultString += "[$id] "
         resultString += "$title "
         resultString += String.format("(%.1f%%) ", confidence * 100.0f)

@@ -3,15 +3,31 @@ package com.arpadfodor.android.paw_scanner.model
 import android.content.res.AssetManager
 
 /**
- * This TensorFlow Lite classifier works with the float MobileNet model
+ * TensorFlow Lite classifier with the float MobileNet model
  */
 class ClassifierFloatMobileNet(asset: AssetManager, device: Device, numThreads: Int) : Classifier(){
 
-    /**
-     * MobileNet requires additional normalization of the used input
-     */
-    private val IMAGE_MEAN = 127.5f
-    private val IMAGE_STD = 127.5f
+    companion object{
+
+        /**
+         * MobileNet requires additional normalization of the used input
+         */
+        private const val IMAGE_MEAN = 127.5f
+        private const val IMAGE_STD = 127.5f
+
+        /**
+         * Input image size required by the model
+         */
+        private const val IMAGE_SIZE_X = 224
+        private const val IMAGE_SIZE_Y = 224
+
+        /**
+         * Model and label paths
+         */
+        private const val MODEL_PATH = "model.tflite"
+        private const val LABEL_PATH = "labels.txt"
+
+    }
 
     /**
      * An array to hold inference results, to be feed into TensorFlow Lite as outputs
@@ -25,21 +41,21 @@ class ClassifierFloatMobileNet(asset: AssetManager, device: Device, numThreads: 
     }
 
     override fun getImageSizeX(): Int {
-        return 224
+        return IMAGE_SIZE_X
     }
 
     override fun getImageSizeY(): Int {
-        return 224
+        return IMAGE_SIZE_Y
     }
 
     override fun getModelPath(): String {
         // you can download this file from see build.gradle for where to obtain this file
         // It should be auto downloaded into assets
-        return "mobilenet_v1_1.0_224.tflite"
+        return MODEL_PATH
     }
 
     override fun getLabelPath(): String {
-        return "labels.txt"
+        return LABEL_PATH
     }
 
     override fun getNumBytesPerChannel(): Int {

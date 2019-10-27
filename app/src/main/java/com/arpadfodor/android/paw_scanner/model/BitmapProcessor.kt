@@ -5,19 +5,18 @@ import android.graphics.Matrix
 import android.os.Environment
 import java.io.File
 import java.io.FileOutputStream
+import kotlin.math.abs
 
 /**
  * Utility class for manipulating images
  */
 object BitmapProcessor {
 
-    // This value is 2 ^ 18 - 1, and is used to clamp the RGB values before their ranges
-    // are normalized to eight bits.
+    // This value is 2 ^ 18 - 1, and is used to clamp the RGB values before their ranges are normalized to eight bits
     internal val kMaxChannelValue = 262143
 
     /**
-     * Utility method to compute the allocated size in bytes of a YUV420SP image of the given
-     * dimensions.
+     * Utility method to compute the allocated size in bytes of a YUV420SP image of the given dimensions
      */
     fun getYUVByteSize(width: Int, height: Int): Int {
         // The luminance plane requires 1 byte per pixel.
@@ -33,8 +32,8 @@ object BitmapProcessor {
     /**
      * Saves a Bitmap object to disk for analysis.
      *
-     * @param bitmap The bitmap to save.
-     * @param filename The location to save the bitmap to.
+     * @param bitmap    The bitmap to save
+     * @param filename  The location to save the bitmap to
      */
     @JvmOverloads
     fun saveBitmap(bitmap: Bitmap, filename: String = "preview.png") {
@@ -60,6 +59,7 @@ object BitmapProcessor {
     }
 
     fun convertYUV420SPToARGB8888(input: ByteArray, width: Int, height: Int, output: IntArray) {
+
         val frameSize = width * height
         var j = 0
         var yp = 0
@@ -82,9 +82,11 @@ object BitmapProcessor {
             }
             j++
         }
+
     }
 
     private fun YUV2RGB(y: Int, u: Int, v: Int): Int {
+
         var y = y
         var u = u
         var v = v
@@ -109,6 +111,7 @@ object BitmapProcessor {
         b = if (b > kMaxChannelValue) kMaxChannelValue else if (b < 0) 0 else b
 
         return -0x1000000 or (r shl 6 and 0xff0000) or (g shr 2 and 0xff00) or (b shr 10 and 0xff)
+
     }
 
     fun convertYUV420ToARGB8888(
@@ -175,7 +178,7 @@ object BitmapProcessor {
 
         // Account for the already applied rotation, if any, and then determine how
         // much scaling is needed for each axis.
-        val transpose = (Math.abs(applyRotation) + 90) % 180 == 0
+        val transpose = (abs(applyRotation) + 90) % 180 == 0
 
         val inWidth = if (transpose) srcHeight else srcWidth
         val inHeight = if (transpose) srcWidth else srcHeight

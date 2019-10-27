@@ -24,16 +24,20 @@ import kotlin.math.min
  */
 abstract class Classifier{
 
-    /**
-     * Number of results to show in the UI
-     */
-    private val MAX_RESULTS = 3
+    companion object{
 
-    /**
-     * Dimensions of inputs
-     */
-    private val DIM_BATCH_SIZE = 1
-    private val DIM_PIXEL_SIZE = 3
+        /**
+         * Number of results to show in the UI
+         */
+        private const val MAX_RESULTS = 3
+
+        /**
+         * Dimensions of inputs
+         */
+        private const val DIM_BATCH_SIZE = 1
+        private const val DIM_PIXEL_SIZE = 3
+
+    }
 
     /**
      * Pre-allocated buffers for storing image data in
@@ -56,26 +60,26 @@ abstract class Classifier{
     private var labels = arrayListOf<String>()
 
     /**
-     * Optional GPU delegate for accleration
+     * Optional GPU delegate for acceleration
      */
     private var gpuDelegate: GpuDelegate? = null
 
     /**
-     * An instance of the driver class to run model inference with Tensorflow Lite
+     * An instance of the driver class to run model inference with TensorFlow Lite
      */
     protected var tfLite: Interpreter? = null
 
     /**
-     * A ByteBuffer to hold image data, to be feed into Tensorflow Lite as inputs
+     * A ByteBuffer to hold image data to be feed into TensorFlow Lite as inputs
      */
     protected lateinit var imgData: ByteBuffer
 
     /**
-     * Creates a classifier with the provided configuration.
+     * Creates a classifier with the provided configuration
      *
-     * @param asset The AssetManager
-     * @param device The device to use for classification
-     * @param numThreads The number of threads to use for classification
+     * @param asset         The AssetManager
+     * @param device        The device to use for classification
+     * @param numThreads    The number of threads to use for classification
      */
     @Throws(IOException::class)
     fun create(asset: AssetManager, device: Device, numThreads: Int){
@@ -95,6 +99,10 @@ abstract class Classifier{
             }
         }
 
+        /*
+        * This byte buffer is sized to contain the image data once converted to float
+        * The interpreter can accept float arrays directly as input, but the ByteBuffer is more efficient as it avoids extra copies in the interpreter
+        */
         imgData = ByteBuffer.allocateDirect(
             DIM_BATCH_SIZE
                     * getImageSizeX()
@@ -113,6 +121,7 @@ abstract class Classifier{
      */
     @Throws(IOException::class)
     private fun loadLabelList(asset: AssetManager): ArrayList<String> {
+
         val labels = ArrayList<String>()
         val reader = BufferedReader(InputStreamReader(asset.open(getLabelPath())))
 
@@ -122,6 +131,7 @@ abstract class Classifier{
         }
         reader.close()
         return labels
+
     }
 
     /**
@@ -129,12 +139,15 @@ abstract class Classifier{
      */
     @Throws(IOException::class)
     private fun loadModelFile(asset: AssetManager): MappedByteBuffer {
+
         val fileDescriptor = asset.openFd(getModelPath())
         val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
         val fileChannel = inputStream.channel
         val startOffset = fileDescriptor.startOffset
         val declaredLength = fileDescriptor.declaredLength
+
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
+
     }
 
     /**
@@ -192,7 +205,7 @@ abstract class Classifier{
                 Recognition(
                     "" + i,
                     if (labels.size > i){
-                        labels[i]
+                        labels[i].substringAfter('-').replace('_', ' ')
                     } else {
                         "unknown"
                     },
