@@ -1,4 +1,4 @@
-package com.arpadfodor.android.paw_scanner.viewmodel
+package com.arpadfodor.android.paw_scanner.model
 
 import android.media.Image
 import java.io.File

@@ -1,8 +1,12 @@
 package com.arpadfodor.android.paw_scanner.model
 
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Matrix
+import android.media.ExifInterface
+import android.net.Uri
 import android.os.Environment
+import android.util.Size
 import java.io.File
 import java.io.FileOutputStream
 import kotlin.math.abs
@@ -143,8 +147,8 @@ object BitmapProcessor {
     }
 
     /**
-     * Returns a transformation matrix from one reference frame into another. Handles cropping (if
-     * maintaining aspect ratio is desired) and rotation.
+     * Returns a transformation matrix from one reference frame into another
+     * Handles cropping (if maintaining aspect ratio is desired) and rotation
      *
      * @param srcWidth Width of source frame
      * @param srcHeight Height of source frame
@@ -205,6 +209,67 @@ object BitmapProcessor {
         }
 
         return matrix
+    }
+
+    fun bitmapToCroppedImage(selectedImageUri: Uri, sourceBitmap: Bitmap): Bitmap{
+
+        val exif = ExifInterface(selectedImageUri.path)
+        val bitmapRotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+
+        val croppedBitmap: Bitmap?
+
+        if (sourceBitmap.width >= sourceBitmap.height) {
+
+            croppedBitmap = Bitmap.createBitmap(
+                sourceBitmap,
+                sourceBitmap.width / 2 - sourceBitmap.height / 2,
+                0,
+                sourceBitmap.height,
+                sourceBitmap.height
+            )
+
+        } else {
+
+            croppedBitmap = Bitmap.createBitmap(
+                sourceBitmap,
+                0,
+                sourceBitmap.height / 2 - sourceBitmap.width / 2,
+                sourceBitmap.width,
+                sourceBitmap.width
+            )
+        }
+
+        return croppedBitmap
+
+    }
+
+    fun resizedBitmapToInferenceResolution(croppedBitmap: Bitmap, classifierInputSize: Size): Bitmap{
+
+        val cropToFrameTransform = Matrix()
+
+        val inferenceBitmap: Bitmap = Bitmap.createBitmap(
+            classifierInputSize.width,
+            classifierInputSize.height,
+            Bitmap.Config.ARGB_8888
+        )
+
+        val frameToReScaleTransform = getTransformationMatrix(
+            croppedBitmap.width,
+            croppedBitmap.height,
+            classifierInputSize.width,
+            classifierInputSize.height,
+            0,
+            //maintain aspects ratio
+            true
+        )
+
+        frameToReScaleTransform.invert(cropToFrameTransform)
+
+        val canvas = Canvas(inferenceBitmap)
+        canvas.drawBitmap(croppedBitmap, frameToReScaleTransform, null)
+
+        return inferenceBitmap
+
     }
 
 }

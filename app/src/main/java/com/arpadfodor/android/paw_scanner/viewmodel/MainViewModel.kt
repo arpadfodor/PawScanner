@@ -6,10 +6,6 @@ import android.util.Size
 import android.view.Surface
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import com.arpadfodor.android.paw_scanner.model.Classifier
-import com.arpadfodor.android.paw_scanner.model.ClassifierFloatMobileNet
-import com.arpadfodor.android.paw_scanner.model.Device
-import com.arpadfodor.android.paw_scanner.model.Recognition
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -20,7 +16,12 @@ import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import android.os.SystemClock
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.work.OneTimeWorkRequest
+import androidx.work.PeriodicWorkRequest
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.arpadfodor.android.paw_scanner.R
+import com.arpadfodor.android.paw_scanner.model.*
 import java.io.ByteArrayOutputStream
 import java.util.*
 import kotlin.collections.ArrayList
@@ -97,6 +98,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     lateinit var classifier: Classifier
 
     /*
+     * The workManager that calculates the results
+     */
+    private val inferenceManager = WorkManager.getInstance(application)
+
+    /*
      * Current data to show
      * [0]: inference duration
      * [1]: most probable recognition info
@@ -107,37 +113,30 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /*
-     * Last live classification result
+     * Last classification result
      */
-    val liveResult: MutableLiveData<List<Recognition>> by lazy {
-        MutableLiveData<List<Recognition>>()
-    }
-
-    /*
-     * Last load classification result
-     */
-    val loadResult: MutableLiveData<List<Recognition>> by lazy {
+    val result: MutableLiveData<List<Recognition>> by lazy {
         MutableLiveData<List<Recognition>>()
     }
 
     /*
      * Last live inference time in milliseconds
      */
-    val lastLiveInferenceDuration: MutableLiveData<Long> by lazy {
+    val inferenceDuration: MutableLiveData<Long> by lazy {
         MutableLiveData<Long>()
     }
 
     /*
-     * Last load inference time in milliseconds
-     */
-    val lastLoadInferenceDuration: MutableLiveData<Long> by lazy {
-        MutableLiveData<Long>()
-    }
-
-    /*
-     * The loaded image
+     * The loaded image to feed
      */
     val loadedImage: MutableLiveData<Bitmap> by lazy {
+        MutableLiveData<Bitmap>()
+    }
+
+    /*
+     * The live image
+     */
+    val liveImage: MutableLiveData<Bitmap> by lazy {
         MutableLiveData<Bitmap>()
     }
 
@@ -165,7 +164,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun init(parentScreenOrientation: Int){
 
         classifier = ClassifierFloatMobileNet(app.assets, Device.CPU, 1)
-        classifierInputSize.value = Size(classifier .getImageSizeX(), classifier. getImageSizeY())
+        classifierInputSize.value = Size(classifier.getImageSizeX(), classifier.getImageSizeY())
         rotation.value = parentScreenOrientation
         isInferenceFinished = true
         currentCameraIndex.value = 0
@@ -174,7 +173,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
             override fun onReceive(context: Context, intent: Intent) {
 
-                lastLiveInferenceDuration.value = intent.getLongExtra("inferenceTime", 0)
+                inferenceDuration.value = intent.getLongExtra("inferenceTime", 0)
                 val sizeOfResults = intent.getIntExtra("numberOfRecognitions", 0)
 
                 val results = arrayListOf<Recognition>()
@@ -189,11 +188,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
                 }
 
-                liveResult.value = results
+                result.value = results
                 isInferenceFinished = true
 
                 //notify the activity to show results
-                updateCurrentInfo(lastLiveInferenceDuration.value, liveResult.value)
+                updateCurrentInfo(inferenceDuration.value, result.value)
 
             }
 
@@ -202,6 +201,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         LocalBroadcastManager.getInstance(app.applicationContext).registerReceiver(
             recognitionResultReceiver, IntentFilter("InferenceResult")
         )
+
+        InferenceService.viewModel = this
 
     }
 
@@ -296,36 +297,32 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     }
 
-    fun recognizeLoadedImage(){
+    fun setLoadedImage(bitmap: Bitmap){
+
+        loadedImage.value = bitmap
 
         if(!loadInferenceEnabled){
             return
         }
-        loadedImage.value?: return
 
-        //recognizeImage(loadedImage.value!!)
-
-        val startTime = SystemClock.uptimeMillis()
-        loadResult.value = classifier.recognizeImage(loadedImage.value!!)
-        lastLoadInferenceDuration.value = SystemClock.uptimeMillis() - startTime
-
-        //notify the activity to show results
-        updateCurrentInfo(lastLoadInferenceDuration.value, loadResult.value)
+        recognizeImage(2)
 
     }
 
-    fun recognizeLiveImage(bitmap: Bitmap?){
+    fun setLiveImage(bitmap: Bitmap?){
+
+        bitmap?: return
 
         if(!liveInferenceEnabled){
             return
         }
-        bitmap?: return
 
-        recognizeImage(bitmap)
+        liveImage.value = bitmap
+        recognizeImage(1)
 
     }
 
-    private fun recognizeImage(bitmap: Bitmap){
+    private fun recognizeImage(recognitionTypeId: Int){
 
         if(!isInferenceFinished){
             return
@@ -334,9 +331,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         isInferenceFinished = false
 
         val intent = Intent(app.applicationContext, InferenceService::class.java)
-        val bs = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 50, bs)
-        intent.putExtra("byteArray", bs.toByteArray())
+        intent.putExtra("type", recognitionTypeId)
         app.applicationContext.startService(intent)
 
     }
@@ -390,7 +385,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         liveInferenceEnabled = true
         isInferenceFinished = true
         //notify the activity to show results
-        updateCurrentInfo(lastLiveInferenceDuration.value, liveResult.value)
+        //recognizeImage(1)
     }
 
     fun activateLoadMode(){
@@ -399,7 +394,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         loadInferenceEnabled = true
         isInferenceFinished = true
         //notify the activity to show results
-        updateCurrentInfo(lastLoadInferenceDuration.value, loadResult.value)
+        recognizeImage(2)
     }
 
     fun activateHistoryMode(){

@@ -2,7 +2,6 @@ package com.arpadfodor.android.paw_scanner.view
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.provider.MediaStore
@@ -11,12 +10,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.lifecycle.Observer
 import com.arpadfodor.android.paw_scanner.R
-import com.arpadfodor.android.paw_scanner.model.Recognition
 import com.arpadfodor.android.paw_scanner.viewmodel.MainViewModel
+import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.arpadfodor.android.paw_scanner.model.BitmapProcessor
+import android.graphics.Bitmap
 
 class LoadFragment : Fragment(), View.OnClickListener {
 
@@ -47,6 +47,10 @@ class LoadFragment : Fragment(), View.OnClickListener {
 
         //due to an Android bug, setting clip to outline cannot be done from XML
         imageView.clipToOutline = true
+        Glide
+            .with(this)
+            .load(R.drawable.load_image_placeholder)
+            .into(imageView)
 
         activity?.let {
             /**
@@ -59,10 +63,17 @@ class LoadFragment : Fragment(), View.OnClickListener {
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
+
         super.onActivityCreated(savedInstanceState)
+
         floatingActionButtonUpload.setOnClickListener {
             this.onClick(floatingActionButtonUpload)
         }
+
+        imageView.setOnClickListener {
+            this.onClick(imageView)
+        }
+
     }
 
     private fun subscribeToViewModel() {
@@ -71,6 +82,14 @@ class LoadFragment : Fragment(), View.OnClickListener {
         val imageObserver = Observer<Bitmap> { newImage ->
             // Update the UI, in this case, the ImageView
             imageView.setImageBitmap(newImage)
+
+            Glide
+                .with(this)
+                .load(newImage)
+                .centerCrop()
+                .error(R.drawable.load_image_placeholder)
+                .placeholder(R.drawable.load_image_placeholder)
+                .into(imageView)
         }
         // Observe the LiveData, passing in this viewLifeCycleOwner as the LifecycleOwner and the observer
         viewModel.loadedImage.observe(viewLifecycleOwner, imageObserver)
@@ -102,11 +121,14 @@ class LoadFragment : Fragment(), View.OnClickListener {
 
             when (requestCode) {
                 GALLERY_REQUEST_CODE -> {
+
                     //data.getData returns the content URI for the selected Image
-                    val selectedImageUri = data?.data
-                    val bitmap = MediaStore.Images.Media.getBitmap(viewModel.app.contentResolver, selectedImageUri)
-                    viewModel.loadedImage.value = bitmap
-                    viewModel.recognizeLoadedImage()
+                    val selectedImageUri = data?.data?:return
+                    val sourceBitmap = MediaStore.Images.Media.getBitmap(viewModel.app.contentResolver, selectedImageUri)
+                    val croppedBitmap = BitmapProcessor.bitmapToCroppedImage(selectedImageUri, sourceBitmap)
+
+                    viewModel.setLoadedImage(croppedBitmap)
+
                 }
             }
 
@@ -118,6 +140,9 @@ class LoadFragment : Fragment(), View.OnClickListener {
 
         when(v.id){
             R.id.fabUpload ->{
+                loadImage()
+            }
+            R.id.ivLoadedImage ->{
                 loadImage()
             }
         }

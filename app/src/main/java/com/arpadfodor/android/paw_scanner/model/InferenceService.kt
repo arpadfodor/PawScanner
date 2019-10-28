@@ -1,15 +1,18 @@
-package com.arpadfodor.android.paw_scanner.viewmodel
+package com.arpadfodor.android.paw_scanner.model
 
 import android.app.IntentService
 import android.content.Intent
-import android.graphics.BitmapFactory
+import android.graphics.Bitmap
 import android.os.SystemClock
-import com.arpadfodor.android.paw_scanner.model.ClassifierFloatMobileNet
-import com.arpadfodor.android.paw_scanner.model.Device
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.arpadfodor.android.paw_scanner.model.Recognition
+import com.arpadfodor.android.paw_scanner.model.BitmapProcessor.resizedBitmapToInferenceResolution
+import com.arpadfodor.android.paw_scanner.viewmodel.MainViewModel
 
 class InferenceService : IntentService("InferenceService") {
+
+    companion object{
+        lateinit var viewModel: MainViewModel
+    }
 
     lateinit var classifier: ClassifierFloatMobileNet
 
@@ -22,13 +25,32 @@ class InferenceService : IntentService("InferenceService") {
 
         intent?: return
 
-        if (intent.hasExtra("byteArray")) {
+        if (intent.hasExtra("type")) {
 
-            val bitmap = BitmapFactory.decodeByteArray(
-                intent.getByteArrayExtra("byteArray"),
-                0,
-                intent.getByteArrayExtra("byteArray")!!.size
-            )
+            val type = intent.getIntExtra("type", 1)
+
+            var bitmap: Bitmap? = null
+            var escape = false
+
+            if(type == 1){
+                bitmap = viewModel.liveImage.value!!
+            }
+            else if(type == 2){
+
+                if(viewModel.loadedImage.value == null || viewModel.classifierInputSize.value == null){
+                    sendMessageToViewModel(List(1){Recognition("0","error",1f, null)}, 0)
+                    return
+                }
+
+                //interestingly, without image resizing the results seem to be more accurate
+                //bitmap = viewModel.loadedImage.value
+                bitmap = resizedBitmapToInferenceResolution(viewModel.loadedImage.value!!, viewModel.classifierInputSize.value!!)
+            }
+
+            if(bitmap == null){
+                sendMessageToViewModel(List(1){Recognition("a","error",1f, null)}, 0)
+                return
+            }
 
             val startTime = SystemClock.uptimeMillis()
             val result = classifier.recognizeImage(bitmap)

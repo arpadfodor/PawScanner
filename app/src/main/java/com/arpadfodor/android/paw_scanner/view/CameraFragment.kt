@@ -13,16 +13,13 @@ import android.view.Surface
 import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.arpadfodor.android.paw_scanner.R
 import com.arpadfodor.android.paw_scanner.model.BitmapProcessor
-import com.arpadfodor.android.paw_scanner.model.Recognition
 import com.arpadfodor.android.paw_scanner.view.additional.AutoFitTextureView
-import com.arpadfodor.android.paw_scanner.viewmodel.ImageSaver
+import com.arpadfodor.android.paw_scanner.model.ImageSaver
 import com.arpadfodor.android.paw_scanner.viewmodel.MainViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.File
@@ -155,7 +152,12 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
      * onImageAvailable will be called when still image is ready to be saved
      */
     private val onImageAvailableListener = ImageReader.OnImageAvailableListener {
-        backgroundHandler?.post(ImageSaver(it.acquireNextImage(), file))
+        backgroundHandler?.post(
+            ImageSaver(
+                it.acquireNextImage(),
+                file
+            )
+        )
     }
 
     /**
@@ -658,7 +660,7 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
         rgbFrameBitmap?.setPixels(getRgbBytes(), 0, viewModel.previewSize.width, 0, 0, viewModel.previewSize.width, viewModel.previewSize.height)
         val canvas = Canvas(croppedBitmap!!)
         canvas.drawBitmap(rgbFrameBitmap!!, frameToCropTransform!!, null)
-        viewModel.recognizeLiveImage(croppedBitmap)
+        viewModel.setLiveImage(croppedBitmap)
         readyForNextImage()
 
     }
@@ -710,7 +712,7 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
             val formattedDate = df.format(Calendar.getInstance().time)
 
             val imagesToSaveDir = Environment.DIRECTORY_DCIM + File.separator + viewModel.saveImageBasename
-            val imageToSaveName = viewModel.saveImageBasename + "_" + formattedDate + "_" + Random(123).nextInt(3)
+            val imageToSaveName = viewModel.saveImageBasename + "-" + formattedDate + "-" + UUID.randomUUID()
 
             file = File(imagesToSaveDir, imageToSaveName)
 
