@@ -14,11 +14,7 @@ import android.content.res.Configuration
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
-import android.os.SystemClock
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.work.OneTimeWorkRequest
-import androidx.work.PeriodicWorkRequest
-import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.arpadfodor.android.paw_scanner.R
 import com.arpadfodor.android.paw_scanner.model.*
@@ -33,6 +29,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     companion object{
         const val MINIMUM_PREVIEW_SIZE = 320
         const val MAINTAIN_ASPECT = true
+
+        const val RECOGNITION_LIVE = 1
+        const val RECOGNITION_LOAD = 2
     }
 
     var app: Application = application
@@ -305,7 +304,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
-        recognizeImage(2)
+        recognizeImage(RECOGNITION_LOAD)
 
     }
 
@@ -317,8 +316,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
-        liveImage.value = bitmap
-        recognizeImage(1)
+        if(!isInferenceFinished){
+            return
+        }
+
+        isInferenceFinished = false
+
+        val intent = Intent(app.applicationContext, LiveInferenceService::class.java)
+        val bs = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 99, bs)
+        intent.putExtra("byteArray", bs.toByteArray())
+        app.applicationContext.startService(intent)
 
     }
 
@@ -385,7 +393,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         liveInferenceEnabled = true
         isInferenceFinished = true
         //notify the activity to show results
-        //recognizeImage(1)
+        //recognizeImage(RECOGNITION_LIVE)
     }
 
     fun activateLoadMode(){
@@ -394,7 +402,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         loadInferenceEnabled = true
         isInferenceFinished = true
         //notify the activity to show results
-        recognizeImage(2)
+        recognizeImage(RECOGNITION_LOAD)
     }
 
     fun activateHistoryMode(){

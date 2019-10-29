@@ -3,16 +3,13 @@ package com.arpadfodor.android.paw_scanner.model
 import android.app.IntentService
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.SystemClock
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.arpadfodor.android.paw_scanner.model.BitmapProcessor.resizedBitmapToInferenceResolution
 import com.arpadfodor.android.paw_scanner.viewmodel.MainViewModel
 
-class InferenceService : IntentService("InferenceService") {
-
-    companion object{
-        lateinit var viewModel: MainViewModel
-    }
+class LiveInferenceService : IntentService("LiveInferenceService") {
 
     lateinit var classifier: ClassifierFloatMobileNet
 
@@ -25,33 +22,13 @@ class InferenceService : IntentService("InferenceService") {
 
         intent?: return
 
-        if (intent.hasExtra("type")) {
+        if (intent.hasExtra("byteArray")) {
 
-            val type = intent.getIntExtra("type", MainViewModel.RECOGNITION_LIVE)
-
-            lateinit var bitmap: Bitmap
-
-            if(type == MainViewModel.RECOGNITION_LIVE){
-
-                if(viewModel.liveImage.value == null){
-                    sendMessageToViewModel(List(1){Recognition("0","error",1f, null)}, 0)
-                    return
-                }
-
-                bitmap = viewModel.liveImage.value!!
-
-            }
-            else if(type == MainViewModel.RECOGNITION_LOAD){
-
-                if(viewModel.loadedImage.value == null || viewModel.classifierInputSize.value == null){
-                    sendMessageToViewModel(List(1){Recognition("0","error",1f, null)}, 0)
-                    return
-                }
-
-                //interestingly, without image resizing the results seem to be more accurate
-                //bitmap = viewModel.loadedImage.value
-                bitmap = resizedBitmapToInferenceResolution(viewModel.loadedImage.value!!, viewModel.classifierInputSize.value!!)
-            }
+            val bitmap = BitmapFactory.decodeByteArray(
+                intent.getByteArrayExtra("byteArray"),
+                0,
+                intent.getByteArrayExtra("byteArray")!!.size
+            )
 
             val startTime = SystemClock.uptimeMillis()
             val result = classifier.recognizeImage(bitmap)

@@ -25,6 +25,7 @@
         </activity>
 
         <service android:name=".model.InferenceService"/>
+        <service android:name=".model.LiveInferenceService"/>
 
     </application>
 
