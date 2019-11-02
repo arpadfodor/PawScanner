@@ -11,35 +11,56 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
+import android.graphics.Color
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CameraCharacteristics.LENS_FACING
 import android.hardware.camera2.CameraManager
+import androidx.camera.core.CameraX
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.work.WorkManager
+import androidx.work.*
 import com.arpadfodor.android.paw_scanner.R
 import com.arpadfodor.android.paw_scanner.model.*
-import java.io.ByteArrayOutputStream
+import com.arpadfodor.android.paw_scanner.viewmodel.workers.InferenceService
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.max
 import kotlin.math.min
+import com.arpadfodor.android.paw_scanner.viewmodel.workers.InferenceWorker
+import com.arpadfodor.android.paw_scanner.viewmodel.workers.LiveInferenceService
+import java.io.ByteArrayOutputStream
+import java.io.File
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     companion object{
+
         const val MINIMUM_PREVIEW_SIZE = 320
         const val MAINTAIN_ASPECT = true
 
         const val RECOGNITION_LIVE = 1
         const val RECOGNITION_LOAD = 2
+
+        const val KEY_EVENT_ACTION = "key_event_action"
+        const val KEY_EVENT_EXTRA = "key_event_extra"
+
+        /**
+         * Milliseconds used for UI animations
+         */
+        const val ANIMATION_FAST = 150L
+        const val ANIMATION_SLOW = 200L
+
+        const val shutterColor = Color.WHITE
+        const val IMAGE_EXTENSION = ".jpg"
+
     }
 
     var app: Application = application
 
     /**
-     * The rotation in degrees of the camera sensor from the display
+     * The base name of the image to save
      */
-    val saveImageBasename = app.resources.getString(R.string.app_name)
+    val fileName = app.resources.getString(R.string.app_name)
 
     /**
      * The camera preview size will be chosen to be the smallest frame by pixel size capable of containing a DESIRED_SIZE x DESIRED_SIZE square
@@ -67,11 +88,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     var cameraOpened = false
 
     /*
-     * Whether inference has finished or not
-     */
-    var isInferenceFinished = true
-
-    /*
      * Whether live inference is enabled or not
      */
     var liveInferenceEnabled = false
@@ -86,8 +102,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      */
     var historyInferenceEnabled = false
 
+    /*
+     * List of available cameras
+     */
     var availableCameras = arrayOfNulls<String>(0)
-    var previewSize = Size(0,0)
 
     lateinit var recognitionResultReceiver: BroadcastReceiver
 
@@ -97,9 +115,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     lateinit var classifier: Classifier
 
     /*
-     * The workManager that calculates the results
+     * The inferenceManager that manages inference work
      */
-    private val inferenceManager = WorkManager.getInstance(application)
+    var inferenceManager = WorkManager.getInstance()
+
+    /*
+     * Whether inference has finished or not
+     */
+    var isInferenceFinished: Boolean = true
+
+    /**
+     * The current selected camera preview size
+     */
+    val previewSize: MutableLiveData<Size> by lazy {
+        MutableLiveData<Size>()
+    }
 
     /*
      * Current data to show
@@ -160,6 +190,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         MutableLiveData<Int>()
     }
 
+    /*
+     * The current camera orientation
+     */
+    val currentCameraOrientation: MutableLiveData<CameraX.LensFacing> by lazy {
+        MutableLiveData<CameraX.LensFacing>()
+    }
+
     fun init(parentScreenOrientation: Int){
 
         classifier = ClassifierFloatMobileNet(app.assets, Device.CPU, 1)
@@ -167,6 +204,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         rotation.value = parentScreenOrientation
         isInferenceFinished = true
         currentCameraIndex.value = 0
+        currentCameraOrientation.value = CameraX.LensFacing.BACK
 
         recognitionResultReceiver = object : BroadcastReceiver(){
 
@@ -202,7 +240,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         )
 
         InferenceService.viewModel = this
-
+        InferenceWorker.viewModel = this
     }
 
     /**
@@ -221,17 +259,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         flashSupported = characteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE) == true
 
 
-        // Attempting to use too large a preview size could exceed camera bus bandwidth limitation
+        // Attempting to use too large preview size could exceed camera bus bandwidth limitation
         // Can result in gorgeous previews but the storage of garbage capture data
-        previewSize = chooseOptimalSize(map!!.getOutputSizes(SurfaceTexture::class.java), classifierInputSize.value!!)
+        previewSize.value = chooseOptimalSize(map!!.getOutputSizes(SurfaceTexture::class.java), desiredPreviewSize)
 
         //Fit the aspect ratio of TextureView to the size of preview picked
         val orientation = app.resources.configuration.orientation
 
+        val preview = previewSize.value?:return
+
         textureViewSize = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            Size(previewSize.width, previewSize.height)
+            Size(preview.width, preview.height)
         } else {
-            Size(previewSize.height, previewSize.width)
+            Size(preview.height, preview.width)
         }
 
     }
@@ -252,6 +292,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         var exactSizeFound = false
         val bigEnough = ArrayList<Size>()
         val tooSmall = ArrayList<Size>()
+
         for (option in choices) {
 
             if (option == dimensions) {
@@ -270,7 +311,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             return dimensions
         }
 
-        // Pick the smallest of those, assuming we found any
+        // Pick the smallest of those, assuming there was a match
         return if (bigEnough.size > 0) {
             Collections.min(bigEnough, CompareSizesByArea())
         } else {
@@ -294,9 +335,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         currentCameraIndex.value = currentCameraIndex.value!!
 
+        val manager = app.getSystemService(Context.CAMERA_SERVICE) as CameraManager
+        val characteristics = manager.getCameraCharacteristics(availableCameras[currentCameraIndex.value!!]!!)
+        characteristics.get(LENS_FACING)
+
     }
 
-    fun setLoadedImage(bitmap: Bitmap){
+    fun loadedImageInference(bitmap: Bitmap){
 
         loadedImage.value = bitmap
 
@@ -308,7 +353,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     }
 
-    fun setLiveImage(bitmap: Bitmap?){
+    fun liveImageInference(bitmap: Bitmap?){
 
         bitmap?: return
 
@@ -321,6 +366,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         isInferenceFinished = false
+
+        //val inference = OneTimeWorkRequestBuilder<InferenceWorker>().build()
+        //inferenceManager.enqueue(inference)
 
         val intent = Intent(app.applicationContext, LiveInferenceService::class.java)
         val bs = ByteArrayOutputStream()
@@ -376,6 +424,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
+     * Use external media if it is available, or app's file directory otherwise
+     */
+    fun getOutputDirectory(): File {
+
+        val appContext = app.applicationContext
+        val mediaDir = app.externalMediaDirs.firstOrNull()?.let {
+            File(it, appContext.resources.getString(R.string.app_name)).apply {
+                mkdirs()
+            }
+        }
+
+        return if (mediaDir != null && mediaDir.exists()){
+            mediaDir
+        }
+        else{
+            appContext.filesDir
+        }
+
+    }
+
+    /**
      * Conversion from screen rotation to JPEG orientation
      */
     fun getScreenOrientation(): Int{
@@ -385,6 +454,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             Surface.ROTATION_90 -> 90
             else -> 0
         }
+    }
+
+    /**
+     * Returns the orientation of the camera
+     */
+    fun getCameraFacing(): CameraX.LensFacing{
+        return CameraX.LensFacing.BACK
     }
 
     fun activateLiveMode(){

@@ -127,7 +127,7 @@ class LoadFragment : Fragment(), View.OnClickListener {
                     val sourceBitmap = MediaStore.Images.Media.getBitmap(viewModel.app.contentResolver, selectedImageUri)
                     val croppedBitmap = BitmapProcessor.bitmapToCroppedImage(selectedImageUri, sourceBitmap)
 
-                    viewModel.setLoadedImage(croppedBitmap)
+                    viewModel.loadedImageInference(croppedBitmap)
 
                 }
             }

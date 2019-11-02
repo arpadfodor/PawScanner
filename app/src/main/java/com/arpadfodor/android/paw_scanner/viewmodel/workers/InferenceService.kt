@@ -1,4 +1,4 @@
-package com.arpadfodor.android.paw_scanner.model
+package com.arpadfodor.android.paw_scanner.viewmodel.workers
 
 import android.app.IntentService
 import android.content.Intent
@@ -6,6 +6,9 @@ import android.graphics.Bitmap
 import android.os.SystemClock
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.arpadfodor.android.paw_scanner.model.BitmapProcessor.resizedBitmapToInferenceResolution
+import com.arpadfodor.android.paw_scanner.model.ClassifierFloatMobileNet
+import com.arpadfodor.android.paw_scanner.model.Device
+import com.arpadfodor.android.paw_scanner.model.Recognition
 import com.arpadfodor.android.paw_scanner.viewmodel.MainViewModel
 
 class InferenceService : IntentService("InferenceService") {
@@ -18,7 +21,11 @@ class InferenceService : IntentService("InferenceService") {
 
     override fun onCreate() {
         super.onCreate()
-        classifier = ClassifierFloatMobileNet(application.assets, Device.CPU, 1)
+        classifier = ClassifierFloatMobileNet(
+            application.assets,
+            Device.CPU,
+            1
+        )
     }
 
     override fun onHandleIntent(intent: Intent?) {
@@ -34,7 +41,14 @@ class InferenceService : IntentService("InferenceService") {
             if(type == MainViewModel.RECOGNITION_LIVE){
 
                 if(viewModel.liveImage.value == null){
-                    sendMessageToViewModel(List(1){Recognition("0","error",1f, null)}, 0)
+                    sendMessageToViewModel(List(1){
+                        Recognition(
+                            "0",
+                            "error",
+                            1f,
+                            null
+                        )
+                    }, 0)
                     return
                 }
 
@@ -44,7 +58,14 @@ class InferenceService : IntentService("InferenceService") {
             else if(type == MainViewModel.RECOGNITION_LOAD){
 
                 if(viewModel.loadedImage.value == null || viewModel.classifierInputSize.value == null){
-                    sendMessageToViewModel(List(1){Recognition("0","error",1f, null)}, 0)
+                    sendMessageToViewModel(List(1){
+                        Recognition(
+                            "0",
+                            "error",
+                            1f,
+                            null
+                        )
+                    }, 0)
                     return
                 }
 

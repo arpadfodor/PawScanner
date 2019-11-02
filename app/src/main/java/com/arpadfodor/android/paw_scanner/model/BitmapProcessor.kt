@@ -99,8 +99,8 @@ object BitmapProcessor {
         u -= 128
         v -= 128
 
-        // This is the floating point equivalent. We do the conversion in integer
-        // because some Android devices do not have floating point in hardware.
+        // The floating point equivalent
+        // Conversion is conducted with integers because some Android devices do not have floating point in hardware
         // nR = (int)(1.164 * nY + 2.018 * nU);
         // nG = (int)(1.164 * nY - 0.813 * nV - 0.391 * nU);
         // nB = (int)(1.164 * nY + 1.596 * nV);
@@ -109,7 +109,7 @@ object BitmapProcessor {
         var g = y1192 - 833 * v - 400 * u
         var b = y1192 + 2066 * u
 
-        // Clipping RGB values to be inside boundaries [ 0 , kMaxChannelValue ]
+        // Clipping RGB values to be inside boundaries [0, kMaxChannelValue]
         r = if (r > kMaxChannelValue) kMaxChannelValue else if (r < 0) 0 else r
         g = if (g > kMaxChannelValue) kMaxChannelValue else if (g < 0) 0 else g
         b = if (b > kMaxChannelValue) kMaxChannelValue else if (b < 0) 0 else b
@@ -129,6 +129,7 @@ object BitmapProcessor {
         uvPixelStride: Int,
         out: IntArray
     ) {
+
         var yp = 0
         for (j in 0 until height) {
             val pY = yRowStride * j

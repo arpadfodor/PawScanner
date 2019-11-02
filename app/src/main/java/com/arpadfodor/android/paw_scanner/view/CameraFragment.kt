@@ -1,25 +1,34 @@
 package com.arpadfodor.android.paw_scanner.view
 
 import android.Manifest
+import android.content.BroadcastReceiver
+import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.*
+import android.graphics.drawable.ColorDrawable
+import android.hardware.Camera
 import android.hardware.camera2.*
+import android.hardware.display.DisplayManager
 import android.media.Image
 import android.media.ImageReader
+import android.media.MediaScannerConnection
+import android.net.Uri
 import android.os.*
-import android.view.LayoutInflater
-import android.view.Surface
-import android.view.TextureView
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Toast
+import android.util.Log
+import android.util.Rational
+import android.view.*
+import android.webkit.MimeTypeMap
+import androidx.camera.core.*
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.arpadfodor.android.paw_scanner.R
 import com.arpadfodor.android.paw_scanner.model.BitmapProcessor
 import com.arpadfodor.android.paw_scanner.view.additional.AutoFitTextureView
-import com.arpadfodor.android.paw_scanner.model.ImageSaver
 import com.arpadfodor.android.paw_scanner.viewmodel.MainViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.File
@@ -28,7 +37,6 @@ import java.util.*
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
-import kotlin.random.Random
 
 class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnClickListener {
 
@@ -44,32 +52,40 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
         private const val STATE_PREVIEW = 0
 
         /**
-         * Camera state: Waiting for the focus to be locked
+         * Camera state: Waiting for the exposure to be pre-capture state
          */
-        private const val STATE_WAITING_LOCK = 1
+        private const val STATE_WAITING_PRECAPTURE = 1
 
         /**
-         * Camera state: Waiting for the exposure to be precapture state
+         * Camera state: Waiting for the exposure state to be something other than pre-capture
          */
-        private const val STATE_WAITING_PRECAPTURE = 2
-
-        /**
-         * Camera state: Waiting for the exposure state to be something other than precapture
-         */
-        private const val STATE_WAITING_NON_PRECAPTURE = 3
-
-        /**
-         * Camera state: Picture was taken
-         */
-        private const val STATE_PICTURE_TAKEN = 4
+        private const val STATE_WAITING_NON_PRECAPTURE = 2
 
     }
 
+    private lateinit var broadcastManager: LocalBroadcastManager
+
     var lastCameraChange = 0L
-    var thresholdBetweenCameraChanges = 2000L
+    var minTimeBetweenCameraChanges = 2000L
+
+    private var imageCapture: ImageCapture? = null
 
     /**
-     * TextureView.SurfaceTextureListener handles several lifecycle events on a [ ]
+     * Volume down button receiver used to trigger taking a photo
+     */
+    private val volumeDownReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            when (intent.getIntExtra(MainViewModel.KEY_EVENT_EXTRA, KeyEvent.KEYCODE_UNKNOWN)) {
+                // When the volume down button is pressed, simulate a shutter button click
+                KeyEvent.KEYCODE_VOLUME_DOWN -> {
+                    takePhoto()
+                }
+            }
+        }
+    }
+
+    /**
+     * TextureView.SurfaceTextureListener handles several lifecycle events
      */
     private val surfaceTextureListener = object : TextureView.SurfaceTextureListener {
 
@@ -127,6 +143,34 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
 
     }
 
+    /** Define callback that will be triggered after a photo has been taken and saved to disk */
+    private val imageSavedListener = object : ImageCapture.OnImageSavedListener {
+        override fun onError(
+            error: ImageCapture.ImageCaptureError, message: String, exc: Throwable?) {
+            Log.e(TAG, "Photo capture failed: $message")
+            exc?.printStackTrace()
+        }
+
+        override fun onImageSaved(photoFile: File) {
+
+            Log.d(TAG, "Photo capture succeeded: ${photoFile.absolutePath}")
+
+            // Implicit broadcasts will be ignored for devices running API level >= 24
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                requireActivity().sendBroadcast(
+                    Intent(Camera.ACTION_NEW_PICTURE, Uri.fromFile(photoFile))
+                )
+            }
+
+            // If the folder selected is an external media directory, this is unnecessary
+            // Otherwise, other apps will not be able to access the images unless scanning them using [MediaScannerConnection]
+            val mimeType = MimeTypeMap.getSingleton()
+                .getMimeTypeFromExtension(photoFile.extension)
+            MediaScannerConnection.scanFile(context, arrayOf(photoFile.absolutePath), arrayOf(mimeType), null)
+
+        }
+    }
+
     /**
      * An additional thread for running tasks that shouldn't block the UI
      */
@@ -141,24 +185,6 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
      * An ImageReader that handles preview frame capture
      */
     private var previewReader: ImageReader? = null
-
-    /**
-     * The output file for the picture
-     */
-    private lateinit var file: File
-
-    /**
-     * This is a callback object for the ImageReader
-     * onImageAvailable will be called when still image is ready to be saved
-     */
-    private val onImageAvailableListener = ImageReader.OnImageAvailableListener {
-        backgroundHandler?.post(
-            ImageSaver(
-                it.acquireNextImage(),
-                file
-            )
-        )
-    }
 
     /**
      * The current state of camera for taking pictures
@@ -187,8 +213,8 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
         private fun process(result: CaptureResult) {
 
             when (state) {
+
                 STATE_PREVIEW -> Unit // Do nothing when the camera preview is working normally
-                STATE_WAITING_LOCK -> capturePicture(result)
                 STATE_WAITING_PRECAPTURE -> {
                     // CONTROL_AE_STATE can be null on some devices
                     val aeState = result.get(CaptureResult.CONTROL_AE_STATE)
@@ -198,38 +224,7 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
                         state = STATE_WAITING_NON_PRECAPTURE
                     }
                 }
-                STATE_WAITING_NON_PRECAPTURE -> {
-                    // CONTROL_AE_STATE can be null on some devices
-                    val aeState = result.get(CaptureResult.CONTROL_AE_STATE)
-                    if (aeState == null || aeState != CaptureResult.CONTROL_AE_STATE_PRECAPTURE) {
-                        state = STATE_PICTURE_TAKEN
-                        captureStillPicture()
-                    }
-                }
-            }
 
-        }
-
-        private fun capturePicture(result: CaptureResult) {
-
-            val afState = result.get(CaptureResult.CONTROL_AF_STATE)
-            if (afState == null) {
-                captureStillPicture()
-            }
-            if(afState == CaptureResult.CONTROL_AF_STATE_INACTIVE){
-                //TODO - why stuck in this state?...
-                unlockFocus()
-            }
-            else if (afState == CaptureResult.CONTROL_AF_STATE_FOCUSED_LOCKED || afState == CaptureResult.CONTROL_AF_STATE_NOT_FOCUSED_LOCKED) {
-                // CONTROL_AE_STATE can be null on some devices
-                val aeState = result.get(CaptureResult.CONTROL_AE_STATE)
-
-                if (aeState == null || aeState == CaptureResult.CONTROL_AE_STATE_CONVERGED) {
-                    state = STATE_PICTURE_TAKEN
-                    captureStillPicture()
-                } else {
-                    runPrecaptureSequence()
-                }
             }
 
         }
@@ -245,6 +240,11 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
     }
 
     private lateinit var viewModel: MainViewModel
+
+    /**
+     * Parent layout of the fragment
+     */
+    private lateinit var container: ConstraintLayout
 
     /**
      * An AutoFitTextureView for camera preview
@@ -283,6 +283,10 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
+        container = view as ConstraintLayout
+
+        broadcastManager = LocalBroadcastManager.getInstance(view.context)
+
         activity?.let {
             /**
              *  create view model in activity scope
@@ -291,7 +295,7 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
         }
 
         textureView = view.findViewById<TextureView>(R.id.textureView) as AutoFitTextureView
-        floatingActionButtonSwitch = view.findViewById(R.id.fabSwitch)
+        floatingActionButtonSwitch = view.findViewById<FloatingActionButton>(R.id.fabSwitch)
         floatingActionButtonSave = view.findViewById(R.id.fabSave)
 
         floatingActionButtonSwitch.setOnClickListener {
@@ -307,12 +311,14 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
 
         val classifierInputSize = viewModel.classifierInputSize.value!!
 
-        rgbFrameBitmap = Bitmap.createBitmap(viewModel.previewSize.width, viewModel.previewSize.height, Bitmap.Config.ARGB_8888)
+        val preview = viewModel.previewSize.value?: return
+
+        rgbFrameBitmap = Bitmap.createBitmap(preview.width, preview.height, Bitmap.Config.ARGB_8888)
         croppedBitmap = Bitmap.createBitmap(classifierInputSize.width, classifierInputSize.height, Bitmap.Config.ARGB_8888)
 
         frameToCropTransform = BitmapProcessor.getTransformationMatrix(
-            viewModel.previewSize.width,
-            viewModel.previewSize.height,
+            preview.width,
+            preview.height,
             classifierInputSize.width,
             classifierInputSize.height,
             viewModel.sensorOrientation,
@@ -321,6 +327,8 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
 
         cropToFrameTransform = Matrix()
         frameToCropTransform!!.invert(cropToFrameTransform)
+
+        isProcessingFrame = false
 
     }
 
@@ -334,21 +342,27 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
      */
     override fun onImageAvailable(reader: ImageReader) {
 
+        val preview = viewModel.previewSize.value?: return
+
         if (RGBbytes == null) {
-            RGBbytes = IntArray(viewModel.previewSize.width * viewModel.previewSize.height)
+            RGBbytes = IntArray(preview.width * preview.height)
+        }
+
+        if(RGBbytes!!.size != (preview.width * preview.height)){
+            RGBbytes = IntArray(preview.width * preview.height)
         }
 
         try {
-            val image = reader.acquireLatestImage() ?: return
+            val readImage = reader.acquireLatestImage() ?: return
 
             if (isProcessingFrame) {
-                image.close()
+                readImage.close()
                 return
             }
 
             isProcessingFrame = true
             Trace.beginSection("imageAvailable")
-            val planes = image.planes
+            val planes = readImage.planes
             fillBytes(planes, YUVbytes)
             luminanceStride = planes[0].rowStride
             val uvRowStride = planes[1].rowStride
@@ -359,8 +373,8 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
                     YUVbytes[0]!!,
                     YUVbytes[1]!!,
                     YUVbytes[2]!!,
-                    viewModel.previewSize.width,
-                    viewModel.previewSize.height,
+                    preview.width,
+                    preview.height,
                     luminanceStride,
                     uvRowStride,
                     uvPixelStride,
@@ -369,7 +383,7 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
             }
 
             postInferenceCallback = Runnable {
-                image.close()
+                readImage.close()
                 isProcessingFrame = false
             }
 
@@ -406,6 +420,10 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
         super.onResume()
         startBackgroundThread()
 
+        // Set up the intent filter that will receive events from our main activity
+        val filter = IntentFilter().apply { addAction(MainViewModel.KEY_EVENT_ACTION) }
+        broadcastManager.registerReceiver(volumeDownReceiver, filter)
+
         // When the screen is turned off and turned back on, the SurfaceTexture is already available, and onSurfaceTextureAvailable will not be called
         // In that case, open a camera and start preview from here (otherwise, wait until the surface is ready in the SurfaceTextureListener)
         if (textureView.isAvailable) {
@@ -414,25 +432,16 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
             textureView.surfaceTextureListener = surfaceTextureListener
         }
 
-        handlerThread = HandlerThread("inference")
-        handlerThread!!.start()
-        handler = Handler(handlerThread!!.looper)
-
     }
 
     @Synchronized
     override fun onPause() {
 
-        handlerThread!!.quitSafely()
-        try {
-            handlerThread!!.join()
-            handlerThread = null
-            handler = null
-        } catch (e: InterruptedException) {
-        }
-
         closeCamera()
         stopBackgroundThread()
+        // Unregister the broadcast receiver
+        broadcastManager.unregisterReceiver(volumeDownReceiver)
+
         super.onPause()
 
     }
@@ -445,13 +454,6 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
     @Synchronized
     override fun onDestroy() {
         super.onDestroy()
-    }
-
-    @Synchronized
-    fun runInBackground(r: Runnable) {
-        if (handler != null) {
-            handler!!.post(r)
-        }
     }
 
     /**
@@ -467,11 +469,9 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
         textureView.setAspectRatio(viewModel.textureViewSize)
         configureTransform(width, height)
 
-        val previewSize = viewModel.previewSize
+        val preview = viewModel.previewSize.value?: return
 
-        previewReader = ImageReader.newInstance(previewSize.width, previewSize.height, ImageFormat.JPEG, /*maxImages*/ 2).apply {
-            setOnImageAvailableListener(onImageAvailableListener, backgroundHandler)
-        }
+        previewReader = ImageReader.newInstance(preview.width, preview.height, ImageFormat.JPEG, /*maxImages*/ 2)
 
         val manager = viewModel.app.getSystemService(Context.CAMERA_SERVICE) as CameraManager
 
@@ -551,12 +551,14 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
 
         onPreviewSizeChosen()
 
+        val preview = viewModel.previewSize.value?: return
+
         try {
 
             val texture = textureView.surfaceTexture
 
             // Configures the size of default buffer to be the size of camera preview wanted
-            texture.setDefaultBufferSize(viewModel.previewSize.width, viewModel.previewSize.height)
+            texture.setDefaultBufferSize(preview.width, preview.height)
 
             //This is the output Surface we need to start preview
             val surface = Surface(texture)
@@ -565,11 +567,10 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
 
             // Sets up a CaptureRequest.Builder with the output Surface
             previewRequestBuilder = cameraDevice!!.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
-            previewRequestBuilder?: return
             previewRequestBuilder.addTarget(surface)
 
             // Creates the reader for the preview frames
-            previewReader = ImageReader.newInstance(viewModel.previewSize.width, viewModel.previewSize.height, ImageFormat.YUV_420_888, 2)
+            previewReader = ImageReader.newInstance(preview.width, preview.height, ImageFormat.YUV_420_888, 2)
             previewReader?: return
 
             previewReader?.setOnImageAvailableListener(this, backgroundHandler)
@@ -614,17 +615,19 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
      */
     private fun configureTransform(viewWidth: Int, viewHeight: Int) {
 
+        val preview = viewModel.previewSize.value?: return
+
         val rotation = viewModel.rotation.value
         val matrix = Matrix()
         val viewRect = RectF(0f, 0f, viewWidth.toFloat(), viewHeight.toFloat())
-        val bufferRect = RectF(0f, 0f, viewModel.previewSize.height.toFloat(), viewModel.previewSize.width.toFloat())
+        val bufferRect = RectF(0f, 0f, preview.height.toFloat(), preview.width.toFloat())
         val centerX = viewRect.centerX()
         val centerY = viewRect.centerY()
 
         if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
             bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY())
             matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL)
-            val scale = max(viewHeight.toFloat() / viewModel.previewSize.height, viewWidth.toFloat() / viewModel.previewSize.width)
+            val scale = max(viewHeight.toFloat() / preview.height, viewWidth.toFloat() / preview.width)
             matrix.postScale(scale, scale, centerX, centerY)
             matrix.postRotate((90 * (rotation - 2)).toFloat(), centerX, centerY)
         } else if (Surface.ROTATION_180 == rotation) {
@@ -640,16 +643,17 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
         when(v.id){
 
             R.id.fabSwitch ->{
-                if((System.currentTimeMillis() - lastCameraChange) > thresholdBetweenCameraChanges){
+                if((System.currentTimeMillis() - lastCameraChange) > minTimeBetweenCameraChanges){
                     viewModel.changeCamera()
                     onPause()
+                    createCameraPreviewSession()
                     onResume()
                     lastCameraChange = System.currentTimeMillis()
                 }
             }
 
             R.id.fabSave ->{
-                lockFocus()
+                takePhoto()
             }
 
         }
@@ -657,122 +661,64 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
 
     fun processImage() {
 
-        rgbFrameBitmap?.setPixels(getRgbBytes(), 0, viewModel.previewSize.width, 0, 0, viewModel.previewSize.width, viewModel.previewSize.height)
+        val preview = viewModel.previewSize.value?: return
+
+        rgbFrameBitmap?.setPixels(getRgbBytes(), 0, preview.width, 0, 0, preview.width, preview.height)
         val canvas = Canvas(croppedBitmap!!)
         canvas.drawBitmap(rgbFrameBitmap!!, frameToCropTransform!!, null)
-        viewModel.setLiveImage(croppedBitmap)
+        viewModel.liveImageInference(croppedBitmap)
         readyForNextImage()
 
     }
 
-    /**
-     * Lock the focus as the first step for a still image capture
-     */
-    fun lockFocus() {
-        try {
-            // This is how to tell the camera to lock focus
-            previewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CameraMetadata.CONTROL_AF_TRIGGER_START)
-            // Tell captureCallback to wait for the lock
-            state = STATE_WAITING_LOCK
-            captureSession?.capture(previewRequestBuilder.build(), captureCallback, backgroundHandler)
-        } catch (e: CameraAccessException) {
-        }
+    fun takePhoto(){
 
-    }
+        val previewSize = viewModel.previewSize.value?: return
 
-    /**
-     * Runs the pre-capture sequence for capturing a still image
-     * Should be called when a response is received in captureCallback from lockFocus
-     */
-    private fun runPrecaptureSequence() {
-        try {
-            // This is how to tell the camera to trigger.
-            previewRequestBuilder.set(CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER,
-                CaptureRequest.CONTROL_AE_PRECAPTURE_TRIGGER_START)
-            // Tell captureCallback to wait for the precapture sequence to be set.
-            state = STATE_WAITING_PRECAPTURE
-            captureSession?.capture(previewRequestBuilder.build(), captureCallback, backgroundHandler)
-        } catch (e: CameraAccessException) {
-        }
-    }
+        // Set up the capture use case to allow users to take photos
+        val imageCaptureConfig = ImageCaptureConfig.Builder().apply {
+            setLensFacing(CameraX.LensFacing.BACK)
+            setCaptureMode(ImageCapture.CaptureMode.MIN_LATENCY)
+            // Request 4:3 aspect ratio
+            setTargetAspectRatio(Rational(previewSize.width, previewSize.height))
+            // Set initial target rotation, necessary to call this again if rotation changes during the lifecycle of this use case
+            setTargetRotation(viewModel.getScreenOrientation())
+        }.build()
 
-    /**
-     * Captures a still picture
-     * This method should be called when a response is received in captureCallback from both lockFocus
-     */
-    private fun captureStillPicture() {
+        imageCapture = ImageCapture(imageCaptureConfig)
 
-        try {
+        imageCapture?.let { imageCapture ->
 
-            if (activity == null || cameraDevice == null) {
-                return
+            val rawDate = SimpleDateFormat("yyyy-MM-dd_HH:mm:ss")
+            val formattedDate = rawDate.format(Calendar.getInstance().time)
+            val outputDirectory = viewModel.getOutputDirectory()
+            val imageName = viewModel.fileName + "-" + formattedDate
+
+            val file = File(outputDirectory, imageName + MainViewModel.IMAGE_EXTENSION)
+
+            // Setup image capture metadata
+            val metadata = ImageCapture.Metadata().apply {
+                // Mirror image when using the front camera
+                //isReversedHorizontal = lensFacing == CameraX.LensFacing.FRONT
             }
 
-            val df = SimpleDateFormat("yyyy-MM-dd_HH:mm:ss")
-            val formattedDate = df.format(Calendar.getInstance().time)
+            // Setup image capture listener which is triggered after photo has been taken
+            //imageCapture.takePicture(file, imageSavedListener, metadata)
+            imageCapture.takePicture(file, imageSavedListener)
 
-            val imagesToSaveDir = Environment.DIRECTORY_DCIM + File.separator + viewModel.saveImageBasename
-            val imageToSaveName = viewModel.saveImageBasename + "-" + formattedDate + "-" + UUID.randomUUID()
+            // We can only change the foreground Drawable using API level 23+ API
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
-            file = File(imagesToSaveDir, imageToSaveName)
-
-            // This is the CaptureRequest.Builder that is used to take a picture
-            val captureBuilder = cameraDevice?.createCaptureRequest(
-                CameraDevice.TEMPLATE_STILL_CAPTURE)?.apply {
-                addTarget(previewReader!!.surface)
-
-                // Sensor orientation is 90 for most devices, or 270 for some devices
-                // Take it into account and rotate JPEG properly
-                // For devices with orientation of 90, returns mapping from ORIENTATIONS
-                // For devices with orientation of 270, necessary to rotate the JPEG image 180 degrees
-                set(CaptureRequest.JPEG_ORIENTATION,
-                    (viewModel.getScreenOrientation() + viewModel.sensorOrientation + 270) % 360)
-
-                // Use the same AE and AF modes as the preview
-                set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
-            }
-
-            val captureCallback = object : CameraCaptureSession.CaptureCallback() {
-
-                override fun onCaptureCompleted(session: CameraCaptureSession, request: CaptureRequest, result: TotalCaptureResult) {
-                    Toast.makeText(viewModel.app.applicationContext, "$imageToSaveName saved to $imagesToSaveDir", Toast.LENGTH_LONG).show()
-                    unlockFocus()
-                }
+                // Display flash animation to indicate that photo was captured
+                container.postDelayed({
+                    container.foreground = ColorDrawable(MainViewModel.shutterColor)
+                    container.postDelayed(
+                        { container.foreground = null }, MainViewModel.ANIMATION_FAST)
+                }, MainViewModel.ANIMATION_SLOW)
 
             }
-
-            captureSession?.apply {
-                stopRepeating()
-                abortCaptures()
-                capture(captureBuilder!!.build(), captureCallback, null)
-            }
-        } catch (e: CameraAccessException) {
         }
 
-    }
-
-    /**
-     * Unlocks the focus; should be called when still image capture sequence is finished
-     */
-    private fun unlockFocus() {
-
-        try {
-            // Reset the auto-focus trigger
-            previewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CameraMetadata.CONTROL_AF_TRIGGER_CANCEL)
-            setAutoFlash(previewRequestBuilder)
-            captureSession?.capture(previewRequestBuilder.build(), captureCallback, backgroundHandler)
-            // After this, the camera returns to the normal state of preview
-            state = STATE_PREVIEW
-            captureSession?.setRepeatingRequest(previewRequest, captureCallback, backgroundHandler)
-        } catch (e: CameraAccessException) {
-        }
-
-    }
-
-    private fun setAutoFlash(requestBuilder: CaptureRequest.Builder) {
-        if (viewModel.flashSupported) {
-            requestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH)
-        }
     }
 
     protected fun readyForNextImage() {
@@ -780,8 +726,5 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
             postInferenceCallback!!.run()
         }
     }
-
-    private var handler: Handler? = null
-    private var handlerThread: HandlerThread? = null
 
 }

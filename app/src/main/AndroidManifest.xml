@@ -24,8 +24,8 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".model.InferenceService"/>
-        <service android:name=".model.LiveInferenceService"/>
+        <service android:name="com.arpadfodor.android.paw_scanner.viewmodel.workers.InferenceService"/>
+        <service android:name="com.arpadfodor.android.paw_scanner.viewmodel.workers.LiveInferenceService"/>
 
     </application>
 

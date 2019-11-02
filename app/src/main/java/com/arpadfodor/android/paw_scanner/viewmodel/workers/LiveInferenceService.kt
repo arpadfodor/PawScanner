@@ -1,13 +1,13 @@
-package com.arpadfodor.android.paw_scanner.model
+package com.arpadfodor.android.paw_scanner.viewmodel.workers
 
 import android.app.IntentService
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.SystemClock
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.arpadfodor.android.paw_scanner.model.BitmapProcessor.resizedBitmapToInferenceResolution
-import com.arpadfodor.android.paw_scanner.viewmodel.MainViewModel
+import com.arpadfodor.android.paw_scanner.model.ClassifierFloatMobileNet
+import com.arpadfodor.android.paw_scanner.model.Device
+import com.arpadfodor.android.paw_scanner.model.Recognition
 
 class LiveInferenceService : IntentService("LiveInferenceService") {
 
@@ -15,7 +15,11 @@ class LiveInferenceService : IntentService("LiveInferenceService") {
 
     override fun onCreate() {
         super.onCreate()
-        classifier = ClassifierFloatMobileNet(application.assets, Device.CPU, 1)
+        classifier = ClassifierFloatMobileNet(
+            application.assets,
+            Device.CPU,
+            1
+        )
     }
 
     override fun onHandleIntent(intent: Intent?) {
