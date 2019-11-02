@@ -3,29 +3,32 @@
     package="com.arpadfodor.android.paw_scanner">
 
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:largeHeap="true"
         android:theme="@style/AppTheme">
+
+        <activity android:name=".view.RecognitionActivity"></activity>
 
         <activity android:name=".view.MainActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.LAUNCHER"/>
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <service android:name="com.arpadfodor.android.paw_scanner.viewmodel.workers.InferenceService"/>
-        <service android:name="com.arpadfodor.android.paw_scanner.viewmodel.workers.LiveInferenceService"/>
+        <service android:name=".viewmodel.workers.InferenceService" />
+        <service android:name=".viewmodel.workers.LiveInferenceService" />
 
     </application>
 

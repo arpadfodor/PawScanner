@@ -259,6 +259,10 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
      * A FloatingActionButton to save image
      */
     private lateinit var floatingActionButtonSave: FloatingActionButton
+    /**
+     * A FloatingActionButton to show detailed recognition info
+     */
+    private lateinit var floatingActionButtonPaw: FloatingActionButton
 
     private var isProcessingFrame = false
     protected var luminanceStride: Int = 0
@@ -295,14 +299,18 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
         }
 
         textureView = view.findViewById<TextureView>(R.id.textureView) as AutoFitTextureView
-        floatingActionButtonSwitch = view.findViewById<FloatingActionButton>(R.id.fabSwitch)
+        floatingActionButtonSwitch = view.findViewById(R.id.fabSwitch)
         floatingActionButtonSave = view.findViewById(R.id.fabSave)
+        floatingActionButtonPaw = view.findViewById(R.id.fabPaw)
 
         floatingActionButtonSwitch.setOnClickListener {
             this.onClick(floatingActionButtonSwitch)
         }
         floatingActionButtonSave.setOnClickListener {
             this.onClick(floatingActionButtonSave)
+        }
+        floatingActionButtonPaw.setOnClickListener {
+            this.onClick(floatingActionButtonPaw)
         }
 
     }
@@ -654,6 +662,10 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
 
             R.id.fabSave ->{
                 takePhoto()
+            }
+
+            R.id.fabPaw ->{
+                viewModel.recognitionDetails()
             }
 
         }

@@ -29,7 +29,7 @@ abstract class Classifier{
         /**
          * Number of results to show in the UI
          */
-        private const val MAX_RESULTS = 3
+        private const val MAX_RESULTS = 10
 
         /**
          * Dimensions of inputs

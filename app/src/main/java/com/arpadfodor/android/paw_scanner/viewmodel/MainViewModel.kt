@@ -17,10 +17,12 @@ import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraCharacteristics.LENS_FACING
 import android.hardware.camera2.CameraManager
 import androidx.camera.core.CameraX
+import androidx.core.content.ContextCompat.startActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.work.*
 import com.arpadfodor.android.paw_scanner.R
 import com.arpadfodor.android.paw_scanner.model.*
+import com.arpadfodor.android.paw_scanner.view.RecognitionActivity
 import com.arpadfodor.android.paw_scanner.viewmodel.workers.InferenceService
 import java.util.*
 import kotlin.collections.ArrayList
@@ -34,6 +36,8 @@ import java.io.File
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     companion object{
+
+        const val MAXIMUM_RECOGNITIONS_TO_SHOW = 3
 
         const val MINIMUM_PREVIEW_SIZE = 320
         const val MAINTAIN_ASPECT = true
@@ -412,14 +416,39 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         var predictions = app.getString(R.string.predictions)
 
+        val showRecognitonFrom = result.size-1
+        val showRecognitionTo = max(showRecognitonFrom - MAXIMUM_RECOGNITIONS_TO_SHOW, 0)
+
         //other results
-        for(i in (result.size-1) downTo 0){
+        for(i in showRecognitonFrom downTo showRecognitionTo){
             predictions += result[i].toString() + "\n"
         }
 
         dataToInsert.add(predictions)
 
         currentDataToShow.value = dataToInsert
+
+    }
+
+    fun recognitionDetails(){
+
+        val resultToSend = result.value!!
+
+        val intent = Intent(app.applicationContext, RecognitionActivity::class.java).apply {
+
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+            putExtra("inferenceTime", inferenceDuration.value)
+            putExtra("numberOfRecognitions", resultToSend.size)
+
+            for((index, recognition) in resultToSend.withIndex()){
+                putExtra("recognition-id-$index", recognition.id)
+                putExtra("recognition-title-$index", recognition.title)
+                putExtra("recognition-confidence-$index", recognition.confidence)
+            }
+
+        }
+        startActivity(app.applicationContext, intent, null)
 
     }
 

@@ -2,26 +2,15 @@ package com.arpadfodor.android.paw_scanner.view
 
 import android.Manifest
 import android.app.ActivityOptions
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.Matrix
-import android.hardware.camera2.CameraManager
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
-import android.os.HandlerThread
-import android.util.Size
 import android.view.KeyEvent
 import android.view.MenuItem
-import android.view.Surface
 import android.view.WindowManager
 import android.widget.TextView
 import android.widget.Toast
-import androidx.annotation.NonNull
-import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
@@ -31,19 +20,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
 import com.arpadfodor.android.paw_scanner.R
-import com.arpadfodor.android.paw_scanner.model.Recognition
 import com.arpadfodor.android.paw_scanner.view.additional.CustomDialog
 import com.arpadfodor.android.paw_scanner.viewmodel.MainViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
-import kotlinx.android.synthetic.main.custom_app_bar.*
-import kotlinx.android.synthetic.main.main_activity.*
-import java.util.concurrent.Executors
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -60,8 +42,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private lateinit var viewModel: MainViewModel
-
-    private val executor = Executors.newSingleThreadExecutor()
 
     val cameraFragment = CameraFragment.newInstance()
     val loadFragment = LoadFragment.newInstance()
@@ -81,7 +61,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         //Remove notification bar
         this.window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
 
-        setContentView(R.layout.main_activity)
+        setContentView(R.layout.activity_main)
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
@@ -114,6 +94,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val toggle = ActionBarDrawerToggle(this, mainActivityDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         mainActivityDrawerLayout.addDrawerListener(toggle)
         toggle.syncState()
+
         dashboard_navigation.setNavigationItemSelectedListener(this)
         val navigationView = findViewById<NavigationView>(R.id.dashboard_navigation)
         val header = navigationView?.getHeaderView(0)

@@ -17,6 +17,7 @@ import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.arpadfodor.android.paw_scanner.model.BitmapProcessor
 import android.graphics.Bitmap
+import androidx.core.content.ContextCompat
 
 class LoadFragment : Fragment(), View.OnClickListener {
 
@@ -33,6 +34,7 @@ class LoadFragment : Fragment(), View.OnClickListener {
     private lateinit var imageView: ImageView
 
     private lateinit var floatingActionButtonUpload: FloatingActionButton
+    private lateinit var floatingActionButtonPaw: FloatingActionButton
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.load_fragment, container, false)
@@ -44,6 +46,7 @@ class LoadFragment : Fragment(), View.OnClickListener {
 
         imageView = view.findViewById(R.id.ivLoadedImage)
         floatingActionButtonUpload = view.findViewById(R.id.fabUpload)
+        floatingActionButtonPaw = view.findViewById(R.id.fabPawUploaded)
 
         //due to an Android bug, setting clip to outline cannot be done from XML
         imageView.clipToOutline = true
@@ -68,6 +71,10 @@ class LoadFragment : Fragment(), View.OnClickListener {
 
         floatingActionButtonUpload.setOnClickListener {
             this.onClick(floatingActionButtonUpload)
+        }
+
+        floatingActionButtonPaw.setOnClickListener {
+            this.onClick(floatingActionButtonPaw)
         }
 
         imageView.setOnClickListener {
@@ -139,12 +146,19 @@ class LoadFragment : Fragment(), View.OnClickListener {
     override fun onClick(v: View) {
 
         when(v.id){
+
             R.id.fabUpload ->{
                 loadImage()
             }
+
             R.id.ivLoadedImage ->{
                 loadImage()
             }
+
+            R.id.fabPawUploaded ->{
+                viewModel.recognitionDetails()
+            }
+
         }
 
     }
