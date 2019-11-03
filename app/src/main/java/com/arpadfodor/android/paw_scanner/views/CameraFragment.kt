@@ -298,9 +298,9 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
         }
 
         textureView = view.findViewById<TextureView>(R.id.textureView) as AutoFitTextureView
-        floatingActionButtonSwitch = view.findViewById(R.id.fabSwitch)
-        floatingActionButtonSave = view.findViewById(R.id.fabSave)
-        floatingActionButtonPaw = view.findViewById(R.id.fabPaw)
+        floatingActionButtonSwitch = view.findViewById<FloatingActionButton>(R.id.fabSwitch)
+        floatingActionButtonSave = view.findViewById<FloatingActionButton>(R.id.fabSave)
+        floatingActionButtonPaw = view.findViewById<FloatingActionButton>(R.id.fabPaw)
 
         floatingActionButtonSwitch.setOnClickListener {
             this.onClick(floatingActionButtonSwitch)
