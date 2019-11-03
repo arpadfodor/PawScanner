@@ -1,4 +1,4 @@
-package com.arpadfodor.android.paw_scanner.view
+package com.arpadfodor.android.paw_scanner.views
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment

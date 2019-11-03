@@ -1,4 +1,4 @@
-package com.arpadfodor.android.paw_scanner.viewmodel
+package com.arpadfodor.android.paw_scanner.viewmodels
 
 import android.app.Application
 import android.graphics.Bitmap
@@ -19,17 +19,14 @@ import android.hardware.camera2.CameraManager
 import androidx.camera.core.CameraX
 import androidx.core.content.ContextCompat.startActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.work.*
 import com.arpadfodor.android.paw_scanner.R
-import com.arpadfodor.android.paw_scanner.model.*
-import com.arpadfodor.android.paw_scanner.view.RecognitionActivity
-import com.arpadfodor.android.paw_scanner.viewmodel.workers.InferenceService
+import com.arpadfodor.android.paw_scanner.models.*
+import com.arpadfodor.android.paw_scanner.views.RecognitionActivity
+import com.arpadfodor.android.paw_scanner.viewmodels.services.InferenceService
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.max
 import kotlin.math.min
-import com.arpadfodor.android.paw_scanner.viewmodel.workers.InferenceWorker
-import com.arpadfodor.android.paw_scanner.viewmodel.workers.LiveInferenceService
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -42,8 +39,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         const val MINIMUM_PREVIEW_SIZE = 320
         const val MAINTAIN_ASPECT = true
 
+        const val RECOGNITION_DISABLED = 0
         const val RECOGNITION_LIVE = 1
         const val RECOGNITION_LOAD = 2
+        const val RECOGNITION_HISTORY = 3
 
         const val KEY_EVENT_ACTION = "key_event_action"
         const val KEY_EVENT_EXTRA = "key_event_extra"
@@ -92,25 +91,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     var cameraOpened = false
 
     /*
-     * Whether live inference is enabled or not
-     */
-    var liveInferenceEnabled = false
-
-    /*
-     * Whether load inference is enabled or not
-     */
-    var loadInferenceEnabled = false
-
-    /*
-     * Whether history inference is enabled or not
-     */
-    var historyInferenceEnabled = false
-
-    /*
      * List of available cameras
      */
     var availableCameras = arrayOfNulls<String>(0)
 
+    /*
+     * Recognition result broadcast receiver
+     */
     lateinit var recognitionResultReceiver: BroadcastReceiver
 
     /*
@@ -119,14 +106,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     lateinit var classifier: Classifier
 
     /*
-     * The inferenceManager that manages inference work
-     */
-    var inferenceManager = WorkManager.getInstance()
-
-    /*
      * Whether inference has finished or not
      */
     var isInferenceFinished: Boolean = true
+
+    /*
+     * Current enabled inference type
+     */
+    val currentRecognitionEnabled: MutableLiveData<Int> by lazy {
+        MutableLiveData<Int>()
+    }
 
     /**
      * The current selected camera preview size
@@ -203,16 +192,25 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun init(parentScreenOrientation: Int){
 
+        FirebaseInteraction.init(app.applicationContext, app.getString(R.string.app_ad_id))
+
         classifier = ClassifierFloatMobileNet(app.assets, Device.CPU, 1)
         classifierInputSize.value = Size(classifier.getImageSizeX(), classifier.getImageSizeY())
         rotation.value = parentScreenOrientation
         isInferenceFinished = true
         currentCameraIndex.value = 0
         currentCameraOrientation.value = CameraX.LensFacing.BACK
+        currentRecognitionEnabled.value = RECOGNITION_LIVE
 
         recognitionResultReceiver = object : BroadcastReceiver(){
 
             override fun onReceive(context: Context, intent: Intent) {
+
+                val resultType = intent.getIntExtra("type", RECOGNITION_LIVE)
+
+                if(resultType != currentRecognitionEnabled.value){
+                    return
+                }
 
                 inferenceDuration.value = intent.getLongExtra("inferenceTime", 0)
                 val sizeOfResults = intent.getIntExtra("numberOfRecognitions", 0)
@@ -233,7 +231,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 isInferenceFinished = true
 
                 //notify the activity to show results
-                updateCurrentInfo(inferenceDuration.value, result.value)
+                updateCurrentInfo(inferenceDuration.value?: 0, result.value?: emptyList())
 
             }
 
@@ -244,7 +242,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         )
 
         InferenceService.viewModel = this
-        InferenceWorker.viewModel = this
     }
 
     /**
@@ -345,36 +342,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     }
 
-    fun loadedImageInference(bitmap: Bitmap){
-
+    fun setLoadedImage(bitmap: Bitmap){
         loadedImage.value = bitmap
-
-        if(!loadInferenceEnabled){
-            return
-        }
-
-        recognizeImage(RECOGNITION_LOAD)
-
+        recognizeLoadedImage()
     }
 
-    fun liveImageInference(bitmap: Bitmap?){
+    fun recognizeLiveImage(bitmap: Bitmap?){
 
         bitmap?: return
-
-        if(!liveInferenceEnabled){
-            return
-        }
 
         if(!isInferenceFinished){
             return
         }
 
+        if(currentRecognitionEnabled.value != RECOGNITION_LIVE){
+            return
+        }
+
         isInferenceFinished = false
 
-        //val inference = OneTimeWorkRequestBuilder<InferenceWorker>().build()
-        //inferenceManager.enqueue(inference)
-
-        val intent = Intent(app.applicationContext, LiveInferenceService::class.java)
+        val intent = Intent(app.applicationContext, InferenceService::class.java)
+        intent.putExtra("type", RECOGNITION_LIVE)
         val bs = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.PNG, 99, bs)
         intent.putExtra("byteArray", bs.toByteArray())
@@ -382,25 +370,29 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     }
 
-    private fun recognizeImage(recognitionTypeId: Int){
+    private fun recognizeLoadedImage(){
 
-        if(!isInferenceFinished){
+        if(!isInferenceFinished || loadedImage.value == null){
+            return
+        }
+
+        if(currentRecognitionEnabled.value != RECOGNITION_LOAD){
             return
         }
 
         isInferenceFinished = false
 
         val intent = Intent(app.applicationContext, InferenceService::class.java)
-        intent.putExtra("type", recognitionTypeId)
+        intent.putExtra("type", RECOGNITION_LOAD)
         app.applicationContext.startService(intent)
 
     }
 
-    private fun updateCurrentInfo(duration: Long?, result: List<Recognition>?){
+    private fun updateCurrentInfo(duration: Long, result: List<Recognition>){
 
         val dataToInsert = arrayListOf<String>()
 
-        if(duration == null || result == null || result.isEmpty()){
+        if(result.isEmpty()){
             dataToInsert.add("")
             dataToInsert.add("")
             dataToInsert.add("")
@@ -416,11 +408,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         var predictions = app.getString(R.string.predictions)
 
-        val showRecognitonFrom = result.size-1
-        val showRecognitionTo = max(showRecognitonFrom - MAXIMUM_RECOGNITIONS_TO_SHOW, 0)
+        val showRecognitionFrom = min(MAXIMUM_RECOGNITIONS_TO_SHOW, result.size) -1
+        val showRecognitionTo = 0
 
         //other results
-        for(i in showRecognitonFrom downTo showRecognitionTo){
+        for(i in showRecognitionFrom downTo showRecognitionTo){
             predictions += result[i].toString() + "\n"
         }
 
@@ -492,39 +484,40 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return CameraX.LensFacing.BACK
     }
 
+    /*
+    * Notifies the activity to delete previous recognitions and start live mode
+    */
     fun activateLiveMode(){
-        loadInferenceEnabled = false
-        historyInferenceEnabled = false
-        liveInferenceEnabled = true
+        currentRecognitionEnabled.value = RECOGNITION_LIVE
         isInferenceFinished = true
-        //notify the activity to show results
-        //recognizeImage(RECOGNITION_LIVE)
-    }
-
-    fun activateLoadMode(){
-        liveInferenceEnabled = false
-        historyInferenceEnabled = false
-        loadInferenceEnabled = true
-        isInferenceFinished = true
-        //notify the activity to show results
-        recognizeImage(RECOGNITION_LOAD)
-    }
-
-    fun activateHistoryMode(){
-        liveInferenceEnabled = false
-        loadInferenceEnabled = false
-        historyInferenceEnabled = true
-        isInferenceFinished = true
-        //notify the activity to show results
         updateCurrentInfo(0, emptyList())
     }
 
+    /*
+    * Notifies the activity to delete previous recognitions and start load mode
+    */
+    fun activateLoadMode(){
+        currentRecognitionEnabled.value = RECOGNITION_LOAD
+        isInferenceFinished = true
+        updateCurrentInfo(0, emptyList())
+        recognizeLoadedImage()
+    }
+
+    /*
+    * Notifies the activity to delete previous recognitions and start history mode
+    */
+    fun activateHistoryMode(){
+        currentRecognitionEnabled.value = RECOGNITION_HISTORY
+        isInferenceFinished = true
+        updateCurrentInfo(0, emptyList())
+    }
+
+    /*
+    * Notifies the activity to delete previous recognitions and disable inference
+    */
     fun disableInference(){
-        liveInferenceEnabled = false
-        loadInferenceEnabled = false
-        historyInferenceEnabled = false
+        currentRecognitionEnabled.value = RECOGNITION_DISABLED
         isInferenceFinished = false
-        //notify the activity to show results
         updateCurrentInfo(0, emptyList())
     }
 

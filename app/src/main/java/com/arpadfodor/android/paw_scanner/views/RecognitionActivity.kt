@@ -1,4 +1,4 @@
-package com.arpadfodor.android.paw_scanner.view
+package com.arpadfodor.android.paw_scanner.views
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -7,7 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import com.arpadfodor.android.paw_scanner.R
-import com.arpadfodor.android.paw_scanner.model.Recognition
+import com.arpadfodor.android.paw_scanner.models.Recognition
 
 class RecognitionActivity : AppCompatActivity() {
 

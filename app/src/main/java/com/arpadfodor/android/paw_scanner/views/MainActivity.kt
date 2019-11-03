@@ -1,4 +1,4 @@
-package com.arpadfodor.android.paw_scanner.view
+package com.arpadfodor.android.paw_scanner.views
 
 import android.Manifest
 import android.app.ActivityOptions
@@ -21,8 +21,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.arpadfodor.android.paw_scanner.R
-import com.arpadfodor.android.paw_scanner.view.additional.CustomDialog
-import com.arpadfodor.android.paw_scanner.viewmodel.MainViewModel
+import com.arpadfodor.android.paw_scanner.views.additional.CustomDialog
+import com.arpadfodor.android.paw_scanner.viewmodels.MainViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.activity_main.*

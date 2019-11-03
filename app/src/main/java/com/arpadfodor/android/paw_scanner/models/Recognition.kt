@@ -1,4 +1,4 @@
-package com.arpadfodor.android.paw_scanner.model
+package com.arpadfodor.android.paw_scanner.models
 
 import android.graphics.RectF
 

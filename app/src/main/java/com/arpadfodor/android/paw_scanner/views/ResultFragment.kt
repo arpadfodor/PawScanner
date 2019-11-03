@@ -1,4 +1,4 @@
-package com.arpadfodor.android.paw_scanner.view
+package com.arpadfodor.android.paw_scanner.views
 
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.arpadfodor.android.paw_scanner.R
-import com.arpadfodor.android.paw_scanner.viewmodel.MainViewModel
+import com.arpadfodor.android.paw_scanner.viewmodels.MainViewModel
 
 class ResultFragment : Fragment() {
 

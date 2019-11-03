@@ -1,13 +1,14 @@
-package com.arpadfodor.android.paw_scanner.viewmodel.workers
+package com.arpadfodor.android.paw_scanner.viewmodels.services
 
 import android.app.IntentService
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.SystemClock
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.arpadfodor.android.paw_scanner.model.ClassifierFloatMobileNet
-import com.arpadfodor.android.paw_scanner.model.Device
-import com.arpadfodor.android.paw_scanner.model.Recognition
+import com.arpadfodor.android.paw_scanner.models.ClassifierFloatMobileNet
+import com.arpadfodor.android.paw_scanner.models.Device
+import com.arpadfodor.android.paw_scanner.models.Recognition
+import com.arpadfodor.android.paw_scanner.viewmodels.MainViewModel
 
 class LiveInferenceService : IntentService("LiveInferenceService") {
 
@@ -26,6 +27,8 @@ class LiveInferenceService : IntentService("LiveInferenceService") {
 
         intent?: return
 
+        val type = intent.getIntExtra("type", MainViewModel.RECOGNITION_LIVE)
+
         if (intent.hasExtra("byteArray")) {
 
             val bitmap = BitmapFactory.decodeByteArray(
@@ -38,16 +41,17 @@ class LiveInferenceService : IntentService("LiveInferenceService") {
             val result = classifier.recognizeImage(bitmap)
             val inferenceTime = SystemClock.uptimeMillis() - startTime
 
-            sendMessageToViewModel(result, inferenceTime)
+            sendMessageToViewModel(result, inferenceTime, type)
 
         }
 
     }
 
-    private fun sendMessageToViewModel(result: List<Recognition>, inferenceTime: Long) {
+    private fun sendMessageToViewModel(result: List<Recognition>, inferenceTime: Long, type: Int) {
 
         val intent = Intent("InferenceResult")
 
+        intent.putExtra("type", type)
         intent.putExtra("inferenceTime", inferenceTime)
         intent.putExtra("numberOfRecognitions", result.size)
 

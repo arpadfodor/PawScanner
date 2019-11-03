@@ -1,4 +1,4 @@
-package com.arpadfodor.android.paw_scanner.viewmodel
+package com.arpadfodor.android.paw_scanner.viewmodels
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

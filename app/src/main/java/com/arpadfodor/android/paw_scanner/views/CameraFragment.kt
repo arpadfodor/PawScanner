@@ -1,4 +1,4 @@
-package com.arpadfodor.android.paw_scanner.view
+package com.arpadfodor.android.paw_scanner.views
 
 import android.Manifest
 import android.content.BroadcastReceiver
@@ -11,7 +11,6 @@ import android.graphics.*
 import android.graphics.drawable.ColorDrawable
 import android.hardware.Camera
 import android.hardware.camera2.*
-import android.hardware.display.DisplayManager
 import android.media.Image
 import android.media.ImageReader
 import android.media.MediaScannerConnection
@@ -27,9 +26,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.arpadfodor.android.paw_scanner.R
-import com.arpadfodor.android.paw_scanner.model.BitmapProcessor
-import com.arpadfodor.android.paw_scanner.view.additional.AutoFitTextureView
-import com.arpadfodor.android.paw_scanner.viewmodel.MainViewModel
+import com.arpadfodor.android.paw_scanner.models.BitmapProcessor
+import com.arpadfodor.android.paw_scanner.views.additional.AutoFitTextureView
+import com.arpadfodor.android.paw_scanner.viewmodels.MainViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.File
 import java.text.SimpleDateFormat
@@ -678,7 +677,7 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
         rgbFrameBitmap?.setPixels(getRgbBytes(), 0, preview.width, 0, 0, preview.width, preview.height)
         val canvas = Canvas(croppedBitmap!!)
         canvas.drawBitmap(rgbFrameBitmap!!, frameToCropTransform!!, null)
-        viewModel.liveImageInference(croppedBitmap)
+        viewModel.recognizeLiveImage(croppedBitmap)
         readyForNextImage()
 
     }

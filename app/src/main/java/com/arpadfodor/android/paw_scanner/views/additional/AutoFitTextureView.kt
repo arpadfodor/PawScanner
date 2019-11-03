@@ -1,10 +1,9 @@
-package com.arpadfodor.android.paw_scanner.view.additional
+package com.arpadfodor.android.paw_scanner.views.additional
 
 import android.content.Context
 import android.util.AttributeSet
 import android.util.Size
 import android.view.TextureView
-import android.view.View
 
 /**
  * A [TextureView] that can be adjusted to a specified aspect ratio

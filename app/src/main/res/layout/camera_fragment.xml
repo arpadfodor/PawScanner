@@ -6,9 +6,9 @@
     android:id="@+id/cameraFragmentConstraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.CameraFragment">
+    tools:context=".views.CameraFragment">
 
-    <com.arpadfodor.android.paw_scanner.view.additional.AutoFitTextureView
+    <com.arpadfodor.android.paw_scanner.views.additional.AutoFitTextureView
         android:id="@+id/textureView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

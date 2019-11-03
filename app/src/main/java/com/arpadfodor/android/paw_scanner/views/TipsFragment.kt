@@ -1,4 +1,5 @@
-package com.arpadfodor.android.paw_scanner.view
+package com.arpadfodor.android.paw_scanner.views
+
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -9,12 +10,12 @@ import android.view.ViewGroup
 import com.arpadfodor.android.paw_scanner.R
 
 /**
- * About Fragment
+ * Tips Fragment
  */
-class AboutFragment : Fragment() {
+class TipsFragment : Fragment() {
 
     companion object {
-        fun newInstance() = AboutFragment()
+        fun newInstance() = TipsFragment()
     }
 
     override fun onCreateView(
@@ -22,7 +23,7 @@ class AboutFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.about_fragment, container, false)
+        return inflater.inflate(R.layout.tips_fragment, container, false)
     }
 
 }

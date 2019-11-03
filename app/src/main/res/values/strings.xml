@@ -1,5 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE resources [
+    <!ENTITY appName "Paw Scanner">
+    <!ENTITY appId "925630375777">
+    <!ENTITY appVersion "v0.1">
+    <!ENTITY appDate "03/11/2019">
+    <!ENTITY adMobAppId "ca-app-pub-3940256099942544~3347511713">
+    <!ENTITY adMobBannerId "ca-app-pub-3940256099942544/6300978111">
+    ]>
+<!--test adMobAppId "ca-app-pub-3940256099942544~3347511713"-->
+<!--test adMobBannerId "ca-app-pub-3940256099942544/6300978111"-->
+
 <resources>
-    <string name="app_name">Paw Scanner</string>
+    <string name="app_name">&appName;</string>
+    <string name="app_id">&appId;</string>
+    <string name="app_version">&appVersion;</string>
+    <string name="app_date">&appDate;</string>
+    <string name="app_ad_id">&adMobAppId;</string>
+    <string name="app_banner_id">&adMobBannerId;</string>
+
     <string name="title_home">Live</string>
     <string name="title_history">History</string>
     <string name="title_load">Load</string>

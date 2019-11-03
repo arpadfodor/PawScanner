@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.arpadfodor.android.paw_scanner.view.additional
+package com.arpadfodor.android.paw_scanner.views.additional
 
 import android.content.Context
 import android.graphics.Matrix

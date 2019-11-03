@@ -1,4 +1,4 @@
-package com.arpadfodor.android.paw_scanner.view
+package com.arpadfodor.android.paw_scanner.views
 
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.Observer
 import com.arpadfodor.android.paw_scanner.R
-import com.arpadfodor.android.paw_scanner.viewmodel.SettingsViewModel
+import com.arpadfodor.android.paw_scanner.viewmodels.SettingsViewModel
 
 
 class SettingsFragment : Fragment() {

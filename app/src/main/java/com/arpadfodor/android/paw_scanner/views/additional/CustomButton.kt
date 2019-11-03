@@ -1,4 +1,4 @@
-package com.arpadfodor.android.paw_scanner.view.additional
+package com.arpadfodor.android.paw_scanner.views.additional
 
 import android.content.Context
 import android.util.AttributeSet

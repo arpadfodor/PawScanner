@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.RecognitionActivity">
+    tools:context=".views.RecognitionActivity">
 
     <include
         layout="@layout/image_app_bar"

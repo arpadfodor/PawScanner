@@ -9,7 +9,7 @@
     android:layout_below= "@+id/main_activity_app_bar"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     android:background="@color/colorPrimaryDark"
-    tools:context=".view.MainActivity">
+    tools:context=".views.MainActivity">
 
     <TextureView
         android:layout_width="match_parent"

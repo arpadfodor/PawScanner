@@ -3,6 +3,7 @@
     package="com.arpadfodor.android.paw_scanner">
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -16,9 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".view.RecognitionActivity"></activity>
+        <activity android:name=".views.RecognitionActivity"/>
 
-        <activity android:name=".view.MainActivity">
+        <activity android:name=".views.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
@@ -27,8 +28,15 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".viewmodel.workers.InferenceService" />
-        <service android:name=".viewmodel.workers.LiveInferenceService" />
+        <service android:name=".viewmodels.services.InferenceService" />
+        <service android:name=".viewmodels.services.LiveInferenceService" />
+
+        <meta-data android:name="com.google.android.gms.games.APP_ID"
+            android:value="@string/app_id" />
+        <meta-data android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version"/>
+        <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/app_ad_id"/>
 
     </application>
 

@@ -1,4 +1,4 @@
-package com.arpadfodor.android.paw_scanner.view
+package com.arpadfodor.android.paw_scanner.views
 
 import android.app.Activity
 import android.content.Intent
@@ -12,12 +12,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.lifecycle.Observer
 import com.arpadfodor.android.paw_scanner.R
-import com.arpadfodor.android.paw_scanner.viewmodel.MainViewModel
+import com.arpadfodor.android.paw_scanner.viewmodels.MainViewModel
 import com.bumptech.glide.Glide
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.arpadfodor.android.paw_scanner.model.BitmapProcessor
+import com.arpadfodor.android.paw_scanner.models.BitmapProcessor
 import android.graphics.Bitmap
-import androidx.core.content.ContextCompat
 
 class LoadFragment : Fragment(), View.OnClickListener {
 
@@ -134,7 +133,7 @@ class LoadFragment : Fragment(), View.OnClickListener {
                     val sourceBitmap = MediaStore.Images.Media.getBitmap(viewModel.app.contentResolver, selectedImageUri)
                     val croppedBitmap = BitmapProcessor.bitmapToCroppedImage(selectedImageUri, sourceBitmap)
 
-                    viewModel.loadedImageInference(croppedBitmap)
+                    viewModel.setLoadedImage(croppedBitmap)
 
                 }
             }

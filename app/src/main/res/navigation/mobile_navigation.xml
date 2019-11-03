@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/navigation_history"
-        android:name="com.arpadfodor.android.paw_scanner.view.HistoryFragment"
+        android:name="com.arpadfodor.android.paw_scanner.views.HistoryFragment"
         android:label="@string/title_history"
         tools:layout="@layout/history_fragment" >
         <action
@@ -29,7 +29,7 @@
 
     <fragment
         android:id="@+id/navigation_live"
-        android:name="com.arpadfodor.android.paw_scanner.view.CameraFragment"
+        android:name="com.arpadfodor.android.paw_scanner.views.CameraFragment"
         android:label="@string/title_home"
         tools:layout="@layout/camera_fragment" >
         <action
@@ -50,7 +50,7 @@
 
     <fragment
         android:id="@+id/navigation_load"
-        android:name="com.arpadfodor.android.paw_scanner.view.LoadFragment"
+        android:name="com.arpadfodor.android.paw_scanner.views.LoadFragment"
         android:label="@string/title_load"
         tools:layout="@layout/load_fragment" >
         <action
