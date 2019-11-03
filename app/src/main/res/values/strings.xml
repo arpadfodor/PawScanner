@@ -28,7 +28,11 @@
     <string name="title_recognition_details">Recognition details</string>
 
     <string name="predictions">Predictions\n</string>
-    <string name="inference_duration">Duration\n%1$d [ms]</string>
+    <string name="human_but_text">%1$s, but looks like a(n) %2$s</string>
+    <string name="result_text">A(n) %1$s recognized</string>
+    <string name="inference_duration">Inference duration\n%1$d [ms]</string>
+    <string name="prediction_stats_chart_title">Predictions chart</string>
+    <string name="prediction_stats_chart_label">[Top %1$d predictions]</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

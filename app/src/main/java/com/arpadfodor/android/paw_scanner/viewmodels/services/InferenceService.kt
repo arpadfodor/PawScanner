@@ -37,33 +37,21 @@ class InferenceService : IntentService("InferenceService") {
 
         lateinit var bitmap: Bitmap
 
+        //interestingly, without image resizing the results seem to be more accurate
+        //bitmap = viewModel.loadedImage.value
         if(type == MainViewModel.RECOGNITION_LOAD){
-
-            //interestingly, without image resizing the results seem to be more accurate
-            //bitmap = viewModel.loadedImage.value
             bitmap = resizedBitmapToInferenceResolution(viewModel.loadedImage.value?: return, viewModel.classifierInputSize.value?: return)
-
-            val startTime = SystemClock.uptimeMillis()
-            val result = classifier.recognizeImage(bitmap)
-            val inferenceTime = SystemClock.uptimeMillis() - startTime
-
-            sendMessageToViewModel(result, inferenceTime, type)
-
         }
         else if(type == MainViewModel.RECOGNITION_LIVE){
-
-            val bitmap = BitmapFactory.decodeByteArray(
-                intent.getByteArrayExtra("byteArray"),
-                0,
-                intent.getByteArrayExtra("byteArray")!!.size)
-
-            val startTime = SystemClock.uptimeMillis()
-            val result = classifier.recognizeImage(bitmap)
-            val inferenceTime = SystemClock.uptimeMillis() - startTime
-
-            sendMessageToViewModel(result, inferenceTime, type)
-
+            bitmap = resizedBitmapToInferenceResolution(viewModel.
+                liveImage?: return, viewModel.classifierInputSize.value?: return)
         }
+
+        val startTime = SystemClock.uptimeMillis()
+        val result = classifier.recognizeImage(bitmap)
+        val inferenceTime = SystemClock.uptimeMillis() - startTime
+
+        sendMessageToViewModel(result, inferenceTime, type)
 
     }
 

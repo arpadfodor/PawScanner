@@ -7,5 +7,5 @@
     <color name="colorNormalButton">#459389</color>
     <color name="colorGray">#14161f</color>
     <color name="colorTransparentGray">#B31A1A1A</color>
-    <color name="colorButtonText">#DFFFFF</color>
+    <color name="colorText">#DFFFFF</color>
 </resources>

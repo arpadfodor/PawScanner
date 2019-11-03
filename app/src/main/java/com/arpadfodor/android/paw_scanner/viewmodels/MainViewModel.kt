@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat.startActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.arpadfodor.android.paw_scanner.R
 import com.arpadfodor.android.paw_scanner.models.*
+import com.arpadfodor.android.paw_scanner.models.BitmapProcessor.resizedBitmapToInferenceResolution
 import com.arpadfodor.android.paw_scanner.views.RecognitionActivity
 import com.arpadfodor.android.paw_scanner.viewmodels.services.InferenceService
 import java.util.*
@@ -158,9 +159,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     /*
      * The live image
      */
-    val liveImage: MutableLiveData<Bitmap> by lazy {
-        MutableLiveData<Bitmap>()
-    }
+    lateinit var liveImage: Bitmap
 
     /*
      * The classifier input size
@@ -350,6 +349,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun recognizeLiveImage(bitmap: Bitmap?){
 
         bitmap?: return
+        liveImage = bitmap
 
         if(!isInferenceFinished){
             return
@@ -363,9 +363,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         val intent = Intent(app.applicationContext, InferenceService::class.java)
         intent.putExtra("type", RECOGNITION_LIVE)
-        val bs = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 99, bs)
-        intent.putExtra("byteArray", bs.toByteArray())
         app.applicationContext.startService(intent)
 
     }
@@ -424,7 +421,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun recognitionDetails(){
 
-        val resultToSend = result.value!!
+        var bitmap = when {
+            currentRecognitionEnabled.value == RECOGNITION_LIVE -> liveImage?: return
+            currentRecognitionEnabled.value == RECOGNITION_LOAD -> loadedImage.value?: return
+            else -> return
+        }
+
+        bitmap = resizedBitmapToInferenceResolution(bitmap, classifierInputSize.value?: return)
+
+        val resultToSend = result.value?: return
 
         val intent = Intent(app.applicationContext, RecognitionActivity::class.java).apply {
 
@@ -432,6 +437,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
             putExtra("inferenceTime", inferenceDuration.value)
             putExtra("numberOfRecognitions", resultToSend.size)
+
+            val bs = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.PNG, 50, bs)
+            putExtra("byteArray", bs.toByteArray())
 
             for((index, recognition) in resultToSend.withIndex()){
                 putExtra("recognition-id-$index", recognition.id)

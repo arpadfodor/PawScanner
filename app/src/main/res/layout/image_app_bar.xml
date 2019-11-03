@@ -17,12 +17,23 @@
         app:expandedTitleTextAppearance="@android:color/transparent"
         android:fitsSystemWindows="true">
 
-        <ImageView
-            app:layout_collapseMode="parallax"
-            android:id="@+id/imageViewCollapsing"
-            android:scaleType="centerCrop"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content">
+
+            <ImageView
+                app:layout_collapseMode="parallax"
+                android:id="@+id/imageViewCollapsing"
+                android:scaleType="centerCrop"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/fade_effect"
+                android:layout_gravity="bottom"
+                android:background="@drawable/custom_gradient_bottom"/>
+        </FrameLayout>
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/imageToolbar"

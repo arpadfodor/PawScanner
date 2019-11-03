@@ -26,7 +26,7 @@ open class CustomButton : Button{
     init {
 
         this.background = resources.getDrawable(R.drawable.custom_button)
-        this.setTextColor(resources.getColor(R.color.colorButtonText))
+        this.setTextColor(resources.getColor(R.color.colorText))
         this.isAllCaps = true
         this.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
         this.setPadding(15,25,15,25)
