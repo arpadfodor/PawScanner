@@ -8,18 +8,35 @@
     tools:context=".views.LoadFragment"
     android:id="@+id/loadFragmentConstraintLayout">
 
-    <ImageView
-        android:id="@+id/ivLoadedImage"
-        android:background="@drawable/loaded_image"
+    <FrameLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_margin="16dp"
-        android:scaleType="center"
+        android:id="@+id/flLoadedImageContainer"
         app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintBottom_toTopOf="@+id/fabPawUploaded"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/loaded_image"
+            android:scaleType="center"
+            android:id="@+id/ivLoadedImage"
+            app:layout_constraintDimensionRatio="1:1"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/fade_effect"
+            android:layout_gravity="bottom"
+            android:background="@drawable/custom_gradient_bottom"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/fade_effect"
+            android:layout_gravity="top"
+            android:background="@drawable/custom_gradient_top"/>
+    </FrameLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabPawUploaded"

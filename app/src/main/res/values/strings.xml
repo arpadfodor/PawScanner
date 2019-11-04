@@ -28,12 +28,12 @@
     <string name="title_recognition_details">Recognition details</string>
 
     <string name="predictions">Predictions\n</string>
-    <string name="prediction_mixed_breed_title">Possible breed mix</string>
+    <string name="prediction_chart_title">Possible breed mix [%]</string>
     <string name="human_but_text">A %1$s, but looks like a(n) %2$s</string>
     <string name="result_text">%1$s recognized</string>
     <string name="category_others">others</string>
     <string name="inference_duration">Inference duration\n%1$d [ms]</string>
-    <string name="prediction_stats_chart_title">Top predictions [%]</string>
+    <string name="prediction_top_title">Top %1$s predictions</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

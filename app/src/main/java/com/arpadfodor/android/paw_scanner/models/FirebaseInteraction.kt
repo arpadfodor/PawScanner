@@ -1,4 +1,4 @@
-package com.arpadfodor.android.paw_scanner.viewmodels
+package com.arpadfodor.android.paw_scanner.models
 
 import android.content.Context
 import com.google.android.gms.ads.AdRequest
@@ -18,7 +18,10 @@ object FirebaseInteraction{
      */
     fun init(context: Context, appAdMobId: String){
         initFirebaseAnalytics(context)
-        initMobileAds(context, appAdMobId)
+        initMobileAds(
+            context,
+            appAdMobId
+        )
     }
 
     /**

@@ -112,6 +112,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     var isInferenceFinished: Boolean = true
 
     /*
+     * Whether currentDataToShow contains empty strings or not
+     */
+    var isCurrentDataToShowEmpty: Boolean = true
+
+    /*
      * Current enabled inference type
      */
     val currentRecognitionEnabled: MutableLiveData<Int> by lazy {
@@ -390,11 +395,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val dataToInsert = arrayListOf<String>()
 
         if(result.isEmpty()){
+
             dataToInsert.add("")
             dataToInsert.add("")
             dataToInsert.add("")
             currentDataToShow.value = dataToInsert
+
+            isCurrentDataToShowEmpty = true
+
             return
+
         }
 
         //inference duration
@@ -417,9 +427,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         currentDataToShow.value = dataToInsert
 
+        isCurrentDataToShowEmpty = false
+
     }
 
     fun recognitionDetails(){
+
+        if(isCurrentDataToShowEmpty){
+            return
+        }
 
         var bitmap = when {
             currentRecognitionEnabled.value == RECOGNITION_LIVE -> liveImage?: return
@@ -439,7 +455,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             putExtra("numberOfRecognitions", resultToSend.size)
 
             val bs = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.PNG, 50, bs)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 99, bs)
             putExtra("byteArray", bs.toByteArray())
 
             for((index, recognition) in resultToSend.withIndex()){
