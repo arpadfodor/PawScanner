@@ -160,31 +160,31 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
             //If the current percentage is greater than the threshold, it will be spoken
             if(currentPercentage >= MIN_PREDICTION_PERCENTAGE_TO_PAY_ATTENTION){
                 counter++
-                recognitionsToMention = recognitionsToMention.plus((recognition.title + ". " + currentPercentage + " percent. "))
+                recognitionsToMention = recognitionsToMention.plus(app.getString(R.string.tts_recognition_element, recognition.title, currentPercentage.toString()))
             }
 
         }
 
-        //Only one prediction exists to mention
+        //Only one prediction to mention
         if(counter == 1){
 
-            spokenText += "The following creature recognized: "
+            spokenText += app.getString(R.string.tts_singular_recognition_start_text)
 
             for(recognition in recognitionsToMention){
                 spokenText += recognition
             }
 
         }
-        //More predictions exist to mention
+        //More predictions to mention
         else{
 
-            spokenText += "The predictions are the following. "
+            spokenText += app.getString(R.string.tts_plural_recognitions_start_text)
 
             for((i, recognition) in recognitionsToMention.withIndex()){
-                spokenText += "Number " + (i+1).toString() + ": " + recognition
+                spokenText += app.getString(R.string.tts_element_order, (i+1).toString(), recognition)
             }
 
-            spokenText += "If the recognized creature is a mixed breed, it is likely to be a mixture of the mentioned breeds."
+            spokenText += app.getString(R.string.tts_if_mixed_text)
 
         }
 
@@ -194,7 +194,7 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
 
     fun mainRecognitionText(): String{
 
-        return if(results[0].title == "human"){
+        return if(results[0].title == app.getString(R.string.human)){
             app.getString(R.string.human_but_text, results[0].toString(), results[1].toString())
         } else{
             app.getString(R.string.result_text, results[0].toString())

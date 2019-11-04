@@ -11,6 +11,7 @@
 <!--test adMobBannerId "ca-app-pub-3940256099942544/6300978111"-->
 
 <resources>
+
     <string name="app_name">&appName;</string>
     <string name="app_id">&appId;</string>
     <string name="app_version">&appVersion;</string>
@@ -29,6 +30,7 @@
 
     <string name="predictions">Predictions\n</string>
     <string name="prediction_chart_title">Possible breed mix [%]</string>
+    <string name="human">human</string>
     <string name="human_but_text">A %1$s, but looks like a(n) %2$s</string>
     <string name="result_text">%1$s recognized</string>
     <string name="category_others">others</string>
@@ -44,4 +46,11 @@
     <string name="confirm_exit">Confirm exit</string>
     <string name="confirm_exit_description">Are you sure you want to exit?</string>
     <string name="camera_error">Camera error occurred</string>
+
+    <string name="tts_recognition_element">%1$s. %2$s percent. </string>
+    <string name="tts_singular_recognition_start_text">The prediction is </string>
+    <string name="tts_plural_recognitions_start_text">The predictions are the following. </string>
+    <string name="tts_element_order">Number %1$s: %2$s</string>
+    <string name="tts_if_mixed_text">If the recognized creature is a mixed breed, it is likely to be a mixture of the mentioned breeds. </string>
+
 </resources>

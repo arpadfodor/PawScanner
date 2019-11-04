@@ -35,7 +35,6 @@ object TextToSpeechModel{
      */
     fun stop(){
         textToSpeech?.stop()
-        //textToSpeech?.shutdown()
     }
 
     fun isSpeaking(): Boolean{

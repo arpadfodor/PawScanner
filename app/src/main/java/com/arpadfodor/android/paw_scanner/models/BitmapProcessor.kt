@@ -1,5 +1,6 @@
 package com.arpadfodor.android.paw_scanner.models
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Matrix
@@ -10,6 +11,9 @@ import android.util.Size
 import java.io.File
 import java.io.FileOutputStream
 import kotlin.math.abs
+import android.provider.MediaStore
+
+
 
 /**
  * Utility class for manipulating images
@@ -177,7 +181,7 @@ object BitmapProcessor {
             // Translate so center of image is at origin.
             matrix.postTranslate(-srcWidth / 2.0f, -srcHeight / 2.0f)
 
-            // Rotate around origin.
+            // Rotate around origin
             matrix.postRotate(applyRotation.toFloat())
         }
 
@@ -212,12 +216,14 @@ object BitmapProcessor {
         return matrix
     }
 
-    fun bitmapToCroppedImage(selectedImageUri: Uri, sourceBitmap: Bitmap): Bitmap{
+    fun bitmapToCroppedImage(selectedImageUri: Uri, sourceBitmap: Bitmap, context: Context): Bitmap{
 
-        val exif = ExifInterface(selectedImageUri.path)
-        val bitmapRotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+        val bitmapRotation = getPhotoOrientation(context, selectedImageUri)
 
         val croppedBitmap: Bitmap?
+
+        val matrix = Matrix()
+        matrix.postRotate(bitmapRotation.toFloat())
 
         if (sourceBitmap.width >= sourceBitmap.height) {
 
@@ -226,7 +232,9 @@ object BitmapProcessor {
                 sourceBitmap.width / 2 - sourceBitmap.height / 2,
                 0,
                 sourceBitmap.height,
-                sourceBitmap.height
+                sourceBitmap.height,
+                matrix,
+                false
             )
 
         } else {
@@ -236,12 +244,58 @@ object BitmapProcessor {
                 0,
                 sourceBitmap.height / 2 - sourceBitmap.width / 2,
                 sourceBitmap.width,
-                sourceBitmap.width
+                sourceBitmap.width,
+                matrix,
+                false
             )
         }
 
         return croppedBitmap
 
+    }
+
+    /**
+     * Returns the orientation of the inspected image from MediaStore
+     * Thanks to some manufacturers (Samsung), Exif orientation read is not reliable
+     *
+     * @param context   Context
+     * @param photoUri  URI of the image to get the orientation information for
+     *
+     * @return Int      Orientation of the image
+     */
+    private fun getPhotoOrientation(context: Context, photoUri: Uri): Int {
+
+        val cursor = context.contentResolver.query(
+            photoUri,
+            arrayOf(MediaStore.Images.ImageColumns.ORIENTATION), null, null, null
+        )
+
+        cursor?: return 0
+
+        if (cursor!!.count !== 1) {
+            cursor.close()
+            return 0
+        }
+
+        cursor.moveToFirst()
+        val orientation = cursor.getInt(0)
+        cursor.close()
+
+        return orientation
+
+    }
+
+    /**
+     * Returns the orientation of the inspected image from Exif metadata
+     * Thanks to some manufacturers (Samsung), Exif orientation read is not reliable
+     *
+     * @param selectedImageUri  URI of the image to get the orientation information for
+     *
+     * @return Int              Orientation of the image
+     */
+    private fun getExifPhotoOrientation(selectedImageUri: Uri): Int{
+        val exif = ExifInterface(selectedImageUri.path)
+        return exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
     }
 
     fun resizedBitmapToInferenceResolution(croppedBitmap: Bitmap, classifierInputSize: Size): Bitmap{
