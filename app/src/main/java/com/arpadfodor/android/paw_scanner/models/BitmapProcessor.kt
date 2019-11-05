@@ -12,7 +12,7 @@ import java.io.File
 import java.io.FileOutputStream
 import kotlin.math.abs
 import android.provider.MediaStore
-
+import kotlin.math.max
 
 
 /**
@@ -105,9 +105,12 @@ object BitmapProcessor {
 
         // The floating point equivalent
         // Conversion is conducted with integers because some Android devices do not have floating point in hardware
-        // nR = (int)(1.164 * nY + 2.018 * nU);
-        // nG = (int)(1.164 * nY - 0.813 * nV - 0.391 * nU);
-        // nB = (int)(1.164 * nY + 1.596 * nV);
+        /*
+        var r = (1.164 * y + 2.018 * u).toInt()
+        var g = (1.164 * y - 0.813 * v - 0.391 * u).toInt()
+        var b = (1.164 * y + 1.596 * v).toInt()
+        */
+
         val y1192 = 1192 * y
         var r = y1192 + 1634 * v
         var g = y1192 - 833 * v - 400 * u
@@ -136,18 +139,22 @@ object BitmapProcessor {
 
         var yp = 0
         for (j in 0 until height) {
+
             val pY = yRowStride * j
             val pUV = uvRowStride * (j shr 1)
 
             for (i in 0 until width) {
-                val uv_offset = pUV + (i shr 1) * uvPixelStride
+
+                val uvOffset = pUV + (i shr 1) * uvPixelStride
 
                 out[yp++] = YUV2RGB(
                     0xff and yData[pY + i].toInt(),
-                    0xff and uData[uv_offset].toInt(),
-                    0xff and vData[uv_offset].toInt()
+                    0xff and uData[uvOffset].toInt(),
+                    0xff and vData[uvOffset].toInt()
                 )
+
             }
+
         }
     }
 
@@ -198,9 +205,9 @@ object BitmapProcessor {
             val scaleFactorY = dstHeight / inHeight.toFloat()
 
             if (maintainAspectRatio) {
-                // Scale by minimum factor so that dst is filled completely while
-                // maintaining the aspect ratio. Some image may fall off the edge.
-                val scaleFactor = Math.max(scaleFactorX, scaleFactorY)
+                // Scale by minimum factor so that dst is filled completely while maintaining the aspect ratio
+                // Some image may fall off the edge
+                val scaleFactor = max(scaleFactorX, scaleFactorY)
                 matrix.postScale(scaleFactor, scaleFactor)
             } else {
                 // Scale exactly to fill dst from src.

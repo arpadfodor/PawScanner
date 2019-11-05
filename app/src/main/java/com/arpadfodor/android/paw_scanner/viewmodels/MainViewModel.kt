@@ -13,9 +13,11 @@ import android.content.IntentFilter
 import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.SurfaceTexture
+import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraCharacteristics.LENS_FACING
 import android.hardware.camera2.CameraManager
+import android.util.Range
 import androidx.camera.core.CameraX
 import androidx.core.content.ContextCompat.startActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -277,6 +279,44 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             Size(preview.width, preview.height)
         } else {
             Size(preview.height, preview.width)
+        }
+
+    }
+
+    /**
+     * FPS range of the current camera device
+     *
+     * @return Range<Int>?      Possible range FPS values
+     */
+    fun getFpsRange(): Range<Int>? {
+
+        val chars: CameraCharacteristics?
+
+        try {
+
+            val manager = app.getSystemService(Context.CAMERA_SERVICE) as CameraManager
+            chars = manager.getCameraCharacteristics(availableCameras[currentCameraIndex.value!!]!!)
+
+            val ranges = chars.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES)
+            var result: Range<Int>? = null
+
+            for (range in ranges!!) {
+                val upper = range.upper
+                //10 - min range upper for needs
+                if (upper >= 10) {
+                    if (result == null || upper < result.upper.toInt()) {
+                        result = range
+                    }
+                }
+            }
+            if (result == null) {
+                result = ranges[0]
+            }
+            return result
+
+        } catch (e: CameraAccessException) {
+            e.printStackTrace()
+            return null
         }
 
     }

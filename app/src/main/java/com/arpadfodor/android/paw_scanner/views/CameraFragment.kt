@@ -405,14 +405,13 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
     }
 
     protected fun fillBytes(planes: Array<Image.Plane>, YUVbytes: Array<ByteArray?>) {
-        // Because of the variable row stride it's not possible to know in
-        // advance the actual necessary dimensions of the yuv planes.
+        // Because of the variable row stride it's not possible to know in advance the actual necessary dimensions of the yuv planes
         for (i in planes.indices) {
             val buffer = planes[i].buffer
             if (YUVbytes[i] == null) {
                 YUVbytes[i] = ByteArray(buffer.capacity())
             }
-            buffer.get(YUVbytes[i])
+            buffer.get(YUVbytes[i]!!)
         }
     }
 
@@ -589,18 +588,31 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
                 object : CameraCaptureSession.StateCallback() {
 
                     override fun onConfigured(cameraCaptureSession: CameraCaptureSession) {
+
                         //The camera is already closed
                         cameraDevice?: return
                         //When the session is ready, start displaying the preview
                         captureSession = cameraCaptureSession
+
                         try {
+
+                            //needed to prevent too dark preview images
+                            previewRequestBuilder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, viewModel.getFpsRange())
+
                             //Auto focus should be continuous for camera preview
                             previewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
+                            previewRequestBuilder.set(CaptureRequest.CONTROL_AE_LOCK, false)
+                            previewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CameraMetadata.CONTROL_AE_MODE_ON)
+                            previewRequestBuilder.set(CaptureRequest.CONTROL_AWB_MODE, CameraMetadata.CONTROL_AWB_MODE_AUTO)
+                            previewRequestBuilder.set(CaptureRequest.STATISTICS_FACE_DETECT_MODE, CameraMetadata.STATISTICS_FACE_DETECT_MODE_SIMPLE)
+
                             //Start displaying the camera preview
                             previewRequest = previewRequestBuilder.build()
                             captureSession!!.setRepeatingRequest(previewRequest, captureCallback, backgroundHandler)
+
                         } catch (e: CameraAccessException) {
                         }
+
                     }
 
                     override fun onConfigureFailed(cameraCaptureSession: CameraCaptureSession) {
