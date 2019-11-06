@@ -29,15 +29,23 @@ class RecognitionActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(R.layout.activity_recognition)
 
         val toolbar = findViewById<Toolbar>(R.id.imageToolbar)
-
         setSupportActionBar(toolbar)
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setDisplayShowTitleEnabled(true)
         supportActionBar?.title = ""
+
+        toolbar.setNavigationOnClickListener {
+            this.finish()
+        }
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         val collapsingImage = findViewById<ImageView>(R.id.imageViewCollapsing)
-        collapsingImage.setImageResource(R.drawable.paw)
+
+        //TODO: load the breed sample image here - API?
+        collapsingImage.setImageResource(R.drawable.dog_example)
 
         floatingActionButtonSpeak = findViewById(R.id.fabSpeak)
 

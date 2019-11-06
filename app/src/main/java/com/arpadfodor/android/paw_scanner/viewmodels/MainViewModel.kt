@@ -19,6 +19,7 @@ import android.hardware.camera2.CameraCharacteristics.LENS_FACING
 import android.hardware.camera2.CameraManager
 import android.util.Range
 import androidx.camera.core.CameraX
+import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.arpadfodor.android.paw_scanner.R
@@ -26,6 +27,9 @@ import com.arpadfodor.android.paw_scanner.models.*
 import com.arpadfodor.android.paw_scanner.models.BitmapProcessor.resizedBitmapToInferenceResolution
 import com.arpadfodor.android.paw_scanner.views.RecognitionActivity
 import com.arpadfodor.android.paw_scanner.viewmodels.services.InferenceService
+import com.arpadfodor.android.paw_scanner.views.AboutActivity
+import com.arpadfodor.android.paw_scanner.views.SettingsActivity
+import com.arpadfodor.android.paw_scanner.views.TipsActivity
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.max
@@ -166,7 +170,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     /*
      * The live image
      */
-    lateinit var liveImage: Bitmap
+    var liveImage: Bitmap? = null
 
     /*
      * The classifier input size
@@ -208,6 +212,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         currentCameraOrientation.value = CameraX.LensFacing.BACK
         currentRecognitionEnabled.value = RECOGNITION_LIVE
 
+        InferenceService.viewModel = this
+
         recognitionResultReceiver = object : BroadcastReceiver(){
 
             override fun onReceive(context: Context, intent: Intent) {
@@ -247,7 +253,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             recognitionResultReceiver, IntentFilter("InferenceResult")
         )
 
-        InferenceService.viewModel = this
     }
 
     /**
@@ -478,12 +483,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         var bitmap = when {
-            currentRecognitionEnabled.value == RECOGNITION_LIVE -> liveImage?: return
+            currentRecognitionEnabled.value == RECOGNITION_LIVE -> liveImage
             currentRecognitionEnabled.value == RECOGNITION_LOAD -> loadedImage.value?: return
             else -> return
         }
 
-        bitmap = resizedBitmapToInferenceResolution(bitmap, classifierInputSize.value?: return)
+        bitmap = resizedBitmapToInferenceResolution(bitmap?: return, classifierInputSize.value?: return)
 
         val resultToSend = result.value?: return
 
@@ -504,6 +509,35 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 putExtra("recognition-confidence-$index", recognition.confidence)
             }
 
+        }
+        startActivity(app.applicationContext, intent, null)
+
+    }
+
+    fun showBreeds(){}
+
+    fun showTips(){
+
+        val intent = Intent(app.applicationContext, TipsActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        startActivity(app.applicationContext, intent, null)
+
+    }
+
+    fun showAbout(){
+
+        val intent = Intent(app.applicationContext, AboutActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        startActivity(app.applicationContext, intent, null)
+
+    }
+
+    fun showSettings(){
+
+        val intent = Intent(app.applicationContext, SettingsActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         startActivity(app.applicationContext, intent, null)
 

@@ -26,6 +26,7 @@ import com.arpadfodor.android.paw_scanner.viewmodels.MainViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.nav_host_layout.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -98,6 +99,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         dashboard_navigation.setNavigationItemSelectedListener(this)
         val navigationView = findViewById<NavigationView>(R.id.dashboard_navigation)
         val header = navigationView?.getHeaderView(0)
+
+        dashboard_navigation.bringToFront()
+        dashboard_navigation.parent.requestLayout()
 
     }
 
@@ -186,31 +190,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
 
-        val fragmentToStart: Fragment
-
         when (item.itemId) {
             R.id.nav_breeds -> {
-                fragmentToStart = BreedsFragment.newInstance()
+                viewModel.showBreeds()
             }
             R.id.nav_tips -> {
-                fragmentToStart = TipsFragment.newInstance()
+                viewModel.showTips()
             }
             R.id.nav_about -> {
-                fragmentToStart = AboutFragment.newInstance()
+                viewModel.showAbout()
             }
             R.id.nav_settings -> {
-                fragmentToStart = SettingsFragment.newInstance()
+                viewModel.showSettings()
             }
             else ->{
                 return false
             }
         }
 
-        val transaction = supportFragmentManager.beginTransaction().apply {
-            replace(R.id.nav_host_layout, fragmentToStart)
-        }
-        // Commit the transaction
-        transaction.commit()
         mainActivityDrawerLayout.closeDrawer(GravityCompat.START)
         return true
 

@@ -13,7 +13,7 @@
         android:id="@+id/kenBurnsView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/ic_launcher_background" />
+        android:src="@drawable/dog_friend" />
 
     <ImageView
         android:id="@+id/ivLogo"

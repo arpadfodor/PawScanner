@@ -84,8 +84,8 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
         chart.setExtraOffsets(5.toFloat(), 10.toFloat(), 5.toFloat(), 5.toFloat())
         chart.dragDecelerationFrictionCoef = 0.95f
         chart.rotationAngle = 0.toFloat()
-        // disable rotation of the chart by touch
-        chart.isRotationEnabled = false
+        //enable rotation of the chart by touch
+        chart.isRotationEnabled = true
         chart.isHighlightPerTapEnabled = true
         chart.animateY(1000, Easing.EaseInOutQuad)
 
@@ -165,26 +165,37 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
 
         }
 
-        //Only one prediction to mention
-        if(counter == 1){
+        when (counter) {
 
-            spokenText += app.getString(R.string.tts_singular_recognition_start_text)
-
-            for(recognition in recognitionsToMention){
-                spokenText += recognition
+            //Every prediction was weak, mention the highest one to tell something
+            0 -> {
+                spokenText += app.getString(R.string.tts_too_weak_recognition_start_text, MIN_PREDICTION_PERCENTAGE_TO_PAY_ATTENTION.toString())
+                spokenText += app.getString(R.string.tts_recognition_element, results[0].title, results[0].toString())
             }
 
-        }
-        //More predictions to mention
-        else{
+            //Only one prediction to mention
+            1 -> {
 
-            spokenText += app.getString(R.string.tts_plural_recognitions_start_text)
+                spokenText += app.getString(R.string.tts_singular_recognition_start_text)
 
-            for((i, recognition) in recognitionsToMention.withIndex()){
-                spokenText += app.getString(R.string.tts_element_order, (i+1).toString(), recognition)
+                for(recognition in recognitionsToMention){
+                    spokenText += recognition
+                }
+
             }
 
-            spokenText += app.getString(R.string.tts_if_mixed_text)
+            //More predictions to mention
+            else -> {
+
+                spokenText += app.getString(R.string.tts_plural_recognitions_start_text)
+
+                for((i, recognition) in recognitionsToMention.withIndex()){
+                    spokenText += app.getString(R.string.tts_element_order, (i+1).toString(), recognition)
+                }
+
+                spokenText += app.getString(R.string.tts_if_mixed_text)
+
+            }
 
         }
 

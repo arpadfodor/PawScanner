@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <!DOCTYPE resources [
     <!ENTITY appName "Paw Scanner">
     <!ENTITY appId "925630375777">
-    <!ENTITY appVersion "v0.1">
-    <!ENTITY appDate "03/11/2019">
+    <!ENTITY appVersion "v0.22">
+    <!ENTITY appDate "07/11/2019">
     <!ENTITY adMobAppId "ca-app-pub-3940256099942544~3347511713">
     <!ENTITY adMobBannerId "ca-app-pub-3940256099942544/6300978111">
     ]>
@@ -48,9 +49,49 @@
     <string name="camera_error">Camera error occurred</string>
 
     <string name="tts_recognition_element">%1$s. %2$s percent. </string>
+    <string name="tts_too_weak_recognition_start_text">All predictions are below %1$s percent, but here is the highest: </string>
     <string name="tts_singular_recognition_start_text">The prediction is </string>
     <string name="tts_plural_recognitions_start_text">The predictions are the following. </string>
     <string name="tts_element_order">Number %1$s: %2$s</string>
     <string name="tts_if_mixed_text">If the recognized creature is a mixed breed, it is likely to be a mixture of the mentioned breeds. </string>
+
+    <string name="text_about">
+        &appName;\n
+        &appVersion;\n
+        \n
+        Created by Arpad Fodor\n
+        github.com/arpadfodor\n
+        \n
+        Release date:\n
+        &appDate;\n
+        \n
+        Images by:\n
+        Elias Schäfer\n
+        Sinisa Maric\n
+        GraphicMama-team\n
+        OpenClipart-Vectors\n
+        Pixaline\n
+        huoadg5888\n
+        gdakaska\n
+        skeeze\n
+        from Pixabay\n
+        \n
+        AI is powered by Keras/TensorFlow\n
+        \n
+        You can report a bug or send a message by clicking on the corresponding buttons - although application crash events are automatically sent.\n
+        \n
+    </string>
+
+    <string name="tips_full_body">Try to capture the full body of the creature. At least the head should be visible.</string>
+    <string name="tips_corner_fullscreen">The creature should fill the image so more details are visible and the background is less distracting.</string>
+    <string name="tips_blurred_sharp">Also, capture sharp images to make details visible.</string>
+    <string name="tips_dark_clear">Ensure good lighting for high contrast.</string>
+    <string name="tips_vertical_horizontal">Try to maintain proper image orientation.</string>
+    <string name="tips_many_one">Strive to have only one creature at the same time to recognize. This reduces recognition uncertainty.</string>
+
+    <string name="title_camera_settings">Camera setting(s)</string>
+    <string name="setting_image_quality">Image quality</string>
+    <string name="label_high">High</string>
+    <string name="label_low">Low</string>
 
 </resources>

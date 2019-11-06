@@ -6,27 +6,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_below= "@+id/main_activity_app_bar"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     android:background="@color/colorPrimaryDark"
     tools:context=".views.MainActivity">
 
-    <TextureView
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:id="@+id/toolbarPlaceholder"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/mainActivityDrawerLayout"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toTopOf="@+id/bottom_nav_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbarPlaceholder"
+        app:layout_constraintTop_toTopOf="parent"
         tools:openDrawer="start">
 
         <include
@@ -53,7 +44,7 @@
         android:id="@+id/bottom_nav_view"
         android:background="@drawable/bottom_navigation"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
         android:layout_marginStart="0dp"
         android:layout_marginEnd="0dp"
         app:itemIconTint="@color/colorText"
@@ -64,19 +55,5 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:menu="@menu/bottom_nav_menu" />
-
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
-            android:id="@+id/mainActivityLayout"
-            android:fitsSystemWindows="true"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <include
-                layout="@layout/inference_text_app_bar"
-                android:id="@+id/main_activity_app_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
