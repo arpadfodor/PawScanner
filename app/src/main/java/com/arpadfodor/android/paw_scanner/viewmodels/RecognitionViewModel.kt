@@ -6,9 +6,11 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
 import com.arpadfodor.android.paw_scanner.R
 import com.arpadfodor.android.paw_scanner.models.Recognition
 import com.arpadfodor.android.paw_scanner.models.TextToSpeechModel
+import com.bumptech.glide.Glide
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.Legend
@@ -25,7 +27,14 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
 
     var app: Application = application
 
-    lateinit var bitmap: Bitmap
+    lateinit var recognizedImage: Bitmap
+
+    /*
+     * Breed image sample
+     */
+    val image: MutableLiveData<Bitmap> by lazy {
+        MutableLiveData<Bitmap>()
+    }
 
     var inferenceDuration = 0L
     var sizeOfResults = 0
@@ -40,7 +49,7 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
 
         TextToSpeechModel.init(app.applicationContext)
 
-        bitmap = BitmapFactory.decodeByteArray(
+        recognizedImage = BitmapFactory.decodeByteArray(
             intent.getByteArrayExtra("byteArray"),
             0,
             intent.getByteArrayExtra("byteArray")!!.size)
@@ -61,6 +70,24 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
         }
 
         setTextToBeSpoken()
+
+    }
+
+    fun loadData(){
+
+        //TODO: load the breed sample image here - API?
+
+        val loaderThread = Thread(Runnable {
+            val loadedImage = Glide.with(app.applicationContext)
+                .asBitmap()
+                .load(R.drawable.dog_example)
+                .submit()
+                .get()
+
+            image.postValue(loadedImage)
+
+        })
+        loaderThread.start()
 
     }
 

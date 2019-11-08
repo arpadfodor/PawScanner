@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import com.arpadfodor.android.paw_scanner.R
 
 /**
  * Activity of settings

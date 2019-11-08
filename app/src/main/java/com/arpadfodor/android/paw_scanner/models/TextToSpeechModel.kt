@@ -11,15 +11,21 @@ object TextToSpeechModel{
     var textToSpeechRequestId = System.currentTimeMillis() + requestCounter
 
     /*
-    * Initialize text to speech object
+    * Initialize text to speech object if not initialized yet
     * Set text to speech listener
     */
     fun init(context: Context){
+
+        textToSpeech?.let{
+            return
+        }
+
         textToSpeech = TextToSpeech(context, TextToSpeech.OnInitListener { status ->
             if (status != TextToSpeech.ERROR) {
                 textToSpeech?.language = Locale.UK
             }
         })
+
     }
 
     /*

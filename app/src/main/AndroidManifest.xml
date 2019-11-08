@@ -32,6 +32,8 @@
 
         <activity android:name=".views.RecognitionActivity" />
 
+        <activity android:name=".views.BreedActivity" />
+
         <activity android:name=".views.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

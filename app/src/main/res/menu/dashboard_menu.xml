@@ -4,7 +4,7 @@
     <item
         android:id="@+id/nav_breeds"
         android:icon="@drawable/logo_breeds"
-        android:title="@string/title_breeds" />
+        android:title="@string/title_breed" />
 
     <item
         android:id="@+id/nav_tips"

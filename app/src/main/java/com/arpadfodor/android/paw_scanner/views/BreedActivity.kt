@@ -11,16 +11,16 @@ import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.arpadfodor.android.paw_scanner.R
-import com.arpadfodor.android.paw_scanner.viewmodels.RecognitionViewModel
-import com.github.mikephil.charting.charts.PieChart
+import com.arpadfodor.android.paw_scanner.viewmodels.BreedViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class RecognitionActivity : AppCompatActivity(), View.OnClickListener {
+class BreedActivity : AppCompatActivity(), View.OnClickListener {
 
-    private lateinit var viewModel: RecognitionViewModel
+    private lateinit var viewModel: BreedViewModel
 
-    lateinit var floatingActionButtonSpeak: FloatingActionButton
+    lateinit var floatingActionButtonSpeakBreedInfo: FloatingActionButton
     lateinit var collapsingImage: ImageView
+    lateinit var textViewMainBreedInfo: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -29,7 +29,7 @@ class RecognitionActivity : AppCompatActivity(), View.OnClickListener {
         //Remove notification bar
         this.window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
 
-        setContentView(R.layout.activity_recognition)
+        setContentView(R.layout.activity_breed)
 
         val toolbar = findViewById<Toolbar>(R.id.imageToolbar)
         setSupportActionBar(toolbar)
@@ -45,38 +45,21 @@ class RecognitionActivity : AppCompatActivity(), View.OnClickListener {
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        collapsingImage = findViewById(R.id.imageViewCollapsing)
-        floatingActionButtonSpeak = findViewById(R.id.fabSpeak)
+        collapsingImage = findViewById<ImageView>(R.id.imageViewCollapsing)
+        textViewMainBreedInfo = findViewById<TextView>(R.id.tvMainBreedInfo)
 
-        floatingActionButtonSpeak.setOnClickListener {
-            this.onClick(floatingActionButtonSpeak)
+        floatingActionButtonSpeakBreedInfo = findViewById(R.id.fabSpeakBreedInfo)
+
+        floatingActionButtonSpeakBreedInfo.setOnClickListener {
+            this.onClick(floatingActionButtonSpeakBreedInfo)
         }
 
-        viewModel = ViewModelProviders.of(this).get(RecognitionViewModel::class.java)
+        viewModel = ViewModelProviders.of(this).get(BreedViewModel::class.java)
         viewModel.init(intent)
+        subscribeToViewModel()
         viewModel.loadData()
 
-        val textViewPredictionsChartTitle = findViewById<TextView>(R.id.tvPredictionsChartTitle)
-        textViewPredictionsChartTitle.text = this.getString(R.string.prediction_chart_title)
-
-        val chart = viewModel.buildStatisticsChart(findViewById<PieChart>(R.id.predictionStatsChart))
-        chart.invalidate()
-
-        supportActionBar?.title = viewModel.results[0].title
-
-        val textViewTopPredictionsTitle = findViewById<TextView>(R.id.tvTopPredictionsTitle)
-        val textViewTopPredictions = findViewById<TextView>(R.id.tvTopPredictions)
-        val textViewDuration = findViewById<TextView>(R.id.tvDuration)
-        val textViewMainPrediction = findViewById<TextView>(R.id.tvMainPrediction)
-        val imageViewCapture = findViewById<ImageView>(R.id.ivCapture)
-
-        textViewTopPredictionsTitle.text = this.getString(R.string.prediction_top_title, viewModel.sizeOfResults.toString())
-        textViewDuration.text = this.getString(R.string.inference_duration, viewModel.inferenceDuration)
-        textViewMainPrediction.text = viewModel.mainRecognitionText()
-        textViewTopPredictions.text = viewModel.predictionsToText()
-        imageViewCapture.setImageBitmap(viewModel.recognizedImage)
-
-        subscribeToViewModel()
+        supportActionBar?.title = viewModel.breedName
 
     }
 
@@ -88,8 +71,16 @@ class RecognitionActivity : AppCompatActivity(), View.OnClickListener {
             collapsingImage.setImageBitmap(result)
         }
 
+        // Create the text observer which updates the UI in case of an inference result
+        val breedTextObserver = Observer<String> { result ->
+            // Update the UI, in this case, the TextView
+            textViewMainBreedInfo.text = result
+            viewModel.setTextToBeSpoken()
+        }
+
         // Observe the LiveData
         viewModel.image.observe(this, imageObserver)
+        viewModel.breedInfo.observe(this, breedTextObserver)
 
     }
 
@@ -101,7 +92,7 @@ class RecognitionActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(v: View) {
 
         when(v.id){
-            R.id.fabSpeak ->{
+            R.id.fabSpeakBreedInfo ->{
                 viewModel.speakClicked()
             }
         }

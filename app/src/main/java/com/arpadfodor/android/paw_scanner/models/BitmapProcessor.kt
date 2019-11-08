@@ -40,8 +40,8 @@ object BitmapProcessor {
     /**
      * Saves a Bitmap object to disk for analysis.
      *
-     * @param bitmap    The bitmap to save
-     * @param filename  The location to save the bitmap to
+     * @param bitmap    The recognizedImage to save
+     * @param filename  The location to save the recognizedImage to
      */
     @JvmOverloads
     fun saveBitmap(bitmap: Bitmap, filename: String = "preview.png") {

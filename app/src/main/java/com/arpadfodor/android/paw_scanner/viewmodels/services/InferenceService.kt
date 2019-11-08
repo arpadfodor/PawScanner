@@ -42,7 +42,7 @@ class InferenceService: IntentService("InferenceService") {
         lateinit var bitmap: Bitmap
 
         //interestingly, without image resizing the results seem to be more accurate
-        //bitmap = viewModel.loadedImage.value
+        //recognizedImage = viewModel.loadedImage.value
         if(type == MainViewModel.RECOGNITION_LOAD){
             bitmap = resizedBitmapToInferenceResolution(viewModel.loadedImage.value?: return, viewModel.classifierInputSize.value?: return)
         }

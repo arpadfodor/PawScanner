@@ -25,11 +25,8 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.arpadfodor.android.paw_scanner.R
 import com.arpadfodor.android.paw_scanner.models.*
 import com.arpadfodor.android.paw_scanner.models.BitmapProcessor.resizedBitmapToInferenceResolution
-import com.arpadfodor.android.paw_scanner.views.RecognitionActivity
 import com.arpadfodor.android.paw_scanner.viewmodels.services.InferenceService
-import com.arpadfodor.android.paw_scanner.views.AboutActivity
-import com.arpadfodor.android.paw_scanner.views.SettingsActivity
-import com.arpadfodor.android.paw_scanner.views.TipsActivity
+import com.arpadfodor.android.paw_scanner.views.*
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.max
@@ -514,7 +511,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     }
 
-    fun showBreeds(){}
+    fun showBreeds(){
+
+        val intent = Intent(app.applicationContext, BreedActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        startActivity(app.applicationContext, intent, null)
+
+    }
 
     fun showTips(){
 
