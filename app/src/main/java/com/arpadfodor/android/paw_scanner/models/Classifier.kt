@@ -4,10 +4,8 @@ import android.content.res.AssetManager
 import android.graphics.Bitmap
 import android.os.SystemClock
 import android.os.Trace
-import java.io.BufferedReader
 import java.io.FileInputStream
 import java.io.IOException
-import java.io.InputStreamReader
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.MappedByteBuffer
@@ -55,11 +53,6 @@ abstract class Classifier{
     private var tfLiteModel: MappedByteBuffer? = null
 
     /**
-     * Labels corresponding to the output of the vision model
-     */
-    private var labels = arrayListOf<String>()
-
-    /**
      * Optional GPU delegate for acceleration
      */
     private var gpuDelegate: GpuDelegate? = null
@@ -85,7 +78,6 @@ abstract class Classifier{
     fun create(asset: AssetManager, device: Device, numThreads: Int){
 
         tfLiteModel = loadModelFile(asset)
-        labels = loadLabelList(asset)
 
         when (device){
             Device.NNAPI -> {
@@ -113,24 +105,6 @@ abstract class Classifier{
         tfLiteOptions.setNumThreads(numThreads)
         tfLite = Interpreter(tfLiteModel!!, tfLiteOptions)
         imgData.order(ByteOrder.nativeOrder())
-
-    }
-
-    /**
-     * Reads label list from Assets
-     */
-    @Throws(IOException::class)
-    private fun loadLabelList(asset: AssetManager): ArrayList<String> {
-
-        val labels = ArrayList<String>()
-        val reader = BufferedReader(InputStreamReader(asset.open(getLabelPath())))
-
-        while(true){
-            val line = reader.readLine() ?: break
-            labels.add(line)
-        }
-        reader.close()
-        return labels
 
     }
 
@@ -187,9 +161,7 @@ abstract class Classifier{
 
         //Run the inference
         Trace.beginSection("run Inference")
-        val startTime = SystemClock.uptimeMillis()
         runInference()
-        val endTime = SystemClock.uptimeMillis()
         Trace.endSection()
 
         //Find the best classifications
@@ -200,12 +172,14 @@ abstract class Classifier{
                 (rhs.confidence).compareTo(lhs.confidence)
             })
 
+        val labels = LabelsManager.getFormattedLabels()
+
         for (i in labels.indices){
             pq.add(
                 Recognition(
                     "" + i,
                     if (labels.size > i){
-                        labels[i].substringAfter('-').replace('_', ' ')
+                        labels[i]
                     } else {
                         "unknown"
                     },
@@ -264,13 +238,6 @@ abstract class Classifier{
     protected abstract fun getModelPath(): String
 
     /**
-     * Get the name of the label file stored in Assets.
-     *
-     * @return
-     */
-    protected abstract fun getLabelPath(): String
-
-    /**
      * Get the number of bytes that is used to store a single color channel value.
      *
      * @return
@@ -317,14 +284,5 @@ abstract class Classifier{
      * primitive data types.
      */
     protected abstract fun runInference()
-
-    /**
-     * Get the total number of labels.
-     *
-     * @return
-     */
-    protected fun getNumLabels(): Int {
-        return labels.size
-    }
 
 }

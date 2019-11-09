@@ -8,4 +8,5 @@
     <color name="colorGray">#14161f</color>
     <color name="colorTransparentGray">#B31A1A1A</color>
     <color name="colorText">#DFFFFF</color>
+    <color name="colorSeparator">#1A1A1A</color>
 </resources>

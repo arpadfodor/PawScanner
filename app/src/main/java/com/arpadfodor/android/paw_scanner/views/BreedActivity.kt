@@ -18,7 +18,10 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var viewModel: BreedViewModel
 
+    var isSelectorDisplayed = false
+
     lateinit var floatingActionButtonSpeakBreedInfo: FloatingActionButton
+    lateinit var floatingActionButtonSelectBreed: FloatingActionButton
     lateinit var collapsingImage: ImageView
     lateinit var textViewMainBreedInfo: TextView
 
@@ -45,13 +48,17 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        collapsingImage = findViewById<ImageView>(R.id.imageViewCollapsing)
-        textViewMainBreedInfo = findViewById<TextView>(R.id.tvMainBreedInfo)
-
+        collapsingImage = findViewById(R.id.imageViewCollapsing)
+        textViewMainBreedInfo = findViewById(R.id.tvMainBreedInfo)
         floatingActionButtonSpeakBreedInfo = findViewById(R.id.fabSpeakBreedInfo)
+        floatingActionButtonSelectBreed = findViewById(R.id.fabSelectBreed)
 
         floatingActionButtonSpeakBreedInfo.setOnClickListener {
             this.onClick(floatingActionButtonSpeakBreedInfo)
+        }
+
+        floatingActionButtonSelectBreed.setOnClickListener {
+            this.onClick(floatingActionButtonSelectBreed)
         }
 
         viewModel = ViewModelProviders.of(this).get(BreedViewModel::class.java)
@@ -59,16 +66,19 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
         subscribeToViewModel()
         viewModel.loadData()
 
-        supportActionBar?.title = viewModel.breedName
+        if(viewModel.isSelectorNecessary()){
+            showSelector()
+        }
 
     }
 
     private fun subscribeToViewModel() {
 
         // Create the text observer which updates the UI in case of an inference result
-        val imageObserver = Observer<Bitmap> { result ->
+        val titleObserver = Observer<String> { result ->
             // Update the UI, in this case, the ImageView
-            collapsingImage.setImageBitmap(result)
+            supportActionBar?.title = result
+            isSelectorDisplayed = false
         }
 
         // Create the text observer which updates the UI in case of an inference result
@@ -78,10 +88,22 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
             viewModel.setTextToBeSpoken()
         }
 
-        // Observe the LiveData
-        viewModel.image.observe(this, imageObserver)
-        viewModel.breedInfo.observe(this, breedTextObserver)
+        // Create the image observer which updates the UI in case of an inference result
+        val imageObserver = Observer<Bitmap> { result ->
+            // Update the UI, in this case, the ImageView
+            collapsingImage.setImageBitmap(result)
+        }
 
+        // Observe the LiveData
+        viewModel.breedName.observe(this, titleObserver)
+        viewModel.breedInfo.observe(this, breedTextObserver)
+        viewModel.image.observe(this, imageObserver)
+
+    }
+
+    fun showSelector(){
+        supportFragmentManager.beginTransaction().add(R.id.breed_activity_layout, SelectorFragment.newInstance()).commit()
+        isSelectorDisplayed = true
     }
 
     public override fun onPause() {
@@ -92,9 +114,16 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(v: View) {
 
         when(v.id){
+
             R.id.fabSpeakBreedInfo ->{
                 viewModel.speakClicked()
             }
+            R.id.fabSelectBreed ->{
+                if(!isSelectorDisplayed){
+                    showSelector()
+                }
+            }
+
         }
 
     }

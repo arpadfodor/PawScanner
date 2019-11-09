@@ -25,7 +25,6 @@ class ClassifierFloatMobileNet(asset: AssetManager, device: Device, numThreads: 
          * Model and label paths
          */
         private const val MODEL_PATH = "model.tflite"
-        private const val LABEL_PATH = "labels.txt"
 
     }
 
@@ -37,7 +36,7 @@ class ClassifierFloatMobileNet(asset: AssetManager, device: Device, numThreads: 
 
     init {
         this.create(asset, device, numThreads)
-        labelProbArray = Array(1) { FloatArray(getNumLabels()) }
+        labelProbArray = Array(1) { FloatArray(LabelsManager.getNumOfLabels()) }
     }
 
     override fun getImageSizeX(): Int {
@@ -52,10 +51,6 @@ class ClassifierFloatMobileNet(asset: AssetManager, device: Device, numThreads: 
         // you can download this file from see build.gradle for where to obtain this file
         // It should be auto downloaded into assets
         return MODEL_PATH
-    }
-
-    override fun getLabelPath(): String {
-        return LABEL_PATH
     }
 
     override fun getNumBytesPerChannel(): Int {

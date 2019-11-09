@@ -201,6 +201,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         FirebaseInteraction.init(app.applicationContext, app.getString(R.string.app_ad_id))
 
+        LabelsManager.loadLabelList(app.assets)
         classifier = ClassifierFloatMobileNet(app.assets, Device.CPU, 1)
         classifierInputSize.value = Size(classifier.getImageSizeX(), classifier.getImageSizeY())
         rotation.value = parentScreenOrientation

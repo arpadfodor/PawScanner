@@ -3,27 +3,24 @@ package com.arpadfodor.android.paw_scanner.viewmodels
 import android.app.Application
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.arpadfodor.android.paw_scanner.R
-import com.arpadfodor.android.paw_scanner.models.Recognition
-import com.arpadfodor.android.paw_scanner.models.TextToSpeechModel
+import com.arpadfodor.android.paw_scanner.models.*
 import com.bumptech.glide.Glide
-import com.github.mikephil.charting.animation.Easing
-import com.github.mikephil.charting.charts.PieChart
-import com.github.mikephil.charting.components.Legend
-import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.PieDataSet
-import com.github.mikephil.charting.data.PieEntry
-import kotlin.math.min
 
 class BreedViewModel(application: Application) : AndroidViewModel(application){
 
     var app: Application = application
 
-    var breedName = ""
+    val labels = LabelsManager.getFormattedLabels()
+
+    /*
+     * Breed name
+     */
+    val breedName: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
 
     /*
      * Breed info text
@@ -43,7 +40,11 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
 
     fun init(intent: Intent){
         TextToSpeechModel.init(app.applicationContext)
-        breedName = intent.getStringExtra("breed_name")?:""
+        breedName.value = intent.getStringExtra("breed_name")?:""
+    }
+
+    fun isSelectorNecessary(): Boolean{
+        return breedName.value?.isBlank()?:true
     }
 
     fun loadData(){
@@ -58,10 +59,10 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
                 .submit()
                 .get()
 
-            val breedText = "Blablabla"
+            val breedText = "Blablablablaaaa bla blabla bla bla bla bla a aa aaa aaaa a aa aaaaaaaaaaaaaa aa aa " + breedName.value + ". "
 
-            image.postValue(loadedImage)
             breedInfo.postValue(breedText)
+            image.postValue(loadedImage)
 
         })
         loaderThread.start()
@@ -70,7 +71,7 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
 
     fun setTextToBeSpoken(){
         var spokenText = ""
-        spokenText += "$breedName. "
+        spokenText += breedName.value + ". "
         spokenText += breedInfo.value
         textToBeSpoken = spokenText
     }
@@ -85,6 +86,11 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
             TextToSpeechModel.speak(textToBeSpoken)
         }
 
+    }
+
+    fun setBreedNameAndLoad(name: String){
+        breedName.postValue(name)
+        loadData()
     }
 
     fun pause() {

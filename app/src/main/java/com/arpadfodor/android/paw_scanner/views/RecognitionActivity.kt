@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
@@ -21,6 +22,7 @@ class RecognitionActivity : AppCompatActivity(), View.OnClickListener {
 
     lateinit var floatingActionButtonSpeak: FloatingActionButton
     lateinit var collapsingImage: ImageView
+    lateinit var mainPredictionLinearLayout: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -47,9 +49,14 @@ class RecognitionActivity : AppCompatActivity(), View.OnClickListener {
 
         collapsingImage = findViewById(R.id.imageViewCollapsing)
         floatingActionButtonSpeak = findViewById(R.id.fabSpeak)
+        mainPredictionLinearLayout = findViewById(R.id.llMainPrediction)
 
         floatingActionButtonSpeak.setOnClickListener {
             this.onClick(floatingActionButtonSpeak)
+        }
+
+        mainPredictionLinearLayout.setOnClickListener {
+            this.onClick(mainPredictionLinearLayout)
         }
 
         viewModel = ViewModelProviders.of(this).get(RecognitionViewModel::class.java)
@@ -101,9 +108,15 @@ class RecognitionActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(v: View) {
 
         when(v.id){
+
             R.id.fabSpeak ->{
                 viewModel.speakClicked()
             }
+
+            R.id.llMainPrediction ->{
+                viewModel.showBreedInfo()
+            }
+
         }
 
     }

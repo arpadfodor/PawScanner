@@ -5,11 +5,13 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.arpadfodor.android.paw_scanner.R
 import com.arpadfodor.android.paw_scanner.models.Recognition
 import com.arpadfodor.android.paw_scanner.models.TextToSpeechModel
+import com.arpadfodor.android.paw_scanner.views.BreedActivity
 import com.bumptech.glide.Glide
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.PieChart
@@ -262,6 +264,16 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
         else{
             TextToSpeechModel.speak(textToBeSpoken)
         }
+
+    }
+
+    fun showBreedInfo(){
+
+        val intent = Intent(app.applicationContext, BreedActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            putExtra("breed_name", results[0].title)
+        }
+        ContextCompat.startActivity(app.applicationContext, intent, null)
 
     }
 

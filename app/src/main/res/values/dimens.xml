@@ -13,5 +13,9 @@
     <dimen name="corner_radius_small">4dp</dimen>
     <dimen name="tall_toolbar_height">150dp</dimen>
     <dimen name="fade_effect">100dp</dimen>
+    <dimen name="list_text_separator_height">1dp</dimen>
+
+    <dimen name="huge_text">20sp</dimen>
+    <dimen name="clickable_list_text">18sp</dimen>
 
 </resources>
