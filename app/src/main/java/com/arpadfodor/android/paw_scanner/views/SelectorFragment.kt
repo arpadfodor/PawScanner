@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ListView
-import androidx.core.view.get
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.arpadfodor.android.paw_scanner.R
 import com.arpadfodor.android.paw_scanner.viewmodels.BreedViewModel
@@ -42,16 +42,31 @@ class SelectorFragment : Fragment(){
              */
             viewModel = ViewModelProviders.of(it).get(BreedViewModel::class.java)
         }
+        subscribeToViewModel()
 
         val breedsAvailable = viewModel.labels
-
-        val adapter = ArrayAdapter<String>(this.context!!, R.layout.breed_listview_row, R.id.tvBreedName, breedsAvailable)
+        val adapter = ArrayAdapter<String>(this.context!!, R.layout.listview_row, R.id.tvItemName, breedsAvailable)
         listView.adapter = adapter
 
         listView.setOnItemClickListener{ parent, view, position, id ->
-            viewModel.setBreedNameAndLoad(adapter.getItem(position)?:"")
-            fragmentManager?.beginTransaction()?.remove(this)?.commit()
+            viewModel.setBreedName(adapter.getItem(position)?:"")
         }
+
+    }
+
+    private fun subscribeToViewModel() {
+
+        // Create the boolean observer which updates the UI in case of setting selector displayed flag to false
+        val isSelectorDisplayedObserver = Observer<Boolean> { result ->
+
+            if(result == false){
+                fragmentManager?.beginTransaction()?.remove(this)?.commit()
+            }
+
+        }
+
+        // Observe the LiveData
+        viewModel.isSelectorDisplayed.observe(this, isSelectorDisplayedObserver)
 
     }
 

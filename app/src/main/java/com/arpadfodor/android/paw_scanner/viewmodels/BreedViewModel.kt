@@ -18,6 +18,13 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
     /*
      * Breed name
      */
+    val isSelectorDisplayed: MutableLiveData<Boolean> by lazy {
+        MutableLiveData<Boolean>()
+    }
+
+    /*
+     * Breed name
+     */
     val breedName: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
     }
@@ -40,11 +47,8 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
 
     fun init(intent: Intent){
         TextToSpeechModel.init(app.applicationContext)
-        breedName.value = intent.getStringExtra("breed_name")?:""
-    }
-
-    fun isSelectorNecessary(): Boolean{
-        return breedName.value?.isBlank()?:true
+        val name = intent.getStringExtra("breed_name")?:""
+        breedName.postValue(name)
     }
 
     fun loadData(){
@@ -54,12 +58,12 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
         val loaderThread = Thread(Runnable {
 
             val loadedImage = Glide.with(app.applicationContext)
-                .asBitmap()
-                .load(R.drawable.dog_example)
-                .submit()
-                .get()
+                    .asBitmap()
+                    .load(R.drawable.dog_example)
+                    .submit()
+                    .get()
 
-            val breedText = "Blablablablaaaa bla blabla bla bla bla bla a aa aaa aaaa a aa aaaaaaaaaaaaaa aa aa " + breedName.value + ". "
+            val breedText = "Blablablablaaaa bla blabla bla bla bla bla a aa aaa aaaa a aa aaaaaaaaaaaaaa aa aa ${breedName.value}. "
 
             breedInfo.postValue(breedText)
             image.postValue(loadedImage)
@@ -88,9 +92,8 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
 
     }
 
-    fun setBreedNameAndLoad(name: String){
+    fun setBreedName(name: String){
         breedName.postValue(name)
-        loadData()
     }
 
     fun pause() {

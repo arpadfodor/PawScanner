@@ -12,18 +12,21 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.arpadfodor.android.paw_scanner.R
 import com.arpadfodor.android.paw_scanner.viewmodels.BreedViewModel
+import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class BreedActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var viewModel: BreedViewModel
 
-    var isSelectorDisplayed = false
-
     lateinit var floatingActionButtonSpeakBreedInfo: FloatingActionButton
     lateinit var floatingActionButtonSelectBreed: FloatingActionButton
     lateinit var collapsingImage: ImageView
     lateinit var textViewMainBreedInfo: TextView
+
+    lateinit var toolbar: Toolbar
+    lateinit var collapsingToolbarLayout: CollapsingToolbarLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -34,7 +37,7 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
 
         setContentView(R.layout.activity_breed)
 
-        val toolbar = findViewById<Toolbar>(R.id.imageToolbar)
+        toolbar = findViewById(R.id.imageToolbar)
         setSupportActionBar(toolbar)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -48,27 +51,16 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
+        collapsingToolbarLayout = findViewById(R.id.collapsing_app_bar_layout)
         collapsingImage = findViewById(R.id.imageViewCollapsing)
         textViewMainBreedInfo = findViewById(R.id.tvMainBreedInfo)
         floatingActionButtonSpeakBreedInfo = findViewById(R.id.fabSpeakBreedInfo)
         floatingActionButtonSelectBreed = findViewById(R.id.fabSelectBreed)
 
-        floatingActionButtonSpeakBreedInfo.setOnClickListener {
-            this.onClick(floatingActionButtonSpeakBreedInfo)
-        }
-
-        floatingActionButtonSelectBreed.setOnClickListener {
-            this.onClick(floatingActionButtonSelectBreed)
-        }
-
         viewModel = ViewModelProviders.of(this).get(BreedViewModel::class.java)
         viewModel.init(intent)
         subscribeToViewModel()
         viewModel.loadData()
-
-        if(viewModel.isSelectorNecessary()){
-            showSelector()
-        }
 
     }
 
@@ -76,15 +68,26 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
 
         // Create the text observer which updates the UI in case of an inference result
         val titleObserver = Observer<String> { result ->
-            // Update the UI, in this case, the ImageView
-            supportActionBar?.title = result
-            isSelectorDisplayed = false
+            // Update the UI, in this case, the Toolbar
+            collapsingToolbarLayout.title = result
+            collapsingToolbarLayout.invalidate()
+
+            viewModel.loadData()
+
+            if(result.isNullOrBlank()){
+                viewModel.isSelectorDisplayed.postValue(true)
+            }
+            else{
+                viewModel.isSelectorDisplayed.postValue(false)
+            }
+
         }
 
         // Create the text observer which updates the UI in case of an inference result
         val breedTextObserver = Observer<String> { result ->
             // Update the UI, in this case, the TextView
             textViewMainBreedInfo.text = result
+            textViewMainBreedInfo.invalidate()
             viewModel.setTextToBeSpoken()
         }
 
@@ -92,18 +95,41 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
         val imageObserver = Observer<Bitmap> { result ->
             // Update the UI, in this case, the ImageView
             collapsingImage.setImageBitmap(result)
+            collapsingImage.invalidate()
+        }
+
+        // Create the image observer which updates the UI in case of an inference result
+        val isSelectorDisplayedObserver = Observer<Boolean> { result ->
+
+            if(result == true){
+                supportFragmentManager.beginTransaction().add(R.id.breed_activity_layout, SelectorFragment.newInstance()).commit()
+                floatingActionButtonSpeakBreedInfo.setOnClickListener {}
+                floatingActionButtonSelectBreed.setOnClickListener {}
+            }
+            else{
+
+                floatingActionButtonSpeakBreedInfo.setOnClickListener {
+                    this.onClick(floatingActionButtonSpeakBreedInfo)
+                }
+
+                floatingActionButtonSelectBreed.setOnClickListener {
+                    this.onClick(floatingActionButtonSelectBreed)
+                }
+
+            }
+
         }
 
         // Observe the LiveData
         viewModel.breedName.observe(this, titleObserver)
         viewModel.breedInfo.observe(this, breedTextObserver)
         viewModel.image.observe(this, imageObserver)
+        viewModel.isSelectorDisplayed.observe(this, isSelectorDisplayedObserver)
 
     }
 
     fun showSelector(){
-        supportFragmentManager.beginTransaction().add(R.id.breed_activity_layout, SelectorFragment.newInstance()).commit()
-        isSelectorDisplayed = true
+        viewModel.isSelectorDisplayed.postValue(true)
     }
 
     public override fun onPause() {
@@ -118,12 +144,24 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
             R.id.fabSpeakBreedInfo ->{
                 viewModel.speakClicked()
             }
+
             R.id.fabSelectBreed ->{
-                if(!isSelectorDisplayed){
+                if(!viewModel.isSelectorDisplayed.value!!){
                     showSelector()
                 }
             }
 
+        }
+
+    }
+
+    override fun onBackPressed() {
+
+        if(viewModel.isSelectorDisplayed.value == true && !viewModel.breedName.value.isNullOrBlank()){
+            viewModel.isSelectorDisplayed.postValue(false)
+        }
+        else{
+            super.onBackPressed()
         }
 
     }

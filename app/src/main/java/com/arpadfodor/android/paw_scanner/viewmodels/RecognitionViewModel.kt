@@ -42,6 +42,7 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
     var sizeOfResults = 0
 
     lateinit var results: ArrayList<Recognition>
+    lateinit var resultsInString: ArrayList<String>
 
     val colorSet = listOf(Color.GRAY, Color.DKGRAY, Color.LTGRAY, Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.CYAN, Color.MAGENTA, Color.WHITE, Color.BLACK)
 
@@ -60,6 +61,7 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
         sizeOfResults = intent.getIntExtra("numberOfRecognitions", 0)
 
         results = arrayListOf()
+        resultsInString = arrayListOf()
 
         for(index in 0 until sizeOfResults){
 
@@ -67,7 +69,10 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
             val title = intent.getStringExtra("recognition-title-$index")
             val confidence = intent.getFloatExtra("recognition-confidence-$index", 0f)
 
-            results.add(Recognition(id?:"", title?:"", confidence, null))
+            val currentRecognitionToAdd = Recognition(id?:"", title?:"", confidence, null)
+
+            results.add(currentRecognitionToAdd)
+            resultsInString.add(currentRecognitionToAdd.toString())
 
         }
 
@@ -242,19 +247,6 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
 
     }
 
-    fun predictionsToText(): String{
-
-        var predictions = ""
-
-        //other results
-        for(element in results){
-            predictions += element.toString() + "\n"
-        }
-
-        return predictions
-
-    }
-
     fun speakClicked(){
 
         if(TextToSpeechModel.isSpeaking()){
@@ -267,11 +259,11 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
 
     }
 
-    fun showBreedInfo(){
+    fun showBreedInfo(name: String){
 
         val intent = Intent(app.applicationContext, BreedActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            putExtra("breed_name", results[0].title)
+            putExtra("breed_name", name)
         }
         ContextCompat.startActivity(app.applicationContext, intent, null)
 

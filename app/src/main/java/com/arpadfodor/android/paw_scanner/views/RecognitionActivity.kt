@@ -5,9 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -23,6 +21,7 @@ class RecognitionActivity : AppCompatActivity(), View.OnClickListener {
     lateinit var floatingActionButtonSpeak: FloatingActionButton
     lateinit var collapsingImage: ImageView
     lateinit var mainPredictionLinearLayout: LinearLayout
+    lateinit var topPredictionsListView: ListView
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -50,6 +49,7 @@ class RecognitionActivity : AppCompatActivity(), View.OnClickListener {
         collapsingImage = findViewById(R.id.imageViewCollapsing)
         floatingActionButtonSpeak = findViewById(R.id.fabSpeak)
         mainPredictionLinearLayout = findViewById(R.id.llMainPrediction)
+        topPredictionsListView = findViewById(R.id.lvTopPredictions)
 
         floatingActionButtonSpeak.setOnClickListener {
             this.onClick(floatingActionButtonSpeak)
@@ -72,7 +72,6 @@ class RecognitionActivity : AppCompatActivity(), View.OnClickListener {
         supportActionBar?.title = viewModel.results[0].title
 
         val textViewTopPredictionsTitle = findViewById<TextView>(R.id.tvTopPredictionsTitle)
-        val textViewTopPredictions = findViewById<TextView>(R.id.tvTopPredictions)
         val textViewDuration = findViewById<TextView>(R.id.tvDuration)
         val textViewMainPrediction = findViewById<TextView>(R.id.tvMainPrediction)
         val imageViewCapture = findViewById<ImageView>(R.id.ivCapture)
@@ -80,8 +79,16 @@ class RecognitionActivity : AppCompatActivity(), View.OnClickListener {
         textViewTopPredictionsTitle.text = this.getString(R.string.prediction_top_title, viewModel.sizeOfResults.toString())
         textViewDuration.text = this.getString(R.string.inference_duration, viewModel.inferenceDuration)
         textViewMainPrediction.text = viewModel.mainRecognitionText()
-        textViewTopPredictions.text = viewModel.predictionsToText()
         imageViewCapture.setImageBitmap(viewModel.recognizedImage)
+
+        val topPredictions = viewModel.resultsInString
+        val adapter = ArrayAdapter<String>(this, R.layout.listview_row, R.id.tvItemName, topPredictions)
+        topPredictionsListView.adapter = adapter
+
+        topPredictionsListView.setOnItemClickListener{ parent, view, position, id ->
+            val currentBreedTitle = viewModel.results[position].title
+            viewModel.showBreedInfo(currentBreedTitle)
+        }
 
         subscribeToViewModel()
 
@@ -114,7 +121,7 @@ class RecognitionActivity : AppCompatActivity(), View.OnClickListener {
             }
 
             R.id.llMainPrediction ->{
-                viewModel.showBreedInfo()
+                viewModel.showBreedInfo(viewModel.results[0].title)
             }
 
         }
