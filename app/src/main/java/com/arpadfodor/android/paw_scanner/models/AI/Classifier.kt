@@ -1,4 +1,4 @@
-package com.arpadfodor.android.paw_scanner.models
+package com.arpadfodor.android.paw_scanner.models.AI
 
 import android.content.res.AssetManager
 import android.graphics.Bitmap
@@ -178,7 +178,7 @@ abstract class Classifier{
             pq.add(
                 Recognition(
                     "" + i,
-                    if (labels.size > i){
+                    if (labels.size > i) {
                         labels[i]
                     } else {
                         "unknown"

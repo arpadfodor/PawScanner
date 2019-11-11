@@ -9,7 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.arpadfodor.android.paw_scanner.R
-import com.arpadfodor.android.paw_scanner.models.Recognition
+import com.arpadfodor.android.paw_scanner.models.AI.Recognition
 import com.arpadfodor.android.paw_scanner.models.TextToSpeechModel
 import com.arpadfodor.android.paw_scanner.views.BreedActivity
 import com.bumptech.glide.Glide
@@ -69,7 +69,12 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
             val title = intent.getStringExtra("recognition-title-$index")
             val confidence = intent.getFloatExtra("recognition-confidence-$index", 0f)
 
-            val currentRecognitionToAdd = Recognition(id?:"", title?:"", confidence, null)
+            val currentRecognitionToAdd = Recognition(
+                id ?: "",
+                title ?: "",
+                confidence,
+                null
+            )
 
             results.add(currentRecognitionToAdd)
             resultsInString.add(currentRecognitionToAdd.toString())

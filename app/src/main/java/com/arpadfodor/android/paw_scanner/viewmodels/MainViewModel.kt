@@ -19,11 +19,11 @@ import android.hardware.camera2.CameraCharacteristics.LENS_FACING
 import android.hardware.camera2.CameraManager
 import android.util.Range
 import androidx.camera.core.CameraX
-import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.arpadfodor.android.paw_scanner.R
 import com.arpadfodor.android.paw_scanner.models.*
+import com.arpadfodor.android.paw_scanner.models.AI.*
 import com.arpadfodor.android.paw_scanner.models.BitmapProcessor.resizedBitmapToInferenceResolution
 import com.arpadfodor.android.paw_scanner.viewmodels.services.InferenceService
 import com.arpadfodor.android.paw_scanner.views.*
@@ -202,7 +202,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         FirebaseInteraction.init(app.applicationContext, app.getString(R.string.app_ad_id))
 
         LabelsManager.loadLabelList(app.assets)
-        classifier = ClassifierFloatMobileNet(app.assets, Device.CPU, 1)
+        classifier = ClassifierFloatMobileNet(
+            app.assets,
+            Device.CPU,
+            1
+        )
         classifierInputSize.value = Size(classifier.getImageSizeX(), classifier.getImageSizeY())
         rotation.value = parentScreenOrientation
         isInferenceFinished = true
@@ -233,7 +237,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     val title = intent.getStringExtra("recognition-title-$index")
                     val confidence = intent.getFloatExtra("recognition-confidence-$index", 0f)
 
-                    results.add(Recognition(id, title, confidence, null))
+                    results.add(
+                        Recognition(
+                            id,
+                            title,
+                            confidence,
+                            null
+                        )
+                    )
 
                 }
 

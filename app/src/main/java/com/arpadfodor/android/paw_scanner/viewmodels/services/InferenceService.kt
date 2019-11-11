@@ -1,16 +1,14 @@
 package com.arpadfodor.android.paw_scanner.viewmodels.services
 
 import android.app.IntentService
-import android.app.Notification
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.SystemClock
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.arpadfodor.android.paw_scanner.models.BitmapProcessor.resizedBitmapToInferenceResolution
-import com.arpadfodor.android.paw_scanner.models.ClassifierFloatMobileNet
-import com.arpadfodor.android.paw_scanner.models.Device
-import com.arpadfodor.android.paw_scanner.models.Recognition
+import com.arpadfodor.android.paw_scanner.models.AI.ClassifierFloatMobileNet
+import com.arpadfodor.android.paw_scanner.models.AI.Device
+import com.arpadfodor.android.paw_scanner.models.AI.Recognition
 import com.arpadfodor.android.paw_scanner.viewmodels.MainViewModel
 
 class InferenceService: IntentService("InferenceService") {
