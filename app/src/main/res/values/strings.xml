@@ -7,7 +7,6 @@
     <!ENTITY appDate "07/11/2019">
     <!ENTITY adMobAppId "ca-app-pub-3940256099942544~3347511713">
     <!ENTITY adMobBannerId "ca-app-pub-3940256099942544/6300978111">
-    <!ENTITY dogApiKey "742e9a47-bd72-4fb1-9cd4-d7d26b88ce71">
     ]>
 <!--test adMobAppId "ca-app-pub-3940256099942544~3347511713"-->
 <!--test adMobBannerId "ca-app-pub-3940256099942544/6300978111"-->
@@ -20,10 +19,6 @@
     <string name="app_date">&appDate;</string>
     <string name="app_ad_id">&adMobAppId;</string>
     <string name="app_banner_id">&adMobBannerId;</string>
-
-    <string name="dog_api_key">&dogApiKey;</string>
-    <string name="dog_api_key_header_name">x-api-key</string>
-    <string name="dog_api_breed_search">https://api.thedogapi.com/v1/breeds/search?q=%1$s</string>
 
     <string name="title_home">Live</string>
     <string name="title_history">History</string>
@@ -83,6 +78,9 @@
         \n
         AI is powered by Keras/TensorFlow\n
         \n
+        APIs used:\n
+        TheDogApi\n
+        \n
         You can report a bug or send a message by clicking on the corresponding buttons - although application crash events are automatically sent.\n
         \n
     </string>
@@ -101,5 +99,19 @@
 
     <string name="title_breed_info">Breed info</string>
     <string name="title_select_breed">Select breed</string>
+    <string name="breed_info">
+        Full name: %1$s\n
+        \n
+        Breed group: %2$s\n
+        \n
+        Average properties\n
+        Weight: %3$s kilograms\n
+        Height: %4$s centimeters\n
+        Life span: %5$s\n
+        \n
+        General personality characteristics: %6$s\n
+        \n
+        Bred for: %7$s.
+    </string>
 
 </resources>

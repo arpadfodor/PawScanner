@@ -87,7 +87,8 @@
                     android:layout_gravity="center"
                     android:text=""
                     android:textColor="@color/colorText"
-                    android:padding="12dp"/>
+                    android:paddingTop="@dimen/default_padding"
+                    android:paddingBottom="@dimen/default_padding"/>
 
             </LinearLayout>
 

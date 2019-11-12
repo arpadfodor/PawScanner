@@ -1,7 +1,7 @@
 n02085620-Chihuahua
 n02085782-Japanese_spaniel
 n02085936-Maltese_dog
-n02086079-Pekinese
+n02086079-Pekingese
 n02086240-Shih-Tzu
 n02086646-Blenheim_spaniel
 n02086910-papillon
@@ -51,7 +51,7 @@ n02097474-Tibetan_terrier
 n02097658-silky_terrier
 n02098105-soft-coated_wheaten_terrier
 n02098286-West_Highland_white_terrier
-n02098413-Lhasa
+n02098413-Lhasa_Apso
 n02099267-flat-coated_retriever
 n02099429-curly-coated_retriever
 n02099601-golden_retriever

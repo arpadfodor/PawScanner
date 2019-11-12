@@ -23,7 +23,7 @@ import androidx.core.content.ContextCompat.startActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.arpadfodor.android.paw_scanner.R
 import com.arpadfodor.android.paw_scanner.models.*
-import com.arpadfodor.android.paw_scanner.models.AI.*
+import com.arpadfodor.android.paw_scanner.models.ai.*
 import com.arpadfodor.android.paw_scanner.models.BitmapProcessor.resizedBitmapToInferenceResolution
 import com.arpadfodor.android.paw_scanner.viewmodels.services.InferenceService
 import com.arpadfodor.android.paw_scanner.views.*

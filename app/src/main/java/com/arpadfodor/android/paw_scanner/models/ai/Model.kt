@@ -1,4 +1,4 @@
-package com.arpadfodor.android.paw_scanner.models.AI
+package com.arpadfodor.android.paw_scanner.models.ai
 
 /**
  * The model type used for classification

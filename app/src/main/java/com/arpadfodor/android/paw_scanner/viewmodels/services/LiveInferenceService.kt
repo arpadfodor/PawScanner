@@ -5,9 +5,9 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.SystemClock
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.arpadfodor.android.paw_scanner.models.AI.ClassifierFloatMobileNet
-import com.arpadfodor.android.paw_scanner.models.AI.Device
-import com.arpadfodor.android.paw_scanner.models.AI.Recognition
+import com.arpadfodor.android.paw_scanner.models.ai.ClassifierFloatMobileNet
+import com.arpadfodor.android.paw_scanner.models.ai.Device
+import com.arpadfodor.android.paw_scanner.models.ai.Recognition
 import com.arpadfodor.android.paw_scanner.viewmodels.MainViewModel
 
 class LiveInferenceService : IntentService("LiveInferenceService") {

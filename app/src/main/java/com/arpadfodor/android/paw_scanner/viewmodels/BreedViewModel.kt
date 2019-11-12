@@ -5,9 +5,13 @@ import android.content.Intent
 import android.graphics.Bitmap
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import com.arpadfodor.android.paw_scanner.models.*
-import com.arpadfodor.android.paw_scanner.models.AI.LabelsManager
-import com.arpadfodor.android.paw_scanner.models.API.ApiInteraction
+import com.arpadfodor.android.paw_scanner.R
+import com.arpadfodor.android.paw_scanner.models.TextToSpeechModel
+import com.arpadfodor.android.paw_scanner.models.ai.LabelsManager
+import com.arpadfodor.android.paw_scanner.models.api.ApiInteraction
+import com.arpadfodor.android.paw_scanner.models.api.BreedImage
+import com.arpadfodor.android.paw_scanner.models.api.BreedInfo
+import com.bumptech.glide.Glide
 
 class BreedViewModel(application: Application) : AndroidViewModel(application){
 
@@ -52,13 +56,60 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
     }
 
     fun loadData(){
+        ApiInteraction.loadBreedInfo(breedName.value?:"", onSuccess = this::showBreedInfo, onError = this::showError)
+    }
 
-        val loaderThread = Thread(Runnable {
+    private fun loadImageByBreedId(id: String){
+        ApiInteraction.loadBreedImage(id, onSuccess = this::showBreedImage, onError = this::showError)
+    }
+
+    private fun showBreedInfo(info: List<BreedInfo>) {
+
+        var breedInfoText = ""
+
+        if(info.isNotEmpty()){
+
+            breedInfoText = app.getString(R.string.breed_info, info[0].name, info[0].breed_group,
+                info[0].weight.metric, info[0].height.metric, info[0].life_span,
+                info[0].temperament, info[0].bred_for)
+
+            loadImageByBreedId(info[0].id.toString())
+
+        }
+
+        breedInfo.postValue(breedInfoText)
+
+    }
+
+    private fun showBreedImage(data: List<BreedImage>) {
+
+        if(data.isNotEmpty()){
+
             //load breed data from API
-            breedInfo.postValue(ApiInteraction.loadBreedInfo(app.applicationContext, breedName.value?:""))
-        })
-        loaderThread.start()
+            val loaderThread = Thread(Runnable {
 
+                try{
+
+                    val loadedImage = Glide.with(app.applicationContext)
+                        .asBitmap()
+                        .load(data[0].url)
+                        .submit()
+                        .get()
+
+                    image.postValue(loadedImage)
+
+                }
+                catch (e: Error){}
+
+            })
+            loaderThread.start()
+
+        }
+
+    }
+
+    private fun showError(e: Throwable) {
+        e.printStackTrace()
     }
 
     fun setTextToBeSpoken(){

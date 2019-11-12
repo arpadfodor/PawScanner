@@ -6,9 +6,9 @@ import android.graphics.Bitmap
 import android.os.SystemClock
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.arpadfodor.android.paw_scanner.models.BitmapProcessor.resizedBitmapToInferenceResolution
-import com.arpadfodor.android.paw_scanner.models.AI.ClassifierFloatMobileNet
-import com.arpadfodor.android.paw_scanner.models.AI.Device
-import com.arpadfodor.android.paw_scanner.models.AI.Recognition
+import com.arpadfodor.android.paw_scanner.models.ai.ClassifierFloatMobileNet
+import com.arpadfodor.android.paw_scanner.models.ai.Device
+import com.arpadfodor.android.paw_scanner.models.ai.Recognition
 import com.arpadfodor.android.paw_scanner.viewmodels.MainViewModel
 
 class InferenceService: IntentService("InferenceService") {

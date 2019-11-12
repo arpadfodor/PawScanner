@@ -1,6 +1,14 @@
-package com.arpadfodor.android.paw_scanner.models.API
+package com.arpadfodor.android.paw_scanner.models.api
 
-data class BreedInfoResponse(
+data class BreedImage(
+    val breeds: List<BreedInfo>,
+    val height: Int,
+    val id: String,
+    val url: String,
+    val width: Int
+)
+
+data class BreedInfo(
     val bred_for: String,
     val breed_group: String,
     val height: Height,
@@ -19,4 +27,4 @@ data class Height(
 data class Weight(
     val imperial: String,
     val metric: String
-)   
+)

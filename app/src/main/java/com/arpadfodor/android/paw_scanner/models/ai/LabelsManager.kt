@@ -1,4 +1,4 @@
-package com.arpadfodor.android.paw_scanner.models.AI
+package com.arpadfodor.android.paw_scanner.models.ai
 
 import android.content.res.AssetManager
 import java.io.BufferedReader
