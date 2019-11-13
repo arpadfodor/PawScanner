@@ -22,6 +22,8 @@ import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.min
 
 class RecognitionViewModel(application: Application) : AndroidViewModel(application){
@@ -92,7 +94,18 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
     }
 
     fun loadData(){
-        ApiInteraction.loadBreedInfo(results[0].title, onSuccess = this::loadBreedImage, onError = this::showError)
+
+        when {
+            results[0].title.toLowerCase(Locale.getDefault()) == "human" -> {
+                loadImage(R.drawable.human)
+            }
+            results[0].title.toLowerCase(Locale.getDefault()) == "cat" -> {
+                loadImage(R.drawable.cat)
+            }
+            else -> {
+                ApiInteraction.loadBreedInfo(results[0].title, onSuccess = this::loadBreedImage, onError = this::showError)
+            }
+        }
     }
 
     private fun loadBreedImage(info: List<BreedInfo>) {
@@ -328,6 +341,31 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
 
                 placeholderImage = loadedImage
                 image.postValue(placeholderImage)
+
+            }
+            catch (e: Error){}
+
+        })
+        loaderThread.start()
+
+    }
+
+    private fun loadImage(imageId: Int){
+
+        //load breed data from API
+        val loaderThread = Thread(Runnable {
+
+            try{
+
+                val loadedImage = Glide.with(app.applicationContext)
+                    .asBitmap()
+                    .load(imageId)
+                    .placeholder(R.drawable.dog_friend)
+                    .error(R.drawable.dog_friend)
+                    .submit()
+                    .get()
+
+                image.postValue(loadedImage)
 
             }
             catch (e: Error){}
