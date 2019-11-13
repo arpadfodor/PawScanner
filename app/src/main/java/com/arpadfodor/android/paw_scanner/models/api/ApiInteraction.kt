@@ -1,5 +1,6 @@
 package com.arpadfodor.android.paw_scanner.models.api
 
+import android.net.Uri
 import android.os.Handler
 import retrofit2.Call
 import retrofit2.Retrofit
@@ -44,7 +45,7 @@ object ApiInteraction {
             return
         }
 
-        val getBreedInfoRequest = dogAPI.getBreedInfo(URLEncoder.encode(name, "utf-8").dropLast(1))
+        val getBreedInfoRequest = dogAPI.getBreedInfo(name)
         runCallOnBackgroundThread(getBreedInfoRequest, onSuccess, onError)
 
     }
@@ -55,7 +56,7 @@ object ApiInteraction {
             return
         }
 
-        val getBreedImageUrlRequest = dogAPI.getBreedImageURL(URLEncoder.encode(id, "utf-8"))
+        val getBreedImageUrlRequest = dogAPI.getBreedImageURL(URLEncoder.encode(id, "utf-8"), "small")
         runCallOnBackgroundThread(getBreedImageUrlRequest, onSuccess, onError)
 
     }

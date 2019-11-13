@@ -11,6 +11,9 @@ import androidx.lifecycle.MutableLiveData
 import com.arpadfodor.android.paw_scanner.R
 import com.arpadfodor.android.paw_scanner.models.ai.Recognition
 import com.arpadfodor.android.paw_scanner.models.TextToSpeechModel
+import com.arpadfodor.android.paw_scanner.models.api.ApiInteraction
+import com.arpadfodor.android.paw_scanner.models.api.BreedImage
+import com.arpadfodor.android.paw_scanner.models.api.BreedInfo
 import com.arpadfodor.android.paw_scanner.views.BreedActivity
 import com.bumptech.glide.Glide
 import com.github.mikephil.charting.animation.Easing
@@ -86,21 +89,48 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
     }
 
     fun loadData(){
+        ApiInteraction.loadBreedInfo(results[0].title, onSuccess = this::loadBreedImage, onError = this::showError)
+    }
 
-        //TODO: load the breed sample image here - API?
+    private fun loadBreedImage(info: List<BreedInfo>) {
 
-        val loaderThread = Thread(Runnable {
-            val loadedImage = Glide.with(app.applicationContext)
-                .asBitmap()
-                .load(R.drawable.dog_example)
-                .submit()
-                .get()
+        if(info.isNotEmpty()){
+            ApiInteraction.loadBreedImage(info[0].id.toString(), onSuccess = this::showBreedImage, onError = this::showError)
+        }
 
-            image.postValue(loadedImage)
+    }
 
-        })
-        loaderThread.start()
+    private fun showBreedImage(data: List<BreedImage>) {
 
+        if(data.isNotEmpty()){
+
+            //load breed data from API
+            val loaderThread = Thread(Runnable {
+
+                try{
+
+                    val loadedImage = Glide.with(app.applicationContext)
+                        .asBitmap()
+                        .load(data[0].url)
+                        .placeholder(R.drawable.dog_friend)
+                        .error(R.drawable.dog_friend)
+                        .submit()
+                        .get()
+
+                    image.postValue(loadedImage)
+
+                }
+                catch (e: Error){}
+
+            })
+            loaderThread.start()
+
+        }
+
+    }
+
+    private fun showError(e: Throwable) {
+        e.printStackTrace()
     }
 
     /**

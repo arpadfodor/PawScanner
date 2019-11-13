@@ -20,6 +20,6 @@ interface DogAPI {
 
     @Headers("x-api-key: $DOG_API_KEY")
     @GET(IMAGE_SEARCH)
-    fun getBreedImageURL(@Query("breed_id") id: String): Call<List<BreedImage>>
+    fun getBreedImageURL(@Query("breed_id") id: String, @Query("size") size: String): Call<List<BreedImage>>
 
 }

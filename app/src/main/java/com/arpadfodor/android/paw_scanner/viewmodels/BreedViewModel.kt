@@ -47,7 +47,7 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
         MutableLiveData<Bitmap>()
     }
 
-    var textToBeSpoken = ""
+    private var textToBeSpoken = ""
 
     fun init(intent: Intent){
         TextToSpeechModel.init(app.applicationContext)
@@ -78,6 +78,7 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
         }
 
         breedInfo.postValue(breedInfoText)
+        image.postValue(null)
 
     }
 
@@ -93,6 +94,8 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
                     val loadedImage = Glide.with(app.applicationContext)
                         .asBitmap()
                         .load(data[0].url)
+                        .placeholder(R.drawable.dog_friend)
+                        .error(R.drawable.dog_friend)
                         .submit()
                         .get()
 

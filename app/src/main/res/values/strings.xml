@@ -78,8 +78,7 @@
         \n
         AI is powered by Keras/TensorFlow\n
         \n
-        APIs used:\n
-        TheDogApi\n
+        Breed info by TheDogApi\n
         \n
         You can report a bug or send a message by clicking on the corresponding buttons - although application crash events are automatically sent.\n
         \n
@@ -97,7 +96,7 @@
     <string name="label_high">High</string>
     <string name="label_low">Low</string>
 
-    <string name="title_breed_info">Breed info</string>
+    <string name="title_breed_info">Info</string>
     <string name="title_select_breed">Select breed</string>
     <string name="breed_info">
         Full name: %1$s\n
@@ -109,7 +108,7 @@
         Height: %4$s centimeters\n
         Life span: %5$s\n
         \n
-        General personality characteristics: %6$s\n
+        General personality: %6$s\n
         \n
         Bred for: %7$s.
     </string>
