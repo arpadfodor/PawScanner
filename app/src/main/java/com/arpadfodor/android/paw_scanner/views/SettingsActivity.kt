@@ -2,6 +2,7 @@ package com.arpadfodor.android.paw_scanner.views
 
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.preference.PreferenceActivity
 import android.preference.PreferenceManager
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
@@ -10,7 +11,7 @@ import com.arpadfodor.android.paw_scanner.R
 /**
  * Activity of settings
  */
-class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
+class SettingsActivity : PreferenceActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     companion object {
 
@@ -29,6 +30,7 @@ class SettingsActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferen
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        addPreferencesFromResource(R.xml.preferences)
     }
 
     override fun onStart() {

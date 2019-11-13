@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Size
 import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.WindowManager
@@ -20,6 +21,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.preference.PreferenceManager
 import com.arpadfodor.android.paw_scanner.R
 import com.arpadfodor.android.paw_scanner.views.additional.CustomDialog
 import com.arpadfodor.android.paw_scanner.viewmodels.MainViewModel
@@ -252,6 +254,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             else -> super.onKeyDown(keyCode, event)
         }
+
+    }
+
+    override fun onResume() {
+
+        super.onResume()
+
+        val settings = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        val isHighQualityRequired = settings.getBoolean("image_quality", false)
+        viewModel.setDesiredPreviewSize(isHighQualityRequired)
 
     }
 

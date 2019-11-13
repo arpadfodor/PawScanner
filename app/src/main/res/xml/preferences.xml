@@ -5,7 +5,6 @@
       android:id="@+id/settingsPreferenceScreen"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:background="@color/colorPrimaryDark"
       android:focusable="true"
       android:focusableInTouchMode="true">
 
@@ -14,7 +13,6 @@
 
         <SwitchPreference
                 android:key="image_quality"
-                android:textColor="@color/colorText"
                 android:summaryOff="@string/label_low"
                 android:summaryOn="@string/label_high"
                 android:title="@string/setting_image_quality" />

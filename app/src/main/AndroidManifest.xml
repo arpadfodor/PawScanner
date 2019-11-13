@@ -20,25 +20,34 @@
 
         <activity
             android:name=".views.AboutActivity"
+            android:screenOrientation="portrait"
             android:label="@string/title_about" />
 
         <activity
             android:name=".views.TipsActivity"
+            android:screenOrientation="portrait"
             android:label="@string/title_tips" />
 
         <activity
             android:name=".views.SettingsActivity"
-            android:label="@string/title_settings" />
+            android:screenOrientation="portrait"
+            android:label="@string/title_settings"
+            android:theme="@style/PreferenceScreen"/>
 
-        <activity android:name=".views.RecognitionActivity" />
+        <activity
+            android:name=".views.RecognitionActivity"
+            android:screenOrientation="portrait"/>
 
-        <activity android:name=".views.BreedActivity" />
+        <activity
+            android:name=".views.BreedActivity"
+            android:screenOrientation="portrait"/>
 
-        <activity android:name=".views.MainActivity">
+        <activity
+            android:name=".views.MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -55,6 +64,7 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/app_ad_id" />
+
     </application>
 
 </manifest>

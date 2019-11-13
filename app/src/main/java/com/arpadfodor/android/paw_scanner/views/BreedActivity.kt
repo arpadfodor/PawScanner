@@ -71,6 +71,7 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
             // Update the UI, in this case, the Toolbar
             collapsingToolbarLayout.title = result
             collapsingToolbarLayout.invalidate()
+            viewModel.setTextToBeSpoken()
 
             viewModel.loadData()
 

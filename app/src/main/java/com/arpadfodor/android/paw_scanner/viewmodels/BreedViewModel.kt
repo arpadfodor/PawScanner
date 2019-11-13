@@ -12,12 +12,15 @@ import com.arpadfodor.android.paw_scanner.models.api.ApiInteraction
 import com.arpadfodor.android.paw_scanner.models.api.BreedImage
 import com.arpadfodor.android.paw_scanner.models.api.BreedInfo
 import com.bumptech.glide.Glide
+import java.util.*
 
 class BreedViewModel(application: Application) : AndroidViewModel(application){
 
     var app: Application = application
 
     val labels = LabelsManager.getFormattedLabels()
+
+    lateinit var placeholderImage: Bitmap
 
     /*
      * Breed name
@@ -50,35 +53,55 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
     private var textToBeSpoken = ""
 
     fun init(intent: Intent){
+
         TextToSpeechModel.init(app.applicationContext)
         val name = intent.getStringExtra("breed_name")?:""
         breedName.postValue(name)
+        loadPlaceholderImage(R.drawable.paw_scanner)
+
     }
 
     fun loadData(){
-        ApiInteraction.loadBreedInfo(breedName.value?:"", onSuccess = this::showBreedInfo, onError = this::showError)
+
+        when {
+            breedName.value?.toLowerCase(Locale.getDefault()) == "human" -> {
+                breedInfo.postValue(app.getString(R.string.human_info_text))
+                loadImage(R.drawable.human)
+            }
+            breedName.value?.toLowerCase(Locale.getDefault()) == "cat" -> {
+                breedInfo.postValue(app.getString(R.string.cat_info_text))
+                loadImage(R.drawable.cat)
+            }
+            else -> {
+                ApiInteraction.loadBreedInfo(breedName.value?:"", onSuccess = this::showBreedInfo, onError = this::showTextLoadError)
+                breedInfo.postValue(app.getString(R.string.loading))
+            }
+        }
+
     }
 
     private fun loadImageByBreedId(id: String){
-        ApiInteraction.loadBreedImage(id, onSuccess = this::showBreedImage, onError = this::showError)
+        ApiInteraction.loadBreedImage(id, onSuccess = this::showBreedImage, onError = this::showImageLoadError)
     }
 
     private fun showBreedInfo(info: List<BreedInfo>) {
 
-        var breedInfoText = ""
+        val breedInfoText: String
 
         if(info.isNotEmpty()){
 
             breedInfoText = app.getString(R.string.breed_info, info[0].name, info[0].breed_group,
                 info[0].weight.metric, info[0].height.metric, info[0].life_span,
                 info[0].temperament, info[0].bred_for)
-
             loadImageByBreedId(info[0].id.toString())
 
         }
+        else{
+            breedInfoText = app.getString(R.string.api_data_empty, breedName.value)
+        }
 
         breedInfo.postValue(breedInfoText)
-        image.postValue(null)
+        image.postValue(placeholderImage)
 
     }
 
@@ -94,8 +117,8 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
                     val loadedImage = Glide.with(app.applicationContext)
                         .asBitmap()
                         .load(data[0].url)
-                        .placeholder(R.drawable.dog_friend)
-                        .error(R.drawable.dog_friend)
+                        .placeholder(R.drawable.paw_scanner)
+                        .error(R.drawable.paw_scanner)
                         .submit()
                         .get()
 
@@ -111,7 +134,12 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
 
     }
 
-    private fun showError(e: Throwable) {
+    private fun showTextLoadError(e: Throwable) {
+        e.printStackTrace()
+        breedInfo.postValue(app.getString(R.string.internet_needed, breedName.value))
+    }
+
+    private fun showImageLoadError(e: Throwable) {
         e.printStackTrace()
     }
 
@@ -131,6 +159,57 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
         else{
             TextToSpeechModel.speak(textToBeSpoken)
         }
+
+    }
+
+    private fun loadPlaceholderImage(imageId: Int){
+
+        //load breed data from API
+        val loaderThread = Thread(Runnable {
+
+            try{
+
+                val loadedImage = Glide.with(app.applicationContext)
+                    .asBitmap()
+                    .load(imageId)
+                    .placeholder(R.drawable.dog_friend)
+                    .error(R.drawable.dog_friend)
+                    .submit()
+                    .get()
+
+                placeholderImage = loadedImage
+                image.postValue(placeholderImage)
+
+            }
+            catch (e: Error){}
+
+        })
+        loaderThread.start()
+
+    }
+
+    private fun loadImage(imageId: Int){
+
+        //load breed data from API
+        val loaderThread = Thread(Runnable {
+
+            try{
+
+                val loadedImage = Glide.with(app.applicationContext)
+                    .asBitmap()
+                    .load(imageId)
+                    .placeholder(R.drawable.dog_friend)
+                    .error(R.drawable.dog_friend)
+                    .submit()
+                    .get()
+
+                image.postValue(loadedImage)
+
+            }
+            catch (e: Error){}
+
+        })
+        loaderThread.start()
 
     }
 

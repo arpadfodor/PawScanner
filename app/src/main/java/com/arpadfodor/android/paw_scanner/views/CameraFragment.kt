@@ -277,9 +277,6 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
     private val YUVbytes = arrayOfNulls<ByteArray>(3)
     private var RGBbytes: IntArray? = null
 
-    protected val luminance: ByteArray?
-        get() = YUVbytes[0]
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.camera_fragment, container, false)
     }
@@ -712,7 +709,7 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
 
         imageCapture?.let { imageCapture ->
 
-            val rawDate = SimpleDateFormat("yyyy-MM-dd_HH:mm:ss")
+            val rawDate = SimpleDateFormat("yyyyMMdd_HH:mm:ss")
             val formattedDate = rawDate.format(Calendar.getInstance().time)
             val outputDirectory = viewModel.getOutputDirectory()
             val imageName = viewModel.fileName + "-" + formattedDate

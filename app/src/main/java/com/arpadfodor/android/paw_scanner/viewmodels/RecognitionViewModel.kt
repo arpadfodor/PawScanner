@@ -33,6 +33,7 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
     var app: Application = application
 
     lateinit var recognizedImage: Bitmap
+    lateinit var placeholderImage: Bitmap
 
     /*
      * Breed image sample
@@ -84,6 +85,8 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
 
         }
 
+        loadPlaceholderImage(R.drawable.paw_scanner)
+
         setTextToBeSpoken()
 
     }
@@ -112,8 +115,8 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
                     val loadedImage = Glide.with(app.applicationContext)
                         .asBitmap()
                         .load(data[0].url)
-                        .placeholder(R.drawable.dog_friend)
-                        .error(R.drawable.dog_friend)
+                        .placeholder(R.drawable.paw_scanner)
+                        .error(R.drawable.paw_scanner)
                         .submit()
                         .get()
 
@@ -306,6 +309,32 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
 
     fun pause() {
         TextToSpeechModel.stop()
+    }
+
+    private fun loadPlaceholderImage(imageId: Int){
+
+        //load breed data from API
+        val loaderThread = Thread(Runnable {
+
+            try{
+
+                val loadedImage = Glide.with(app.applicationContext)
+                    .asBitmap()
+                    .load(imageId)
+                    .placeholder(R.drawable.dog_friend)
+                    .error(R.drawable.dog_friend)
+                    .submit()
+                    .get()
+
+                placeholderImage = loadedImage
+                image.postValue(placeholderImage)
+
+            }
+            catch (e: Error){}
+
+        })
+        loaderThread.start()
+
     }
 
 }

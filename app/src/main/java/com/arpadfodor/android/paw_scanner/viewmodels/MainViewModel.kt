@@ -77,7 +77,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * The desired camera preview size
      */
-    val desiredPreviewSize = Size(640, 480)
+    var desiredPreviewSize = Size(640, 480)
 
     /**
      * The rotation in degrees of the camera sensor from the display
@@ -634,6 +634,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         currentRecognitionEnabled.value = RECOGNITION_DISABLED
         isInferenceFinished = false
         updateCurrentInfo(0, emptyList())
+    }
+
+    fun setDesiredPreviewSize(isHighQualityRequired: Boolean){
+
+        desiredPreviewSize = if(isHighQualityRequired){
+            Size(1280, 960)
+        }
+        else{
+            Size(640, 480)
+        }
+
     }
 
 }

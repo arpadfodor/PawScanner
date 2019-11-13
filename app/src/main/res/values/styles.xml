@@ -17,4 +17,11 @@
         <item name="android:windowExitAnimation">@android:anim/slide_out_right</item>
     </style>
 
+    <style name="PreferenceScreen" parent="AppTheme">
+        <item name="colorAccent">@color/colorNormalButton</item>
+        <item name="android:textColor">@color/colorText</item>
+        <item name="android:textColorSecondary">@color/colorNormalButton</item>
+        <item name="android:windowBackground">@color/colorGray</item>
+    </style>
+
 </resources>
