@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
             android:backgroundTint="@color/colorSecondaryButton"
-            app:srcCompat="@drawable/logo_message"
+            app:srcCompat="@drawable/logo_rate_review"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

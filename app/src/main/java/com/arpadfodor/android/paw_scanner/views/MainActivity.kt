@@ -4,10 +4,8 @@ import android.Manifest
 import android.app.ActivityOptions
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Size
 import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.WindowManager
@@ -262,8 +260,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onResume()
 
         val settings = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        viewModel.setQuality(settings.getBoolean(getString(R.string.KEY_IMAGE_PREFERENCE), false))
-        viewModel.setDesiredPreviewSize(settings.getBoolean(getString(R.string.KEY_SHUTTER_COLOR), false))
+        viewModel.setQuality(settings.getBoolean(getString(R.string.PREFERENCE_KEY_IMAGE_PREFERENCE), false))
+        viewModel.setShutterColor(settings.getBoolean(getString(R.string.PREFERENCE_KEY_SHUTTER_COLOR), false))
 
     }
 

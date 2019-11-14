@@ -61,7 +61,7 @@ class RecognitionActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         val settings = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        val onlineEnabled = settings.getBoolean(getString(R.string.KEY_ONLINE_IMAGE), false)
+        val onlineEnabled = settings.getBoolean(getString(R.string.PREFERENCE_KEY_ONLINE_IMAGE), false)
 
         viewModel = ViewModelProviders.of(this).get(RecognitionViewModel::class.java)
         viewModel.init(intent, onlineEnabled)
@@ -90,8 +90,11 @@ class RecognitionActivity : AppCompatActivity(), View.OnClickListener {
         topPredictionsListView.adapter = adapter
 
         topPredictionsListView.setOnItemClickListener{ parent, view, position, id ->
+
+            val currentBreedId = viewModel.results[position].id
             val currentBreedTitle = viewModel.results[position].title
-            viewModel.showBreedInfo(currentBreedTitle)
+            viewModel.showBreedInfo(currentBreedId, currentBreedTitle)
+
         }
 
         subscribeToViewModel()
@@ -126,7 +129,7 @@ class RecognitionActivity : AppCompatActivity(), View.OnClickListener {
             }
 
             R.id.llMainPrediction ->{
-                viewModel.showBreedInfo(viewModel.results[0].title)
+                viewModel.showBreedInfo(viewModel.results[0].id, viewModel.results[0].title)
             }
 
         }

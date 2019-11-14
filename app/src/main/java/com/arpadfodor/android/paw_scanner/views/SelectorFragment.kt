@@ -44,12 +44,17 @@ class SelectorFragment : Fragment(){
         }
         subscribeToViewModel()
 
-        val breedsAvailable = viewModel.labels
+        val breedsAvailable = arrayListOf<String>()
+
+        for(label in viewModel.labels){
+            breedsAvailable.add(label.second)
+        }
+
         val adapter = ArrayAdapter<String>(this.context!!, R.layout.listview_row, R.id.tvItemName, breedsAvailable)
         listView.adapter = adapter
 
         listView.setOnItemClickListener{ parent, view, position, id ->
-            viewModel.setBreedName(adapter.getItem(position)?:"")
+            viewModel.setCurrentBreed(viewModel.labels[position])
         }
 
     }

@@ -3,8 +3,8 @@
 <!DOCTYPE resources [
     <!ENTITY appName "Paw Scanner">
     <!ENTITY appId "925630375777">
-    <!ENTITY appVersion "v0.29">
-    <!ENTITY appDate "13/11/2019">
+    <!ENTITY appVersion "v0.30">
+    <!ENTITY appDate "15/11/2019">
     <!ENTITY adMobAppId "ca-app-pub-3940256099942544~3347511713">
     <!ENTITY adMobBannerId "ca-app-pub-3940256099942544/6300978111">
     ]>
@@ -59,13 +59,17 @@
         &appName;\n
         &appVersion;\n
         \n
+        \n
         Created by Arpad Fodor\n
         github.com/arpadfodor\n
+        \n
         \n
         Release date:\n
         &appDate;\n
         \n
+        \n
         Images by:\n
+        \n
         Elias Schäfer\n
         Sinisa Maric\n
         Pixaline\n
@@ -77,14 +81,23 @@
         skeeze\n
         from Pixabay\n
         \n
+        \n
         AI is powered by Keras/TensorFlow\n
+        \n
+        \n
+        Dataset Reference:\n
+        \n
+        Aditya Khosla, Nityananda Jayadevaprakash, Bangpeng Yao and Li Fei-Fei. Novel dataset for Fine-Grained Image Categorization. First Workshop on Fine-Grained Visual Categorization (FGVC), IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2011.\n
+        \n
+        J. Deng, W. Dong, R. Socher, L.-J. Li, K. Li and L. Fei-Fei, ImageNet: A Large-Scale Hierarchical Image Database. IEEE Computer Vision and Pattern Recognition (CVPR), 2009.\n
+        \n
         \n
         Breed info by\n
         TheDogApi\n
         Wikipedia\n
         \n
-        You can report a bug or send a message by clicking on the corresponding buttons - although application crash events are automatically sent.\n
         \n
+        You can report a bug or send a message by clicking on the corresponding buttons - although application crash events are automatically sent.\n
     </string>
 
     <string name="tips_full_body">Try to capture the full body of the creature. At least the head should be visible.</string>
@@ -96,20 +109,23 @@
 
     <string name="title_camera_settings">Camera settings</string>
     <string name="setting_image_preference">Image preference</string>
-    <string name="label_nice_image">Nicer images</string>
+    <string name="label_nice_image">Better images</string>
     <string name="label_fast_process">Faster image processing</string>
     <string name="title_network_settings">Network settings</string>
+    <string name="setting_online_image">Breed image source</string>
     <string name="label_disable_online_image">Use app images only</string>
-    <string name="label_enable_online_image">Nicer pics, increased network traffic</string>
-    <string name="setting_online_image">Breed image from internet</string>
+    <string name="label_enable_online_image">Download image with higher resolution if available (increases network traffic)</string>
     <string name="setting_shutter_color_preference">Shutter color</string>
     <string name="label_black">Black</string>
     <string name="label_white">White</string>
 
+    <string name="review_app">Review app</string>
+    <string name="report_bug">Report a bug</string>
+
     <string name="title_breed_info">Info</string>
     <string name="title_select_breed">Select breed</string>
     <string name="breed_info">
-        Full name: %1$s\n
+         Full name: %1$s\n
         \n
         Breed group: %2$s\n
         \n
@@ -123,33 +139,58 @@
         Bred for: %7$s.
     </string>
     <string name="cat_info_text">
-        Cats, also called domestic cats (Felis catus) are small, carnivorous (meat-eating) mammals. Domestic cats are often called house cats when kept as indoor pets.\n
+         Cats in general\n
         \n
-        Cats have been domesticated (tamed) for nearly 10,000 years. They are one of the most popular pets in the world. Their origin is probably the African Wildcat Felis silvestris lybica.\n
+        Family: Felidae\n
+        Order: Carnivora\n
         \n
-        Cats were probably first kept because they ate mice, and this is still their main task in farms throughout the world. Later they were kept because they are friendly and good companions.\n
+        Average properties\n
+        Life span: 2 - 16 years (In the wild)\n
+        Gestation period: 58 – 67 days\n
+        Daily sleep: 12 – 16 hours\n
+        \n
+        Cats are small, carnivorous (meat-eating) mammals. Domestic cats are often called house cats when kept as indoor pets.\n
+        \n
+        Cats have been domesticated for nearly 10,000 years. They are one of the most popular pets in the world. Cats were probably first kept because they ate mice, and this is still their main task in farms throughout the world. Later they were kept because they are friendly and good companions.\n
         \n
         A cat is sometimes called a kitty. A young cat is called a kitten.\n
         \n
-        Domestic cats are found in shorthair, longhair, and hairless breeds. Cats which are not specific breeds can be referred to as \'domestic shorthair\' (DSH) or \'domestic longhair\' (DLH).\n
+        The word \'cat\' is also used for other felines. Felines are usually called either big cats or small cats. The big, wild cats are well known: lions, tigers, leopards, jaguars, pumas, and cheetahs. There are small, wild cats in most parts of the world, such as the lynx in northern Europe. The big cats and wild cats are not tame, and can be dangerous.
+    </string>
+    <string name="dog_info_text">
+         Dogs in general\n
         \n
-        The word \'cat\' is also used for other felines. Felines are usually called either big cats or small cats. The big, wild cats are well known: lions, tigers, leopards, jaguars, pumas, and cheetahs. There are small, wild cats in most parts of the world, such as the lynx in northern Europe. The big cats and wild cats are not tame, and can be very dangerous.
+        Family: Canidae\n
+        Order: Carnivora\n
+        \n
+        Average properties\n
+        Life span: 10 - 13 years\n
+        Gestation period: 58 – 68 days\n
+        \n
+        The domestic dog is a member of the genus Canis (canines), which forms part of the wolf-like canids, and is the most widely abundant terrestrial carnivore. The dog and the extant gray wolf are sister taxa as modern wolves are not closely related to the wolves that were first domesticated, which implies that the direct ancestor of the dog is extinct. The dog was the first species to be domesticated and has been selectively bred over millennia for various behaviors, sensory capabilities, and physical attributes.\n
+        \n
+        Their long association with humans has led dogs to be uniquely attuned to human behavior and they are able to thrive on a starch-rich diet that would be inadequate for other canid species. Dogs vary widely in shape, size and colors. They perform many roles for humans, such as hunting, herding, pulling loads, protection, assisting police and military, companionship and, more recently, aiding disabled people and therapeutic roles. This influence on human society has given them the sobriquet of "man's best friend".
     </string>
     <string name="human_info_text">
-        Humans are part of the family Hominidae (the great apes, or hominids) together with chimpanzees, gorillas and orangutans.\n
+         Humans in general\n
         \n
-        As a terrestrial animal, humans are characterized by their erect posture and bipedal locomotion; high manual dexterity and heavy tool use compared to other animals; open-ended and complex language use compared to other animal communications; larger, more complex brains than other animals; and highly advanced and organized societies.\n
+        Family: Hominidae\n
+        Order: Primates\n
         \n
-        Humans began to exhibit evidence of behavioral modernity around 50,000 years ago, and in several waves of migration, they ventured out of Africa and populated most of the world.\n
+        Average properties\n
+        Life span: 79 years\n
+        Speed: 45 km/h (Maximum, Running)\n
         \n
-        The spread of humans has profoundly affected much of the biosphere and millions of species worldwide. Advantages that explain this evolutionary success include a larger brain with a well-developed neocortex, prefrontal cortex and temporal lobes, which enable advanced abstract reasoning, language, problem solving, sociality, and culture through social learning. Humans use tools more frequently and effectively than any other animal; and are the only extant species to build fires, cook food, clothe themselves, and create and use numerous other technologies and arts.\n
+        Homo sapiens is the only extant human species. The name is Latin for "wise man" and was introduced in 1758 by Carl Linnaeus. Extinct species of the genus Homo include Homo erectus, extant from roughly 1.9 to 0.4 million years ago, and a number of other species.\n
+        \n
+        Humans began to exhibit evidence of behavioral modernity around 50,000 years ago, and in several waves of migration, they ventured out of Africa and populated most of the world. The spread of humans has profoundly affected much of the biosphere and millions of species worldwide. Advantages that explain this evolutionary success include a larger brain with a well-developed neocortex, prefrontal cortex and temporal lobes, which enable advanced abstract reasoning, language, problem solving, sociality, and culture through social learning. Humans use tools more frequently and effectively than any other animal; and are the only extant species to build fires, cook food, clothe themselves, and create and use numerous other technologies and arts.\n
         \n
         Humans uniquely use such systems of symbolic communication as language and art to express themselves and exchange ideas, and also organize themselves into purposeful groups. Humans create complex social structures composed of many cooperating and competing groups, from families and kinship networks to political states. Social interactions between humans have established an extremely wide variety of values, social norms, and rituals, which together undergird human society. Curiosity and the human desire to understand and influence the environment and to explain and manipulate phenomena (or events) have motivated humanity\'s development of science, philosophy, mythology, religion, anthropology, and numerous other fields of knowledge.\n
         \n
         Though most of human existence has been sustained by hunting and gathering in band societies, increasingly many human societies transitioned to sedentary agriculture approximately some 10,000 years ago, domesticating plants and animals, thus enabling the growth of civilization. These human societies subsequently expanded, establishing various forms of government, religion, and culture around the world, and unifying people within regions to form states and empires. The rapid advancement of scientific and medical understanding in the 19th and 20th centuries permitted the development of fuel-driven technologies and increased lifespans, causing the human population to rise exponentially. The global human population was estimated to be near 7.7 billion in 2019.
     </string>
     <string name="internet_needed">Internet connection is required to get info about %1$s.</string>
-    <string name="loading">Loading...</string>
     <string name="api_data_empty">Cannot find info about %1$s.</string>
+    <string name="loading">Loading...</string>
 
 </resources>

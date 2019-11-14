@@ -36,6 +36,7 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
     var app: Application = application
 
     lateinit var recognizedImage: Bitmap
+
     var placeholderImage: Bitmap? = null
 
     var onlineImageEnabled = false
@@ -62,21 +63,21 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
         TextToSpeechModel.init(app.applicationContext)
 
         recognizedImage = BitmapFactory.decodeByteArray(
-            intent.getByteArrayExtra("byteArray"),
+            intent.getByteArrayExtra(app.getString(R.string.KEY_IMAGE_BYTE_ARRAY)),
             0,
-            intent.getByteArrayExtra("byteArray")!!.size)
+            intent.getByteArrayExtra(app.getString(R.string.KEY_IMAGE_BYTE_ARRAY))!!.size)
 
-        inferenceDuration = intent.getLongExtra("inferenceTime", 0)
-        sizeOfResults = intent.getIntExtra("numberOfRecognitions", 0)
+        inferenceDuration = intent.getLongExtra(app.getString(R.string.KEY_INFERENCE_TIME), 0)
+        sizeOfResults = intent.getIntExtra(app.getString(R.string.KEY_NUM_OF_RECOGNITIONS), 0)
 
         results = arrayListOf()
         resultsInString = arrayListOf()
 
         for(index in 0 until sizeOfResults){
 
-            val id = intent.getStringExtra("recognition-id-$index")
-            val title = intent.getStringExtra("recognition-title-$index")
-            val confidence = intent.getFloatExtra("recognition-confidence-$index", 0f)
+            val id = intent.getStringExtra(app.getString(R.string.KEY_RECOGNITION_ID, index))
+            val title = intent.getStringExtra(app.getString(R.string.KEY_RECOGNITION_TITLE, index))
+            val confidence = intent.getFloatExtra(app.getString(R.string.KEY_RECOGNITION_CONFIDENCE, index), 0f)
 
             val currentRecognitionToAdd = Recognition(
                 id ?: "",
@@ -317,11 +318,12 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
 
     }
 
-    fun showBreedInfo(name: String){
+    fun showBreedInfo(id: String, title: String){
 
         val intent = Intent(app.applicationContext, BreedActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            putExtra("breed_name", name)
+            putExtra(app.getString(R.string.KEY_BREED_ID), id)
+            putExtra(app.getString(R.string.KEY_BREED_TITLE), title)
         }
         ContextCompat.startActivity(app.applicationContext, intent, null)
 

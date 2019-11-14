@@ -19,7 +19,7 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
 
     var app: Application = application
 
-    val labels = LabelsManager.getFormattedLabels()
+    val labels = LabelsManager.getIdWithNames()
 
     var placeholderImage: Bitmap? = null
 
@@ -35,8 +35,8 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
     /*
      * Breed name
      */
-    val breedName: MutableLiveData<String> by lazy {
-        MutableLiveData<String>()
+    val currentBreed: MutableLiveData<Pair<String, String>> by lazy {
+        MutableLiveData<Pair<String, String>>()
     }
 
     /*
@@ -58,8 +58,11 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
     fun init(intent: Intent){
 
         TextToSpeechModel.init(app.applicationContext)
-        val name = intent.getStringExtra("breed_name")?:""
-        breedName.postValue(name)
+        val id = intent.getStringExtra(app.getString(R.string.KEY_BREED_ID))?:""
+        val title = intent.getStringExtra(app.getString(R.string.KEY_BREED_TITLE))?:""
+
+        currentBreed.postValue(Pair(id, title))
+
         loadPlaceholderImage(R.drawable.paw_scanner)
 
     }
@@ -68,7 +71,7 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
 
         image.postValue(placeholderImage)
 
-        val name = breedName.value?:return
+        val name = currentBreed.value?.second?:return
 
         when {
             name.toLowerCase(Locale.getDefault()) == "human" -> {
@@ -87,31 +90,35 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
 
     }
 
-    private fun loadImageByBreedId(id: String){
+    private fun loadImageByBreedApiId(id: String){
         ApiInteraction.loadBreedImage(id, onSuccess = this::showBreedImage, onError = this::showImageLoadError)
     }
 
     private fun showBreedInfo(info: List<BreedInfo>) {
 
-        val breedInfoText: String
+        var breedInfoText: String
 
         if(info.isNotEmpty()){
 
             breedInfoText = app.getString(R.string.breed_info, info[0].name, info[0].breed_group,
                 info[0].weight.metric, info[0].height.metric, info[0].life_span,
                 info[0].temperament, info[0].bred_for)
+            breedInfoText += "\n\n"
+            breedInfoText += app.getString(R.string.dog_info_text)
 
             if(onlineImageEnabled){
-                loadImageByBreedId(info[0].id.toString())
+                loadImageByBreedApiId(info[0].id.toString())
             }
             else{
-                loadImageFromAssets(breedName.value?:return)
+                loadImageFromAssets(currentBreed.value?.first?:return)
             }
 
         }
         else{
-            breedInfoText = app.getString(R.string.api_data_empty, breedName.value)
-            loadImageFromAssets(breedName.value?:return)
+            breedInfoText = app.getString(R.string.api_data_empty, currentBreed.value?.second)
+            breedInfoText += "\n\n"
+            breedInfoText += app.getString(R.string.dog_info_text)
+            loadImageFromAssets(currentBreed.value?.first?:return)
         }
 
         breedInfo.postValue(breedInfoText)
@@ -149,18 +156,23 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
 
     private fun showTextLoadError(e: Throwable) {
         e.printStackTrace()
-        breedInfo.postValue(app.getString(R.string.internet_needed, breedName.value))
-        loadImageFromAssets(breedName.value?:return)
+
+        var breedInfoText: String = app.getString(R.string.internet_needed, currentBreed.value?.second)
+        breedInfoText += "\n\n"
+        breedInfoText += app.getString(R.string.dog_info_text)
+
+        breedInfo.postValue(breedInfoText)
+        loadImageFromAssets(currentBreed.value?.first?:return)
     }
 
     private fun showImageLoadError(e: Throwable) {
         e.printStackTrace()
-        loadImageFromAssets(breedName.value?:return)
+        loadImageFromAssets(currentBreed.value?.first?:return)
     }
 
     fun setTextToBeSpoken(){
         var spokenText = ""
-        spokenText += breedName.value + ". "
+        spokenText += currentBreed.value?.second + ". "
         spokenText += breedInfo.value
         textToBeSpoken = spokenText
     }
@@ -203,7 +215,7 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
 
     }
 
-    private fun loadImageFromAssets(imageName: String){
+    private fun loadImageFromAssets(imageId: String){
 
         //load breed data from API
         val loaderThread = Thread(Runnable {
@@ -212,7 +224,7 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
 
                 val loadedImage = Glide.with(app.applicationContext)
                     .asBitmap()
-                    .load(Uri.parse("file:///android_asset/breeds/$imageName.jpg"))
+                    .load(Uri.parse("file:///android_asset/breeds/$imageId.jpg"))
                     .placeholder(R.drawable.dog_friend)
                     .error(R.drawable.dog_friend)
                     .submit()
@@ -230,8 +242,8 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
 
     }
 
-    fun setBreedName(name: String){
-        breedName.postValue(name)
+    fun setCurrentBreed(element: Pair<String, String>){
+        currentBreed.postValue(element)
     }
 
     fun pause() {

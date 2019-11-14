@@ -13,7 +13,6 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.preference.PreferenceManager
 import com.arpadfodor.android.paw_scanner.R
 import com.arpadfodor.android.paw_scanner.viewmodels.BreedViewModel
-import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -68,15 +67,15 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
     private fun subscribeToViewModel() {
 
         // Create the text observer which updates the UI in case of an inference result
-        val titleObserver = Observer<String> { result ->
+        val titleObserver = Observer<Pair<String, String>> { result ->
             // Update the UI, in this case, the Toolbar
-            collapsingToolbarLayout.title = result
+            collapsingToolbarLayout.title = result.second
             collapsingToolbarLayout.invalidate()
             viewModel.setTextToBeSpoken()
 
             viewModel.loadData()
 
-            if(result.isNullOrBlank()){
+            if(result.second.isBlank()){
                 viewModel.isSelectorDisplayed.postValue(true)
             }
             else{
@@ -123,7 +122,7 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         // Observe the LiveData
-        viewModel.breedName.observe(this, titleObserver)
+        viewModel.currentBreed.observe(this, titleObserver)
         viewModel.breedInfo.observe(this, breedTextObserver)
         viewModel.image.observe(this, imageObserver)
         viewModel.isSelectorDisplayed.observe(this, isSelectorDisplayedObserver)
@@ -159,7 +158,7 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onBackPressed() {
 
-        if(viewModel.isSelectorDisplayed.value == true && !viewModel.breedName.value.isNullOrBlank()){
+        if(viewModel.isSelectorDisplayed.value == true && !viewModel.currentBreed.value?.second.isNullOrBlank()){
             viewModel.isSelectorDisplayed.postValue(false)
         }
         else{
@@ -173,7 +172,7 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
         super.onResume()
 
         val settings = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        viewModel.onlineImageEnabled = settings.getBoolean(getString(R.string.KEY_ONLINE_IMAGE), false)
+        viewModel.onlineImageEnabled = settings.getBoolean(getString(R.string.PREFERENCE_KEY_ONLINE_IMAGE), false)
 
     }
 

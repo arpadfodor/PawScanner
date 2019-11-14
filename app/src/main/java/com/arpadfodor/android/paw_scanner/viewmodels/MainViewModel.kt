@@ -509,17 +509,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
-            putExtra("inferenceTime", inferenceDuration.value)
-            putExtra("numberOfRecognitions", resultToSend.size)
+            putExtra(app.getString(R.string.KEY_INFERENCE_TIME), inferenceDuration.value)
+            putExtra(app.getString(R.string.KEY_NUM_OF_RECOGNITIONS), resultToSend.size)
 
             val bs = ByteArrayOutputStream()
             bitmap.compress(Bitmap.CompressFormat.PNG, 99, bs)
-            putExtra("byteArray", bs.toByteArray())
+            putExtra(app.getString(R.string.KEY_IMAGE_BYTE_ARRAY), bs.toByteArray())
 
             for((index, recognition) in resultToSend.withIndex()){
-                putExtra("recognition-id-$index", recognition.id)
-                putExtra("recognition-title-$index", recognition.title)
-                putExtra("recognition-confidence-$index", recognition.confidence)
+                putExtra(app.getString(R.string.KEY_RECOGNITION_ID, index), recognition.id)
+                putExtra(app.getString(R.string.KEY_RECOGNITION_TITLE, index), recognition.title)
+                putExtra(app.getString(R.string.KEY_RECOGNITION_CONFIDENCE, index), recognition.confidence)
             }
 
         }
@@ -640,7 +640,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         updateCurrentInfo(0, emptyList())
     }
 
-    fun setDesiredPreviewSize(isHighQualityRequired: Boolean){
+    fun setQuality(isHighQualityRequired: Boolean){
 
         desiredPreviewSize = if(isHighQualityRequired){
             Size(1280, 960)
@@ -651,9 +651,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     }
 
-    fun setQuality(isHighQualityRequired: Boolean){
+    fun setShutterColor(isBlack: Boolean){
 
-        setDesiredPreviewSize(isHighQualityRequired)
+        shutterColor = if(isBlack){
+            Color.BLACK
+        }
+        else{
+            Color.WHITE
+        }
 
     }
 

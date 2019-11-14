@@ -172,14 +172,14 @@ abstract class Classifier{
                 (rhs.confidence).compareTo(lhs.confidence)
             })
 
-        val labels = LabelsManager.getFormattedLabels()
+        val labels = LabelsManager.getIdWithNames()
 
         for (i in labels.indices){
             pq.add(
                 Recognition(
-                    "" + i,
+                    labels[i].first,
                     if (labels.size > i) {
-                        labels[i]
+                        labels[i].second
                     } else {
                         "unknown"
                     },
