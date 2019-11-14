@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.preference.PreferenceManager
 import com.arpadfodor.android.paw_scanner.R
 import com.arpadfodor.android.paw_scanner.viewmodels.BreedViewModel
 import com.google.android.material.appbar.AppBarLayout
@@ -164,6 +165,15 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
         else{
             super.onBackPressed()
         }
+
+    }
+
+    override fun onResume() {
+
+        super.onResume()
+
+        val settings = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        viewModel.onlineImageEnabled = settings.getBoolean(getString(R.string.KEY_ONLINE_IMAGE), false)
 
     }
 

@@ -3,6 +3,7 @@ package com.arpadfodor.android.paw_scanner.viewmodels
 import android.app.Application
 import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.arpadfodor.android.paw_scanner.R
@@ -20,7 +21,9 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
 
     val labels = LabelsManager.getFormattedLabels()
 
-    lateinit var placeholderImage: Bitmap
+    var placeholderImage: Bitmap? = null
+
+    var onlineImageEnabled = false
 
     /*
      * Breed name
@@ -63,17 +66,21 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
 
     fun loadData(){
 
+        image.postValue(placeholderImage)
+
+        val name = breedName.value?:return
+
         when {
-            breedName.value?.toLowerCase(Locale.getDefault()) == "human" -> {
+            name.toLowerCase(Locale.getDefault()) == "human" -> {
                 breedInfo.postValue(app.getString(R.string.human_info_text))
-                loadImage(R.drawable.human)
+                loadImageFromAssets(name)
             }
-            breedName.value?.toLowerCase(Locale.getDefault()) == "cat" -> {
+            name.toLowerCase(Locale.getDefault()) == "cat" -> {
                 breedInfo.postValue(app.getString(R.string.cat_info_text))
-                loadImage(R.drawable.cat)
+                loadImageFromAssets(name)
             }
             else -> {
-                ApiInteraction.loadBreedInfo(breedName.value?:"", onSuccess = this::showBreedInfo, onError = this::showTextLoadError)
+                ApiInteraction.loadBreedInfo(name, onSuccess = this::showBreedInfo, onError = this::showTextLoadError)
                 breedInfo.postValue(app.getString(R.string.loading))
             }
         }
@@ -93,15 +100,21 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
             breedInfoText = app.getString(R.string.breed_info, info[0].name, info[0].breed_group,
                 info[0].weight.metric, info[0].height.metric, info[0].life_span,
                 info[0].temperament, info[0].bred_for)
-            loadImageByBreedId(info[0].id.toString())
+
+            if(onlineImageEnabled){
+                loadImageByBreedId(info[0].id.toString())
+            }
+            else{
+                loadImageFromAssets(breedName.value?:return)
+            }
 
         }
         else{
             breedInfoText = app.getString(R.string.api_data_empty, breedName.value)
+            loadImageFromAssets(breedName.value?:return)
         }
 
         breedInfo.postValue(breedInfoText)
-        image.postValue(placeholderImage)
 
     }
 
@@ -137,10 +150,12 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
     private fun showTextLoadError(e: Throwable) {
         e.printStackTrace()
         breedInfo.postValue(app.getString(R.string.internet_needed, breedName.value))
+        loadImageFromAssets(breedName.value?:return)
     }
 
     private fun showImageLoadError(e: Throwable) {
         e.printStackTrace()
+        loadImageFromAssets(breedName.value?:return)
     }
 
     fun setTextToBeSpoken(){
@@ -188,7 +203,7 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
 
     }
 
-    private fun loadImage(imageId: Int){
+    private fun loadImageFromAssets(imageName: String){
 
         //load breed data from API
         val loaderThread = Thread(Runnable {
@@ -197,7 +212,7 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
 
                 val loadedImage = Glide.with(app.applicationContext)
                     .asBitmap()
-                    .load(imageId)
+                    .load(Uri.parse("file:///android_asset/breeds/$imageName.jpg"))
                     .placeholder(R.drawable.dog_friend)
                     .error(R.drawable.dog_friend)
                     .submit()
@@ -206,7 +221,9 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
                 image.postValue(loadedImage)
 
             }
-            catch (e: Error){}
+            catch (e: Exception){
+                image.postValue(placeholderImage)
+            }
 
         })
         loaderThread.start()

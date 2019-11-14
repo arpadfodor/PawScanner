@@ -731,7 +731,7 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
 
                 // Display flash animation to indicate that photo was captured
                 container.postDelayed({
-                    container.foreground = ColorDrawable(MainViewModel.shutterColor)
+                    container.foreground = ColorDrawable(viewModel.shutterColor)
                     container.postDelayed(
                         { container.foreground = null }, MainViewModel.ANIMATION_FAST)
                 }, MainViewModel.ANIMATION_SLOW)

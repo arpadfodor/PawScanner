@@ -9,6 +9,7 @@ import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.preference.PreferenceManager
 import com.arpadfodor.android.paw_scanner.R
 import com.arpadfodor.android.paw_scanner.viewmodels.RecognitionViewModel
 import com.github.mikephil.charting.charts.PieChart
@@ -59,8 +60,11 @@ class RecognitionActivity : AppCompatActivity(), View.OnClickListener {
             this.onClick(mainPredictionLinearLayout)
         }
 
+        val settings = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        val onlineEnabled = settings.getBoolean(getString(R.string.KEY_ONLINE_IMAGE), false)
+
         viewModel = ViewModelProviders.of(this).get(RecognitionViewModel::class.java)
-        viewModel.init(intent)
+        viewModel.init(intent, onlineEnabled)
         viewModel.loadData()
 
         val textViewPredictionsChartTitle = findViewById<TextView>(R.id.tvPredictionsChartTitle)
@@ -100,6 +104,7 @@ class RecognitionActivity : AppCompatActivity(), View.OnClickListener {
         val imageObserver = Observer<Bitmap> { result ->
             // Update the UI, in this case, the ImageView
             collapsingImage.setImageBitmap(result)
+            collapsingImage.invalidate()
         }
 
         // Observe the LiveData

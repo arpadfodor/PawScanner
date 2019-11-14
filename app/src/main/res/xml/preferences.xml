@@ -12,10 +12,27 @@
         android:title="@string/title_camera_settings">
 
         <SwitchPreference
-                android:key="image_quality"
-                android:summaryOff="@string/label_low"
-                android:summaryOn="@string/label_high"
-                android:title="@string/setting_image_quality" />
+                android:key="@string/KEY_IMAGE_PREFERENCE"
+                android:summaryOff="@string/label_fast_process"
+                android:summaryOn="@string/label_nice_image"
+                android:title="@string/setting_image_preference" />
+
+        <SwitchPreference
+            android:key="@string/KEY_SHUTTER_COLOR"
+            android:summaryOff="@string/label_white"
+            android:summaryOn="@string/label_black"
+            android:title="@string/setting_shutter_color_preference" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/title_network_settings">
+
+        <SwitchPreference
+            android:key="@string/KEY_ONLINE_IMAGE"
+            android:summaryOff="@string/label_disable_online_image"
+            android:summaryOn="@string/label_enable_online_image"
+            android:title="@string/setting_online_image" />
 
     </PreferenceCategory>
 

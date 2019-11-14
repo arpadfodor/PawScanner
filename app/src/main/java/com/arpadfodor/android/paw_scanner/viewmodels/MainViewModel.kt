@@ -57,12 +57,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         const val ANIMATION_FAST = 150L
         const val ANIMATION_SLOW = 200L
 
-        const val shutterColor = Color.WHITE
         const val IMAGE_EXTENSION = ".jpg"
 
     }
 
     var app: Application = application
+
+    /**
+     * The color of the shutter
+     */
+    var shutterColor = Color.WHITE
 
     /**
      * The base name of the image to save
@@ -644,6 +648,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         else{
             Size(640, 480)
         }
+
+    }
+
+    fun setQuality(isHighQualityRequired: Boolean){
+
+        setDesiredPreviewSize(isHighQualityRequired)
 
     }
 

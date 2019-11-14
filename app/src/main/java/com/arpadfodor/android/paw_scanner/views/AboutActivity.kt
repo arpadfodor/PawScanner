@@ -32,7 +32,7 @@ class AboutActivity : AppCompatActivity() {
         val fabBugReport = findViewById<FloatingActionButton>(R.id.fabBugReport)
 
         fabMessage.setOnClickListener { view ->
-            Snackbar.make(view, "Send message to developer", Snackbar.LENGTH_LONG)
+            Snackbar.make(view, "Rate/review app", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
         }
 

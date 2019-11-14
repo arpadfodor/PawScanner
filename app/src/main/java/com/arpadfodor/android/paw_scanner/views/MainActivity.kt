@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.ActivityOptions
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Size
@@ -28,7 +29,6 @@ import com.arpadfodor.android.paw_scanner.viewmodels.MainViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.nav_host_layout.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -262,8 +262,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onResume()
 
         val settings = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        val isHighQualityRequired = settings.getBoolean("image_quality", false)
-        viewModel.setDesiredPreviewSize(isHighQualityRequired)
+        viewModel.setQuality(settings.getBoolean(getString(R.string.KEY_IMAGE_PREFERENCE), false))
+        viewModel.setDesiredPreviewSize(settings.getBoolean(getString(R.string.KEY_SHUTTER_COLOR), false))
 
     }
 

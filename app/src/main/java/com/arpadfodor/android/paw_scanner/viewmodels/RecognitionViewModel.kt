@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.net.Uri
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -35,7 +36,9 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
     var app: Application = application
 
     lateinit var recognizedImage: Bitmap
-    lateinit var placeholderImage: Bitmap
+    var placeholderImage: Bitmap? = null
+
+    var onlineImageEnabled = false
 
     /*
      * Breed image sample
@@ -54,7 +57,7 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
 
     var textToBeSpoken = ""
 
-    fun init(intent: Intent){
+    fun init(intent: Intent, onlineEnabled: Boolean){
 
         TextToSpeechModel.init(app.applicationContext)
 
@@ -88,30 +91,32 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
         }
 
         loadPlaceholderImage(R.drawable.paw_scanner)
-
         setTextToBeSpoken()
+
+        onlineImageEnabled = onlineEnabled
 
     }
 
     fun loadData(){
 
-        when {
-            results[0].title.toLowerCase(Locale.getDefault()) == "human" -> {
-                loadImage(R.drawable.human)
-            }
-            results[0].title.toLowerCase(Locale.getDefault()) == "cat" -> {
-                loadImage(R.drawable.cat)
-            }
-            else -> {
-                ApiInteraction.loadBreedInfo(results[0].title, onSuccess = this::loadBreedImage, onError = this::showError)
-            }
+        val name = results[0].title
+
+        if(onlineImageEnabled){
+            ApiInteraction.loadBreedInfo(name, onSuccess = this::loadBreedImage, onError = this::showError)
         }
+        else{
+            loadImageFromAssets(name)
+        }
+
     }
 
     private fun loadBreedImage(info: List<BreedInfo>) {
 
         if(info.isNotEmpty()){
             ApiInteraction.loadBreedImage(info[0].id.toString(), onSuccess = this::showBreedImage, onError = this::showError)
+        }
+        else{
+            loadImageFromAssets(results[0].title)
         }
 
     }
@@ -147,6 +152,8 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
 
     private fun showError(e: Throwable) {
         e.printStackTrace()
+        loadImageFromAssets(results[0].title)
+
     }
 
     /**
@@ -350,7 +357,7 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
 
     }
 
-    private fun loadImage(imageId: Int){
+    private fun loadImageFromAssets(imageName: String){
 
         //load breed data from API
         val loaderThread = Thread(Runnable {
@@ -359,7 +366,7 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
 
                 val loadedImage = Glide.with(app.applicationContext)
                     .asBitmap()
-                    .load(imageId)
+                    .load(Uri.parse("file:///android_asset/breeds/$imageName.jpg"))
                     .placeholder(R.drawable.dog_friend)
                     .error(R.drawable.dog_friend)
                     .submit()
@@ -368,7 +375,9 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
                 image.postValue(loadedImage)
 
             }
-            catch (e: Error){}
+            catch (e: Exception){
+                image.postValue(placeholderImage)
+            }
 
         })
         loaderThread.start()

@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.preference.PreferenceActivity
 import android.preference.PreferenceManager
 import android.view.WindowManager
-import androidx.appcompat.app.AppCompatActivity
 import com.arpadfodor.android.paw_scanner.R
 
 /**
@@ -15,14 +14,22 @@ class SettingsActivity : PreferenceActivity(), SharedPreferences.OnSharedPrefere
 
     companion object {
 
-        const val KEY_IMAGE_QUALITY = "image_quality"
+        const val KEY_IMAGE_PREFERENCE = "image_preference"
+        const val KEY_ONLINE_IMAGE = "online_image"
+        const val KEY_SHUTTER_COLOR = "shutter_color"
 
         fun changeSettings(sharedPreferences: SharedPreferences) {
+
             with (sharedPreferences.edit()) {
-                remove(KEY_IMAGE_QUALITY)
-                putBoolean(KEY_IMAGE_QUALITY, sharedPreferences.getBoolean(KEY_IMAGE_QUALITY, false))
+                remove(KEY_IMAGE_PREFERENCE)
+                putBoolean(KEY_IMAGE_PREFERENCE, sharedPreferences.getBoolean(KEY_IMAGE_PREFERENCE, false))
+                remove(KEY_SHUTTER_COLOR)
+                putBoolean(KEY_SHUTTER_COLOR, sharedPreferences.getBoolean(KEY_SHUTTER_COLOR, false))
+                remove(KEY_ONLINE_IMAGE)
+                putBoolean(KEY_ONLINE_IMAGE, sharedPreferences.getBoolean(KEY_ONLINE_IMAGE, false))
                 apply()
             }
+
         }
 
     }
@@ -48,9 +55,19 @@ class SettingsActivity : PreferenceActivity(), SharedPreferences.OnSharedPrefere
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
 
         when(key) {
-            KEY_IMAGE_QUALITY -> {
+
+            KEY_IMAGE_PREFERENCE -> {
                 changeSettings(sharedPreferences)
             }
+
+            KEY_SHUTTER_COLOR -> {
+                changeSettings(sharedPreferences)
+            }
+
+            KEY_ONLINE_IMAGE -> {
+                changeSettings(sharedPreferences)
+            }
+
         }
 
     }

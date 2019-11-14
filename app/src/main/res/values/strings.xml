@@ -95,9 +95,16 @@
     <string name="tips_many_one">Strive to have only one creature at the same time to recognize. This reduces recognition uncertainty.</string>
 
     <string name="title_camera_settings">Camera settings</string>
-    <string name="setting_image_quality">Image quality</string>
-    <string name="label_high">High - nicer images</string>
-    <string name="label_low">Low - faster processing</string>
+    <string name="setting_image_preference">Image preference</string>
+    <string name="label_nice_image">Nicer images</string>
+    <string name="label_fast_process">Faster image processing</string>
+    <string name="title_network_settings">Network settings</string>
+    <string name="label_disable_online_image">Use app images only</string>
+    <string name="label_enable_online_image">Nicer pics, increased network traffic</string>
+    <string name="setting_online_image">Breed image from internet</string>
+    <string name="setting_shutter_color_preference">Shutter color</string>
+    <string name="label_black">Black</string>
+    <string name="label_white">White</string>
 
     <string name="title_breed_info">Info</string>
     <string name="title_select_breed">Select breed</string>

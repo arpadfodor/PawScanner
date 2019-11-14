@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="KEY_IMAGE_PREFERENCE">image_preference</string>
+    <string name="KEY_ONLINE_IMAGE">online_image</string>
+    <string name="KEY_SHUTTER_COLOR">shutter_color</string>
+
+</resources>
