@@ -1,6 +1,5 @@
 package com.arpadfodor.android.paw_scanner.models.api
 
-import android.net.Uri
 import android.os.Handler
 import retrofit2.Call
 import retrofit2.Retrofit
@@ -10,15 +9,22 @@ import java.net.URLEncoder
 object ApiInteraction {
 
     var dogAPI: DogAPI
+    var factAPI: FactAPI
 
     init {
 
-        val retrofit = Retrofit.Builder()
+        val retrofitDogApi = Retrofit.Builder()
             .baseUrl(DogAPI.ENDPOINT_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-        this.dogAPI = retrofit.create(DogAPI::class.java)
+        val retrofitFactApi = Retrofit.Builder()
+            .baseUrl(FactAPI.ENDPOINT_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        this.dogAPI = retrofitDogApi.create(DogAPI::class.java)
+        this.factAPI = retrofitFactApi.create(FactAPI::class.java)
 
     }
 
@@ -59,6 +65,16 @@ object ApiInteraction {
         val getBreedImageUrlRequest = dogAPI.getBreedImageURL(URLEncoder.encode(id, "utf-8"), "small")
         runCallOnBackgroundThread(getBreedImageUrlRequest, onSuccess, onError)
 
+    }
+
+    fun loadCatFact(onSuccess: (Fact) -> Unit, onError: (Throwable) -> Unit){
+        val getCatFactRequest = factAPI.getCatFact()
+        runCallOnBackgroundThread(getCatFactRequest, onSuccess, onError)
+    }
+
+    fun loadDogFact(onSuccess: (Fact) -> Unit, onError: (Throwable) -> Unit){
+        val getDogFactRequest = factAPI.getDogFact()
+        runCallOnBackgroundThread(getDogFactRequest, onSuccess, onError)
     }
 
 }

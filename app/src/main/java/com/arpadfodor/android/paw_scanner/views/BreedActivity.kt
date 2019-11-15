@@ -24,6 +24,8 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
     lateinit var floatingActionButtonSelectBreed: FloatingActionButton
     lateinit var collapsingImage: ImageView
     lateinit var textViewMainBreedInfo: TextView
+    lateinit var textViewGeneralInfo: TextView
+    lateinit var textViewFact: TextView
 
     lateinit var toolbar: Toolbar
     lateinit var collapsingToolbarLayout: CollapsingToolbarLayout
@@ -54,6 +56,8 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
         collapsingToolbarLayout = findViewById(R.id.collapsing_app_bar_layout)
         collapsingImage = findViewById(R.id.imageViewCollapsing)
         textViewMainBreedInfo = findViewById(R.id.tvMainBreedInfo)
+        textViewGeneralInfo = findViewById(R.id.tvGeneralInfo)
+        textViewFact = findViewById(R.id.tvFact)
         floatingActionButtonSpeakBreedInfo = findViewById(R.id.fabSpeakBreedInfo)
         floatingActionButtonSelectBreed = findViewById(R.id.fabSelectBreed)
 
@@ -92,6 +96,22 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
             viewModel.setTextToBeSpoken()
         }
 
+        // Create the text observer which updates the UI
+        val generalTextObserver = Observer<String> { result ->
+            // Update the UI, in this case, the TextView
+            textViewGeneralInfo.text = result
+            textViewMainBreedInfo.invalidate()
+            viewModel.setTextToBeSpoken()
+        }
+
+        // Create the text observer which updates the UI in case of fact message change
+        val factObserver = Observer<String> { result ->
+            // Update the UI, in this case, the TextView
+            textViewFact.text = result
+            textViewFact.invalidate()
+            viewModel.setTextToBeSpoken()
+        }
+
         // Create the image observer which updates the UI in case of an inference result
         val imageObserver = Observer<Bitmap> { result ->
             // Update the UI, in this case, the ImageView
@@ -121,11 +141,45 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
 
         }
 
+        // Create the observer which hides/shows breed text view
+        val breedTextViewVisibilityObserver = Observer<Boolean> { result ->
+
+            // Update the UI, in this case, the TextView
+            if(result){
+                textViewMainBreedInfo.visibility = View.GONE
+                textViewMainBreedInfo.invalidate()
+            }
+            else{
+                textViewMainBreedInfo.visibility = View.VISIBLE
+                textViewMainBreedInfo.invalidate()
+            }
+
+        }
+
+        // Create the observer which hides/shows fact text view
+        val factTextViewVisibilityObserver = Observer<Boolean> { result ->
+
+            // Update the UI, in this case, the TextView
+            if(result){
+                textViewFact.visibility = View.GONE
+                textViewFact.invalidate()
+            }
+            else{
+                textViewFact.visibility = View.VISIBLE
+                textViewFact.invalidate()
+            }
+
+        }
+
         // Observe the LiveData
         viewModel.currentBreed.observe(this, titleObserver)
         viewModel.breedInfo.observe(this, breedTextObserver)
+        viewModel.generalInfo.observe(this, generalTextObserver)
+        viewModel.factText.observe(this, factObserver)
         viewModel.image.observe(this, imageObserver)
         viewModel.isSelectorDisplayed.observe(this, isSelectorDisplayedObserver)
+        viewModel.isBreedTextViewGone.observe(this, breedTextViewVisibilityObserver)
+        viewModel.isFactTextViewGone.observe(this, factTextViewVisibilityObserver)
 
     }
 

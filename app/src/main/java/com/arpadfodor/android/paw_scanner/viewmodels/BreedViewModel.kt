@@ -12,6 +12,7 @@ import com.arpadfodor.android.paw_scanner.models.ai.LabelsManager
 import com.arpadfodor.android.paw_scanner.models.api.ApiInteraction
 import com.arpadfodor.android.paw_scanner.models.api.BreedImage
 import com.arpadfodor.android.paw_scanner.models.api.BreedInfo
+import com.arpadfodor.android.paw_scanner.models.api.Fact
 import com.bumptech.glide.Glide
 import java.util.*
 
@@ -47,10 +48,38 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
     }
 
     /*
+     * General info text
+     */
+    val generalInfo: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+    /*
+     * Fact text
+     */
+    val factText: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+    /*
      * Breed image sample
      */
     val image: MutableLiveData<Bitmap> by lazy {
         MutableLiveData<Bitmap>()
+    }
+
+    /*
+     * Whether breed text view is visible or not
+     */
+    val isBreedTextViewGone: MutableLiveData<Boolean> by lazy {
+        MutableLiveData<Boolean>()
+    }
+
+    /*
+     * Whether fact text view is visible or not
+     */
+    val isFactTextViewGone: MutableLiveData<Boolean> by lazy {
+        MutableLiveData<Boolean>()
     }
 
     private var textToBeSpoken = ""
@@ -62,6 +91,8 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
         val title = intent.getStringExtra(app.getString(R.string.KEY_BREED_TITLE))?:""
 
         currentBreed.postValue(Pair(id, title))
+        isBreedTextViewGone.postValue(true)
+        isFactTextViewGone.postValue(true)
 
         loadPlaceholderImage(R.drawable.paw_scanner)
 
@@ -75,16 +106,34 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
 
         when {
             name.toLowerCase(Locale.getDefault()) == "human" -> {
-                breedInfo.postValue(app.getString(R.string.human_info_text))
+
+                generalInfo.postValue(app.getString(R.string.human_info_text))
                 loadImageFromAssets(name)
+
+                isBreedTextViewGone.postValue(true)
+                isFactTextViewGone.postValue(true)
+
             }
             name.toLowerCase(Locale.getDefault()) == "cat" -> {
-                breedInfo.postValue(app.getString(R.string.cat_info_text))
+
+                generalInfo.postValue(app.getString(R.string.cat_info_text))
                 loadImageFromAssets(name)
+                loadCatFact()
+
+                isBreedTextViewGone.postValue(true)
+                isFactTextViewGone.postValue(false)
+
             }
             else -> {
+
+                generalInfo.postValue(app.getString(R.string.dog_info_text))
                 ApiInteraction.loadBreedInfo(name, onSuccess = this::showBreedInfo, onError = this::showTextLoadError)
+                loadDogFact()
                 breedInfo.postValue(app.getString(R.string.loading))
+
+                isBreedTextViewGone.postValue(false)
+                isFactTextViewGone.postValue(false)
+
             }
         }
 
@@ -94,17 +143,23 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
         ApiInteraction.loadBreedImage(id, onSuccess = this::showBreedImage, onError = this::showImageLoadError)
     }
 
+    fun loadCatFact(){
+        ApiInteraction.loadCatFact(onSuccess = this::showFact, onError = this::showFactLoadError)
+    }
+
+    fun loadDogFact(){
+        ApiInteraction.loadDogFact(onSuccess = this::showFact, onError = this::showFactLoadError)
+    }
+
     private fun showBreedInfo(info: List<BreedInfo>) {
 
-        var breedInfoText: String
+        val breedInfoText: String
 
         if(info.isNotEmpty()){
 
             breedInfoText = app.getString(R.string.breed_info, info[0].name, info[0].breed_group,
                 info[0].weight.metric, info[0].height.metric, info[0].life_span,
                 info[0].temperament, info[0].bred_for)
-            breedInfoText += "\n\n"
-            breedInfoText += app.getString(R.string.dog_info_text)
 
             if(onlineImageEnabled){
                 loadImageByBreedApiId(info[0].id.toString())
@@ -116,8 +171,6 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
         }
         else{
             breedInfoText = app.getString(R.string.api_data_empty, currentBreed.value?.second)
-            breedInfoText += "\n\n"
-            breedInfoText += app.getString(R.string.dog_info_text)
             loadImageFromAssets(currentBreed.value?.first?:return)
         }
 
@@ -154,12 +207,14 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
 
     }
 
+    private fun showFact(fact: Fact){
+        factText.postValue(app.getString(R.string.fact, fact.fact))
+    }
+
     private fun showTextLoadError(e: Throwable) {
         e.printStackTrace()
 
-        var breedInfoText: String = app.getString(R.string.internet_needed, currentBreed.value?.second)
-        breedInfoText += "\n\n"
-        breedInfoText += app.getString(R.string.dog_info_text)
+        val breedInfoText: String = app.getString(R.string.internet_needed, currentBreed.value?.second)
 
         breedInfo.postValue(breedInfoText)
         loadImageFromAssets(currentBreed.value?.first?:return)
@@ -170,11 +225,25 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
         loadImageFromAssets(currentBreed.value?.first?:return)
     }
 
+    private fun showFactLoadError(e: Throwable) {
+        e.printStackTrace()
+        val fact: String = app.getString(R.string.fact, app.getString(R.string.internet_needed_to_fact))
+        factText.postValue(fact)
+    }
+
     fun setTextToBeSpoken(){
+
         var spokenText = ""
-        spokenText += currentBreed.value?.second + ". "
+        spokenText += currentBreed.value?.second
+        spokenText += "\n"
         spokenText += breedInfo.value
+        spokenText += "\n"
+        spokenText += generalInfo.value
+        spokenText += "\n"
+        spokenText += factText.value
+
         textToBeSpoken = spokenText
+
     }
 
     fun speakClicked(){
@@ -182,7 +251,6 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
         if(TextToSpeechModel.isSpeaking()){
             TextToSpeechModel.stop()
         }
-
         else{
             TextToSpeechModel.speak(textToBeSpoken)
         }

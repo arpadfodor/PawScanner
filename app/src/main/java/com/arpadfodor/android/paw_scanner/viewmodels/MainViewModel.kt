@@ -536,6 +536,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     }
 
+    fun showFact(){
+
+        val intent = Intent(app.applicationContext, FactActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        startActivity(app.applicationContext, intent, null)
+
+    }
+
     fun showTips(){
 
         val intent = Intent(app.applicationContext, TipsActivity::class.java).apply {

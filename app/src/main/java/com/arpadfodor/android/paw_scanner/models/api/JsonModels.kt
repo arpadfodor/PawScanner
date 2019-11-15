@@ -28,3 +28,7 @@ data class Weight(
     val imperial: String,
     val metric: String
 )
+
+data class Fact(
+    val fact: String
+)

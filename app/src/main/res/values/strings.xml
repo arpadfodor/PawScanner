@@ -27,6 +27,7 @@
     <string name="title_about">About</string>
     <string name="title_tips">Tips</string>
     <string name="title_breed">Breeds</string>
+    <string name="title_fact">Fact</string>
     <string name="title_recognition_details">Recognition details</string>
 
     <string name="predictions">Predictions\n</string>
@@ -59,17 +60,13 @@
         &appName;\n
         &appVersion;\n
         \n
-        \n
         Created by Arpad Fodor\n
         github.com/arpadfodor\n
-        \n
         \n
         Release date:\n
         &appDate;\n
         \n
-        \n
         Images by:\n
-        \n
         Elias Schäfer\n
         Sinisa Maric\n
         Pixaline\n
@@ -81,20 +78,18 @@
         skeeze\n
         from Pixabay\n
         \n
+        Breed info by\n
+        TheDogApi\n
+        Some Random Api\n
+        Wikipedia\n
         \n
         AI is powered by Keras/TensorFlow\n
-        \n
         \n
         Dataset Reference:\n
         \n
         Aditya Khosla, Nityananda Jayadevaprakash, Bangpeng Yao and Li Fei-Fei. Novel dataset for Fine-Grained Image Categorization. First Workshop on Fine-Grained Visual Categorization (FGVC), IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2011.\n
         \n
         J. Deng, W. Dong, R. Socher, L.-J. Li, K. Li and L. Fei-Fei, ImageNet: A Large-Scale Hierarchical Image Database. IEEE Computer Vision and Pattern Recognition (CVPR), 2009.\n
-        \n
-        \n
-        Breed info by\n
-        TheDogApi\n
-        Wikipedia\n
         \n
         \n
         You can report a bug or send a message by clicking on the corresponding buttons - although application crash events are automatically sent.\n
@@ -192,5 +187,12 @@
     <string name="internet_needed">Internet connection is required to get info about %1$s.</string>
     <string name="api_data_empty">Cannot find info about %1$s.</string>
     <string name="loading">Loading...</string>
+    <string name="fact">
+        Did you know?\n
+        \n
+        %1$s
+    </string>
+    <string name="internet_needed_to_fact">Internet connection is required to get a fact.</string>
+    <string name="fact_get_help">You can get a fact by clicking on the buttons.</string>
 
 </resources>

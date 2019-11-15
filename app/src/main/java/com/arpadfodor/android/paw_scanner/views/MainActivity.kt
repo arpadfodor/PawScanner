@@ -194,6 +194,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_breeds -> {
                 viewModel.showBreeds()
             }
+            R.id.nav_fact -> {
+                viewModel.showFact()
+            }
             R.id.nav_tips -> {
                 viewModel.showTips()
             }

@@ -7,6 +7,11 @@
         android:title="@string/title_breed" />
 
     <item
+        android:id="@+id/nav_fact"
+        android:icon="@drawable/logo_fact"
+        android:title="@string/title_fact" />
+
+    <item
         android:id="@+id/nav_tips"
         android:icon="@drawable/logo_help"
         android:title="@string/title_tips" />

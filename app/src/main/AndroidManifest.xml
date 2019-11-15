@@ -24,6 +24,11 @@
             android:label="@string/title_about" />
 
         <activity
+            android:name=".views.FactActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/title_fact" />
+
+        <activity
             android:name=".views.TipsActivity"
             android:screenOrientation="portrait"
             android:label="@string/title_tips" />
