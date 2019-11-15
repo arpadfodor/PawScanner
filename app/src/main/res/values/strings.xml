@@ -3,7 +3,7 @@
 <!DOCTYPE resources [
     <!ENTITY appName "Paw Scanner">
     <!ENTITY appId "925630375777">
-    <!ENTITY appVersion "v0.30">
+    <!ENTITY appVersion "v0.32">
     <!ENTITY appDate "15/11/2019">
     <!ENTITY adMobAppId "ca-app-pub-3940256099942544~3347511713">
     <!ENTITY adMobBannerId "ca-app-pub-3940256099942544/6300978111">
@@ -27,7 +27,7 @@
     <string name="title_about">About</string>
     <string name="title_tips">Tips</string>
     <string name="title_breed">Breeds</string>
-    <string name="title_fact">Fact</string>
+    <string name="title_fact">Facts</string>
     <string name="title_recognition_details">Recognition details</string>
 
     <string name="predictions">Predictions\n</string>
@@ -82,6 +82,7 @@
         TheDogApi\n
         Some Random Api\n
         Wikipedia\n
+        \n
         \n
         AI is powered by Keras/TensorFlow\n
         \n
