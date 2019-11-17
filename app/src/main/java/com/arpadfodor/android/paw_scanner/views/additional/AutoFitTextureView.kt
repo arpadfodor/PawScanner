@@ -6,7 +6,7 @@ import android.util.Size
 import android.view.TextureView
 
 /**
- * A [TextureView] that can be adjusted to a specified aspect ratio
+ * A TextureView that can be adjusted to a specified aspect ratio
  */
 class AutoFitTextureView @JvmOverloads constructor(
     context: Context,

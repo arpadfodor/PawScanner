@@ -76,12 +76,14 @@ class RecognitionActivity : AppCompatActivity(), View.OnClickListener {
         supportActionBar?.title = viewModel.results[0].title
 
         val textViewTopPredictionsTitle = findViewById<TextView>(R.id.tvTopPredictionsTitle)
+        val textViewDurationTitle = findViewById<TextView>(R.id.tvDurationTitle)
         val textViewDuration = findViewById<TextView>(R.id.tvDuration)
         val textViewMainPrediction = findViewById<TextView>(R.id.tvMainPrediction)
         val imageViewCapture = findViewById<ImageView>(R.id.ivCapture)
 
         textViewTopPredictionsTitle.text = this.getString(R.string.prediction_top_title, viewModel.sizeOfResults.toString())
-        textViewDuration.text = this.getString(R.string.inference_duration, viewModel.inferenceDuration)
+        textViewDurationTitle.text = this.getString(R.string.title_inference_duration)
+        textViewDuration.text = this.getString(R.string.inference_duration_value, viewModel.inferenceDuration)
         textViewMainPrediction.text = viewModel.mainRecognitionText()
         imageViewCapture.setImageBitmap(viewModel.recognizedImage)
 

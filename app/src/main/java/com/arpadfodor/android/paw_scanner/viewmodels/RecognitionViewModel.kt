@@ -54,7 +54,17 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
     lateinit var results: ArrayList<Recognition>
     lateinit var resultsInString: ArrayList<String>
 
-    val colorSet = listOf(Color.GRAY, Color.DKGRAY, Color.LTGRAY, Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.CYAN, Color.MAGENTA, Color.WHITE, Color.BLACK)
+    val rallyGreenColorId = Color.parseColor("#1EB980")
+    val rallyBlueColorId = Color.parseColor("#72DEFF")
+    val rallyPurpleColorId = Color.parseColor("#B15DFF")
+    val rallyYellowColorId = Color.parseColor("#FFCF44")
+    val rallyDarkGreenColorId = Color.parseColor("#045D56")
+    val rallyOrangeColorId = Color.parseColor("#FF6859")
+    val accentColor = Color.parseColor("#5F2600")
+    val normalButtonColor = Color.parseColor("#459389")
+    val primaryDarkColor = Color.parseColor("#26282F")
+
+    val colorSet = listOf(rallyGreenColorId, rallyBlueColorId, rallyPurpleColorId, Color.LTGRAY, rallyYellowColorId, rallyDarkGreenColorId, rallyOrangeColorId, accentColor, normalButtonColor, Color.RED, primaryDarkColor)
 
     var textToBeSpoken = ""
 
@@ -352,7 +362,6 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
                     .get()
 
                 placeholderImage = loadedImage
-                image.postValue(placeholderImage)
 
             }
             catch (e: Error){}
@@ -363,8 +372,6 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
     }
 
     private fun loadImageFromAssets(imageId: String){
-
-
 
         //load breed data from API
         val loaderThread = Thread(Runnable {

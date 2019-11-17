@@ -41,6 +41,13 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
     }
 
     /*
+     * Breed info title text
+     */
+    val breedInfoTitle: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+    /*
      * Breed info text
      */
     val breedInfo: MutableLiveData<String> by lazy {
@@ -48,9 +55,23 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
     }
 
     /*
+     * General info title text
+     */
+    val generalInfoTitle: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+    /*
      * General info text
      */
     val generalInfo: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+    /*
+     * Fact text title
+     */
+    val factTextTitle: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
     }
 
@@ -71,14 +92,14 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
     /*
      * Whether breed text view is visible or not
      */
-    val isBreedTextViewGone: MutableLiveData<Boolean> by lazy {
+    val isBreedTextViewContainerGone: MutableLiveData<Boolean> by lazy {
         MutableLiveData<Boolean>()
     }
 
     /*
      * Whether fact text view is visible or not
      */
-    val isFactTextViewGone: MutableLiveData<Boolean> by lazy {
+    val isFactTextViewContainerGone: MutableLiveData<Boolean> by lazy {
         MutableLiveData<Boolean>()
     }
 
@@ -91,8 +112,8 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
         val title = intent.getStringExtra(app.getString(R.string.KEY_BREED_TITLE))?:""
 
         currentBreed.postValue(Pair(id, title))
-        isBreedTextViewGone.postValue(true)
-        isFactTextViewGone.postValue(true)
+        isBreedTextViewContainerGone.postValue(true)
+        isFactTextViewContainerGone.postValue(true)
 
         loadPlaceholderImage(R.drawable.paw_scanner)
 
@@ -100,8 +121,11 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
 
     fun loadData(){
 
+        breedInfoTitle.postValue("")
         breedInfo.postValue("")
+        generalInfoTitle.postValue("")
         generalInfo.postValue("")
+        factTextTitle.postValue("")
         factText.postValue("")
         image.postValue(placeholderImage)
 
@@ -110,32 +134,35 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
         when {
             currentBreed.second.toLowerCase(Locale.getDefault()) == "human" -> {
 
+                generalInfoTitle.postValue(app.getString(R.string.title_general, "Human"))
                 generalInfo.postValue(app.getString(R.string.human_info_text))
                 loadImageFromAssets(currentBreed.first)
 
-                isBreedTextViewGone.postValue(true)
-                isFactTextViewGone.postValue(true)
+                isBreedTextViewContainerGone.postValue(true)
+                isFactTextViewContainerGone.postValue(true)
 
             }
             currentBreed.second.toLowerCase(Locale.getDefault()) == "cat" -> {
 
+                generalInfoTitle.postValue(app.getString(R.string.title_general, "Cat"))
                 generalInfo.postValue(app.getString(R.string.cat_info_text))
                 loadImageFromAssets(currentBreed.first)
                 loadCatFact()
 
-                isBreedTextViewGone.postValue(true)
-                isFactTextViewGone.postValue(false)
+                isBreedTextViewContainerGone.postValue(true)
+                isFactTextViewContainerGone.postValue(false)
 
             }
             else -> {
 
+                generalInfoTitle.postValue(app.getString(R.string.title_general, "Dog"))
                 generalInfo.postValue(app.getString(R.string.dog_info_text))
                 ApiInteraction.loadBreedInfo(currentBreed.second, onSuccess = this::showBreedInfo, onError = this::showTextLoadError)
                 loadDogFact()
                 breedInfo.postValue(app.getString(R.string.loading))
 
-                isBreedTextViewGone.postValue(false)
-                isFactTextViewGone.postValue(false)
+                isBreedTextViewContainerGone.postValue(false)
+                isFactTextViewContainerGone.postValue(false)
 
             }
         }
@@ -177,6 +204,7 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
             loadImageFromAssets(currentBreed.value?.first?:return)
         }
 
+        breedInfoTitle.postValue(app.getString(R.string.title_breed_specific))
         breedInfo.postValue(breedInfoText)
 
     }
@@ -214,6 +242,7 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
     }
 
     private fun showFact(fact: Fact){
+        factTextTitle.postValue(app.getString(R.string.did_you_know))
         factText.postValue(app.getString(R.string.fact, fact.fact))
     }
 
@@ -222,6 +251,7 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
 
         val breedInfoText: String = app.getString(R.string.internet_needed, currentBreed.value?.second)
 
+        breedInfoTitle.postValue(app.getString(R.string.title_breed_specific))
         breedInfo.postValue(breedInfoText)
         loadImageFromAssets(currentBreed.value?.first?:return)
     }
@@ -234,6 +264,7 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
     private fun showFactLoadError(e: Throwable) {
         e.printStackTrace()
         val fact: String = app.getString(R.string.fact, app.getString(R.string.internet_needed_to_fact))
+        factTextTitle.postValue(app.getString(R.string.did_you_know))
         factText.postValue(fact)
     }
 
@@ -242,9 +273,15 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
         var spokenText = ""
         spokenText += currentBreed.value?.second
         spokenText += "\n"
+        spokenText += breedInfoTitle.value
+        spokenText += "\n"
         spokenText += breedInfo.value
         spokenText += "\n"
+        spokenText += generalInfoTitle.value
+        spokenText += "\n"
         spokenText += generalInfo.value
+        spokenText += "\n"
+        spokenText += factTextTitle.value
         spokenText += "\n"
         spokenText += factText.value
 

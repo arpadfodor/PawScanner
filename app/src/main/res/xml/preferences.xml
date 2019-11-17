@@ -9,6 +9,17 @@
       android:focusableInTouchMode="true">
 
     <PreferenceCategory
+        android:title="@string/title_network_settings">
+
+        <SwitchPreference
+            android:key="@string/PREFERENCE_KEY_ONLINE_IMAGE"
+            android:summaryOff="@string/label_disable_online_image"
+            android:summaryOn="@string/label_enable_online_image"
+            android:title="@string/setting_online_image" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:title="@string/title_camera_settings">
 
         <SwitchPreference
@@ -22,17 +33,6 @@
             android:summaryOff="@string/label_white"
             android:summaryOn="@string/label_black"
             android:title="@string/setting_shutter_color_preference" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:title="@string/title_network_settings">
-
-        <SwitchPreference
-            android:key="@string/PREFERENCE_KEY_ONLINE_IMAGE"
-            android:summaryOff="@string/label_disable_online_image"
-            android:summaryOn="@string/label_enable_online_image"
-            android:title="@string/setting_online_image" />
 
     </PreferenceCategory>
 

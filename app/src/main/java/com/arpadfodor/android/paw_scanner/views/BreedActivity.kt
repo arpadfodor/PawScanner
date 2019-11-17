@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
@@ -20,12 +21,18 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var viewModel: BreedViewModel
 
+    lateinit var textViewMainBreedInfoContainer: LinearLayout
+    lateinit var textViewFactContainer: LinearLayout
+
     lateinit var floatingActionButtonSpeakBreedInfo: FloatingActionButton
     lateinit var floatingActionButtonSelectBreed: FloatingActionButton
     lateinit var collapsingImage: ImageView
     lateinit var textViewMainBreedInfo: TextView
     lateinit var textViewGeneralInfo: TextView
     lateinit var textViewFact: TextView
+    lateinit var textViewMainBreedInfoTitle: TextView
+    lateinit var textViewGeneralInfoTitle: TextView
+    lateinit var textViewFactTitle: TextView
 
     lateinit var toolbar: Toolbar
     lateinit var collapsingToolbarLayout: CollapsingToolbarLayout
@@ -53,11 +60,17 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
+        textViewMainBreedInfoContainer = findViewById(R.id.tvMainBreedInfoContainer)
+        textViewFactContainer = findViewById(R.id.tvFactContainer)
+
         collapsingToolbarLayout = findViewById(R.id.collapsing_app_bar_layout)
         collapsingImage = findViewById(R.id.imageViewCollapsing)
         textViewMainBreedInfo = findViewById(R.id.tvMainBreedInfo)
         textViewGeneralInfo = findViewById(R.id.tvGeneralInfo)
         textViewFact = findViewById(R.id.tvFact)
+        textViewMainBreedInfoTitle = findViewById(R.id.tvMainBreedInfoTitle)
+        textViewGeneralInfoTitle = findViewById(R.id.tvGeneralInfoTitle)
+        textViewFactTitle = findViewById(R.id.tvFactTitle)
         floatingActionButtonSpeakBreedInfo = findViewById(R.id.fabSpeakBreedInfo)
         floatingActionButtonSelectBreed = findViewById(R.id.fabSelectBreed)
 
@@ -89,6 +102,14 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         // Create the text observer which updates the UI in case of an inference result
+        val breedTextTitleObserver = Observer<String> { result ->
+            // Update the UI, in this case, the TextView
+            textViewMainBreedInfoTitle.text = result
+            textViewMainBreedInfoTitle.invalidate()
+            viewModel.setTextToBeSpoken()
+        }
+
+        // Create the text observer which updates the UI in case of an inference result
         val breedTextObserver = Observer<String> { result ->
             // Update the UI, in this case, the TextView
             textViewMainBreedInfo.text = result
@@ -97,10 +118,26 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         // Create the text observer which updates the UI
+        val generalTextTitleObserver = Observer<String> { result ->
+            // Update the UI, in this case, the TextView
+            textViewGeneralInfoTitle.text = result
+            textViewGeneralInfoTitle.invalidate()
+            viewModel.setTextToBeSpoken()
+        }
+
+        // Create the text observer which updates the UI
         val generalTextObserver = Observer<String> { result ->
             // Update the UI, in this case, the TextView
             textViewGeneralInfo.text = result
-            textViewMainBreedInfo.invalidate()
+            textViewGeneralInfo.invalidate()
+            viewModel.setTextToBeSpoken()
+        }
+
+        // Create the text observer which updates the UI in case of fact message change
+        val factTitleObserver = Observer<String> { result ->
+            // Update the UI, in this case, the TextView
+            textViewFactTitle.text = result
+            textViewFactTitle.invalidate()
             viewModel.setTextToBeSpoken()
         }
 
@@ -142,44 +179,47 @@ class BreedActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         // Create the observer which hides/shows breed text view
-        val breedTextViewVisibilityObserver = Observer<Boolean> { result ->
+        val breedTextViewContainerVisibilityObserver = Observer<Boolean> { result ->
 
             // Update the UI, in this case, the TextView
             if(result){
-                textViewMainBreedInfo.visibility = View.GONE
-                textViewMainBreedInfo.invalidate()
+                textViewMainBreedInfoContainer.visibility = View.GONE
+                textViewMainBreedInfoContainer.invalidate()
             }
             else{
-                textViewMainBreedInfo.visibility = View.VISIBLE
-                textViewMainBreedInfo.invalidate()
+                textViewMainBreedInfoContainer.visibility = View.VISIBLE
+                textViewMainBreedInfoContainer.invalidate()
             }
 
         }
 
         // Create the observer which hides/shows fact text view
-        val factTextViewVisibilityObserver = Observer<Boolean> { result ->
+        val factTextViewContainerVisibilityObserver = Observer<Boolean> { result ->
 
             // Update the UI, in this case, the TextView
             if(result){
-                textViewFact.visibility = View.GONE
-                textViewFact.invalidate()
+                textViewFactContainer.visibility = View.GONE
+                textViewFactContainer.invalidate()
             }
             else{
-                textViewFact.visibility = View.VISIBLE
-                textViewFact.invalidate()
+                textViewFactContainer.visibility = View.VISIBLE
+                textViewFactContainer.invalidate()
             }
 
         }
 
         // Observe the LiveData
         viewModel.currentBreed.observe(this, titleObserver)
+        viewModel.breedInfoTitle.observe(this, breedTextTitleObserver)
         viewModel.breedInfo.observe(this, breedTextObserver)
+        viewModel.generalInfoTitle.observe(this, generalTextTitleObserver)
         viewModel.generalInfo.observe(this, generalTextObserver)
+        viewModel.factTextTitle.observe(this, factTitleObserver)
         viewModel.factText.observe(this, factObserver)
         viewModel.image.observe(this, imageObserver)
         viewModel.isSelectorDisplayed.observe(this, isSelectorDisplayedObserver)
-        viewModel.isBreedTextViewGone.observe(this, breedTextViewVisibilityObserver)
-        viewModel.isFactTextViewGone.observe(this, factTextViewVisibilityObserver)
+        viewModel.isBreedTextViewContainerGone.observe(this, breedTextViewContainerVisibilityObserver)
+        viewModel.isFactTextViewContainerGone.observe(this, factTextViewContainerVisibilityObserver)
 
     }
 

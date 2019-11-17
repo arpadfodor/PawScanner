@@ -1,5 +1,6 @@
 package com.arpadfodor.android.paw_scanner.views
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
@@ -302,8 +303,8 @@ class TipsActivity : AppCompatActivity() {
         val tvText = TextView(this)
         tvText.setTextColor(getColor(R.color.colorText))
         tvText.textAlignment = View.TEXT_ALIGNMENT_CENTER
+        tvText.typeface = Typeface.create("body", Typeface.NORMAL)
         tvText.text = text
-
         tvText.layoutParams = lp
 
         tableRow.addView(tvText)
@@ -315,7 +316,7 @@ class TipsActivity : AppCompatActivity() {
     private fun buildContainer(): LinearLayout{
 
         val verticalMargin = resources.getDimension(R.dimen.card_vertical_margin).toInt()
-        val horizontalMargin = resources.getDimension(R.dimen.activity_horizontal_margin).toInt()
+        val horizontalMargin = resources.getDimension(R.dimen.card_horizontal_margin).toInt()
 
         val params = TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT)
         params.setMargins(horizontalMargin, verticalMargin, horizontalMargin, 0)

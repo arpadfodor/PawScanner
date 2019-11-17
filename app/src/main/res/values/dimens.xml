@@ -1,9 +1,11 @@
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="card_vertical_margin">8dp</dimen>
+    <dimen name="card_horizontal_margin">16dp</dimen>
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">24dp</dimen>
     <dimen name="default_padding">8dp</dimen>
+    <dimen name="default_elevation">8dp</dimen>
     <dimen name="row_padding">16dp</dimen>
     <dimen name="nav_header_vertical_spacing">8dp</dimen>
     <dimen name="nav_header_height">180dp</dimen>
@@ -16,7 +18,10 @@
     <dimen name="fade_effect">100dp</dimen>
     <dimen name="list_text_separator_height">1dp</dimen>
 
-    <dimen name="huge_text">20sp</dimen>
+    <dimen name="title_text">20sp</dimen>
+    <dimen name="sub_title_text">16sp</dimen>
+    <dimen name="body_text">14sp</dimen>
     <dimen name="clickable_list_text">14sp</dimen>
+    <dimen name="small_text">12sp</dimen>
 
 </resources>

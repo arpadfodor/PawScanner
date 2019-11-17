@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TextView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="50dp"
-    android:id="@+id/tvItemName"
-    android:textColor="@color/colorText"
-    android:textSize="@dimen/clickable_list_text"
-    android:background="@color/colorListRow"
-    android:padding="@dimen/row_padding" />
+    style="@style/ListElement"
+    android:id="@+id/tvItemName"/>

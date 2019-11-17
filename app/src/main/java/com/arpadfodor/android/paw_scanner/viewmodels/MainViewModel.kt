@@ -466,7 +466,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         //inference duration
-        dataToInsert.add(app.getString(R.string.inference_duration, duration))
+        dataToInsert.add(app.getString(R.string.inference_duration_value, duration))
 
         //most possible result
         dataToInsert.add(result[0].toString())

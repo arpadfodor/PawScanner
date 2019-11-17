@@ -24,4 +24,65 @@
         <item name="android:windowBackground">@color/colorGray</item>
     </style>
 
+    <style name="CardElement">
+        <item name="android:background">@drawable/card_background</item>
+        <item name="android:elevation">@dimen/default_elevation</item>
+        <item name="android:padding">@dimen/default_padding</item>
+        <item name="android:layout_marginStart">@dimen/card_horizontal_margin</item>
+        <item name="android:layout_marginTop">@dimen/card_vertical_margin</item>
+        <item name="android:layout_marginEnd">@dimen/card_horizontal_margin</item>
+        <item name="android:layout_marginBottom">@dimen/card_vertical_margin</item>
+        <item name="android:textColor">@color/colorText</item>
+        <item name="android:textSize">@dimen/body_text</item>
+        <item name="android:fontFamily">@font/body</item>
+    </style>
+
+    <style name="CardElementParent">
+        <item name="android:background">@color/colorPrimaryDark</item>
+        <item name="android:layout_marginTop">@dimen/card_vertical_margin</item>
+        <item name="android:layout_marginBottom">@dimen/card_vertical_margin</item>
+    </style>
+
+    <style name="ListElement">
+        <item name="android:background">@color/colorListRow</item>
+        <item name="android:textColor">@color/colorText</item>
+        <item name="android:textSize">@dimen/clickable_list_text</item>
+        <item name="android:fontFamily">@font/body</item>
+        <item name="android:padding">@dimen/row_padding</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">50dp</item>
+    </style>
+
+    <style name="InferenceText">
+        <item name="android:textColor">@color/colorText</item>
+        <item name="android:textSize">@dimen/body_text</item>
+        <item name="android:fontFamily">@font/body</item>
+    </style>
+
+    <style name="SmallInferenceText">
+        <item name="android:textColor">@color/colorText</item>
+        <item name="android:textSize">@dimen/small_text</item>
+        <item name="android:fontFamily">@font/body</item>
+    </style>
+
+    <style name="TitleText">
+        <item name="android:textColor">@color/colorText</item>
+        <item name="android:textSize">@dimen/title_text</item>
+        <item name="android:fontFamily">@font/title</item>
+    </style>
+
+    <style name="SubTitleText">
+        <item name="android:textColor">@color/colorText</item>
+        <item name="android:textSize">@dimen/sub_title_text</item>
+        <item name="android:fontFamily">@font/title</item>
+        <item name="android:padding">@dimen/default_padding</item>
+    </style>
+
+    <style name="BodyParagraph">
+        <item name="android:textColor">@color/colorText</item>
+        <item name="android:textSize">@dimen/body_text</item>
+        <item name="android:fontFamily">@font/body</item>
+        <item name="android:padding">@dimen/default_padding</item>
+    </style>
+
 </resources>

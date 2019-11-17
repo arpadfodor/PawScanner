@@ -11,12 +11,9 @@
     tools:showIn="@layout/activity_fact">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        style="@style/CardElementParent"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/card_vertical_margin"
-        android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:layout_marginBottom="@dimen/card_vertical_margin">
+        android:layout_height="match_parent">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabCatFact"
@@ -39,22 +36,29 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
         <LinearLayout
+            style="@style/CardElement"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/llAboutInfo"
             android:orientation="vertical"
-            android:background="@drawable/card_background"
-            android:layout_marginTop="@dimen/card_vertical_margin"
             app:layout_constraintTop_toBottomOf="@+id/fabDogFact"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
             <TextView
+                style="@style/SubTitleText"
+                android:id="@+id/tvFactTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/did_you_know" />
+
+            <TextView
+                style="@style/BodyParagraph"
                 android:id="@+id/tvFact"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textColor="@color/colorText"
-                android:textAlignment="center" />
+                android:textColor="@color/colorText" />
 
         </LinearLayout>
 
