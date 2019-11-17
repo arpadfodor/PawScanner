@@ -100,13 +100,13 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
 
     fun loadData(){
 
-        val name = results[0].title
+        val breedToLoad = results[0]
 
         if(onlineImageEnabled){
-            ApiInteraction.loadBreedInfo(name, onSuccess = this::loadBreedImage, onError = this::showError)
+            ApiInteraction.loadBreedInfo(breedToLoad.title, onSuccess = this::loadBreedImage, onError = this::showError)
         }
         else{
-            loadImageFromAssets(name)
+            loadImageFromAssets(breedToLoad.id)
         }
 
     }
@@ -117,7 +117,7 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
             ApiInteraction.loadBreedImage(info[0].id.toString(), onSuccess = this::showBreedImage, onError = this::showError)
         }
         else{
-            loadImageFromAssets(results[0].title)
+            loadImageFromAssets(results[0].id)
         }
 
     }
@@ -148,12 +148,15 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
             loaderThread.start()
 
         }
+        else{
+            loadImageFromAssets(results[0].id)
+        }
 
     }
 
     private fun showError(e: Throwable) {
         e.printStackTrace()
-        loadImageFromAssets(results[0].title)
+        loadImageFromAssets(results[0].id)
 
     }
 
@@ -359,7 +362,9 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
 
     }
 
-    private fun loadImageFromAssets(imageName: String){
+    private fun loadImageFromAssets(imageId: String){
+
+
 
         //load breed data from API
         val loaderThread = Thread(Runnable {
@@ -368,7 +373,7 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
 
                 val loadedImage = Glide.with(app.applicationContext)
                     .asBitmap()
-                    .load(Uri.parse("file:///android_asset/breeds/$imageName.jpg"))
+                    .load(Uri.parse("file:///android_asset/breeds/$imageId.jpg"))
                     .placeholder(R.drawable.dog_friend)
                     .error(R.drawable.dog_friend)
                     .submit()

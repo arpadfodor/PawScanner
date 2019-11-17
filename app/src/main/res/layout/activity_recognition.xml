@@ -121,7 +121,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="450dp"
                     android:layout_gravity="center_horizontal"
-                    android:layout_margin="@dimen/card_vertical_margin" />
+                    android:layout_margin="@dimen/activity_horizontal_margin" />
 
             </LinearLayout>
 
@@ -146,15 +146,16 @@
                     android:layout_gravity="center"
                     android:textColor="@color/colorText"
                     android:padding="12dp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
                 <ListView
                     android:id="@+id/lvTopPredictions"
                     android:layout_width="match_parent"
-                    android:layout_height="300dp"
+                    android:layout_height="350dp"
                     android:divider="@color/colorPrimary"
                     android:dividerHeight="@dimen/list_text_separator_height"
-                    android:nestedScrollingEnabled="true"/>
+                    android:nestedScrollingEnabled="true"
+                    android:layout_margin="@dimen/activity_horizontal_margin"/>
 
             </LinearLayout>
 

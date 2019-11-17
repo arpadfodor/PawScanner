@@ -100,24 +100,27 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
 
     fun loadData(){
 
+        breedInfo.postValue("")
+        generalInfo.postValue("")
+        factText.postValue("")
         image.postValue(placeholderImage)
 
-        val name = currentBreed.value?.second?:return
+        val currentBreed = currentBreed.value?:return
 
         when {
-            name.toLowerCase(Locale.getDefault()) == "human" -> {
+            currentBreed.second.toLowerCase(Locale.getDefault()) == "human" -> {
 
                 generalInfo.postValue(app.getString(R.string.human_info_text))
-                loadImageFromAssets(name)
+                loadImageFromAssets(currentBreed.first)
 
                 isBreedTextViewGone.postValue(true)
                 isFactTextViewGone.postValue(true)
 
             }
-            name.toLowerCase(Locale.getDefault()) == "cat" -> {
+            currentBreed.second.toLowerCase(Locale.getDefault()) == "cat" -> {
 
                 generalInfo.postValue(app.getString(R.string.cat_info_text))
-                loadImageFromAssets(name)
+                loadImageFromAssets(currentBreed.first)
                 loadCatFact()
 
                 isBreedTextViewGone.postValue(true)
@@ -127,7 +130,7 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
             else -> {
 
                 generalInfo.postValue(app.getString(R.string.dog_info_text))
-                ApiInteraction.loadBreedInfo(name, onSuccess = this::showBreedInfo, onError = this::showTextLoadError)
+                ApiInteraction.loadBreedInfo(currentBreed.second, onSuccess = this::showBreedInfo, onError = this::showTextLoadError)
                 loadDogFact()
                 breedInfo.postValue(app.getString(R.string.loading))
 
@@ -203,6 +206,9 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
             })
             loaderThread.start()
 
+        }
+        else{
+            loadImageFromAssets(currentBreed.value?.first?:return)
         }
 
     }
