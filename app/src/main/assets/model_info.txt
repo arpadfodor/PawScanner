@@ -1,3 +1,5 @@
-Model: mobilenet_v2_saved_at_2019-10-27-12_26_26_accuracy_07830
+Model: mobilenet_v2_saved_at_2019-12-05-15_28_56_accuracy_06934
 Input: (224, 224, 3), type: DT_FLOAT
-Output: (122), type: DT_FLOAT
+-Pixel values must be between 0 and 1
+Output: (168), type: DT_FLOAT
+-Use labels.txt to interpret the output
