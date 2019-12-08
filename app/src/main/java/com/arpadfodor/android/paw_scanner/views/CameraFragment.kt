@@ -73,6 +73,7 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
      * Volume down button receiver used to trigger taking a photo
      */
     private val volumeDownReceiver = object : BroadcastReceiver() {
+
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.getIntExtra(MainViewModel.KEY_EVENT_EXTRA, KeyEvent.KEYCODE_UNKNOWN)) {
                 // When the volume down button is pressed, simulate a shutter button click
@@ -81,6 +82,7 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
                 }
             }
         }
+
     }
 
     /**
@@ -488,14 +490,15 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
 
             viewModel.cameraOpened = true
 
-        } catch (e: CameraAccessException) {
-        } catch (e: InterruptedException) {
+        }
+        catch (e: CameraAccessException) {}
+        catch (e: InterruptedException) {
             throw RuntimeException("Interrupted while trying to lock camera opening", e)
         }
 
     }
 
-    /**
+    /*
      * Closes the current CameraDevice
      */
     private fun closeCamera() {
@@ -516,9 +519,11 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
 
             viewModel.cameraOpened = false
 
-        } catch (e: InterruptedException) {
+        }
+        catch (e: InterruptedException) {
             throw RuntimeException("Interrupted while trying to lock camera closing", e)
-        } finally {
+        }
+        finally {
             cameraOpenCloseLock.release()
         }
     }
@@ -607,7 +612,8 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
                             previewRequest = previewRequestBuilder.build()
                             captureSession!!.setRepeatingRequest(previewRequest, captureCallback, backgroundHandler)
 
-                        } catch (e: CameraAccessException) {
+                        }
+                        catch (e: CameraAccessException) {
                         }
 
                     }
@@ -617,7 +623,8 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
                 }, null
             )
 
-        } catch (e: CameraAccessException) {
+        }
+        catch (e: CameraAccessException) {
         }
 
     }
@@ -641,12 +648,15 @@ class CameraFragment: Fragment(), ImageReader.OnImageAvailableListener, View.OnC
         val centerY = viewRect.centerY()
 
         if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
+
             bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY())
             matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL)
             val scale = max(viewHeight.toFloat() / preview.height, viewWidth.toFloat() / preview.width)
             matrix.postScale(scale, scale, centerX, centerY)
             matrix.postRotate((90 * (rotation - 2)).toFloat(), centerX, centerY)
-        } else if (Surface.ROTATION_180 == rotation) {
+
+        }
+        else if (Surface.ROTATION_180 == rotation) {
             matrix.postRotate(180f, centerX, centerY)
         }
 

@@ -12,9 +12,7 @@ import androidx.lifecycle.MutableLiveData
 import com.arpadfodor.android.paw_scanner.R
 import com.arpadfodor.android.paw_scanner.models.ai.Recognition
 import com.arpadfodor.android.paw_scanner.models.TextToSpeechModel
-import com.arpadfodor.android.paw_scanner.models.api.ApiInteraction
-import com.arpadfodor.android.paw_scanner.models.api.BreedImage
-import com.arpadfodor.android.paw_scanner.models.api.BreedInfo
+import com.arpadfodor.android.paw_scanner.models.api.*
 import com.arpadfodor.android.paw_scanner.views.BreedActivity
 import com.bumptech.glide.Glide
 import com.github.mikephil.charting.animation.Easing
@@ -23,7 +21,6 @@ import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.min
 
@@ -113,7 +110,18 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
         val breedToLoad = results[0]
 
         if(onlineImageEnabled){
-            ApiInteraction.loadBreedInfo(breedToLoad.title, onSuccess = this::loadBreedImage, onError = this::showError)
+
+            when(breedToLoad.getAnimalTypePrefix()){
+
+                ApiInteraction.DOG_PREFIX ->{
+                    ApiInteraction.loadDogBreedInfo(breedToLoad.title, onSuccess = this::loadDogBreedImage, onError = this::showError)
+                }
+                ApiInteraction.CAT_PREFIX ->{
+                    ApiInteraction.loadCatBreedInfo(breedToLoad.title, onSuccess = this::loadCatBreedImage, onError = this::showError)
+                }
+
+            }
+
         }
         else{
             loadImageFromAssets(breedToLoad.id)
@@ -121,10 +129,10 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
 
     }
 
-    private fun loadBreedImage(info: List<BreedInfo>) {
+    private fun loadDogBreedImage(info: List<DogBreedInfo>) {
 
         if(info.isNotEmpty()){
-            ApiInteraction.loadBreedImage(info[0].id.toString(), onSuccess = this::showBreedImage, onError = this::showError)
+            ApiInteraction.loadDogBreedImage(info[0].id.toString(), onSuccess = this::showDogBreedImage, onError = this::showError)
         }
         else{
             loadImageFromAssets(results[0].id)
@@ -132,7 +140,50 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
 
     }
 
-    private fun showBreedImage(data: List<BreedImage>) {
+    private fun loadCatBreedImage(info: List<CatBreedInfo>) {
+
+        if(info.isNotEmpty()){
+            ApiInteraction.loadCatBreedImage(info[0].id, onSuccess = this::showCatBreedImage, onError = this::showError)
+        }
+        else{
+            loadImageFromAssets(results[0].id)
+        }
+
+    }
+
+    private fun showDogBreedImage(data: List<DogBreedImage>) {
+
+        if(data.isNotEmpty()){
+
+            //load breed data from API
+            val loaderThread = Thread(Runnable {
+
+                try{
+
+                    val loadedImage = Glide.with(app.applicationContext)
+                        .asBitmap()
+                        .load(data[0].url)
+                        .placeholder(R.drawable.paw_scanner)
+                        .error(R.drawable.paw_scanner)
+                        .submit()
+                        .get()
+
+                    image.postValue(loadedImage)
+
+                }
+                catch (e: Error){}
+
+            })
+            loaderThread.start()
+
+        }
+        else{
+            loadImageFromAssets(results[0].id)
+        }
+
+    }
+
+    private fun showCatBreedImage(data: List<CatBreedImage>) {
 
         if(data.isNotEmpty()){
 

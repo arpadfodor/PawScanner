@@ -61,4 +61,8 @@ class Recognition(
 
     }
 
+    fun getAnimalTypePrefix(): Int{
+        return id[2].toString().toInt()
+    }
+
 }

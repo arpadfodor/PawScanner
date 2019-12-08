@@ -8,7 +8,12 @@ import java.net.URLEncoder
 
 object ApiInteraction {
 
+    const val HUMAN_PREFIX = 1
+    const val CAT_PREFIX = 2
+    const val DOG_PREFIX = 3
+
     var dogAPI: DogAPI
+    var catAPI: CatAPI
     var factAPI: FactAPI
 
     init {
@@ -18,12 +23,18 @@ object ApiInteraction {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
+        val retrofitCatApi = Retrofit.Builder()
+            .baseUrl(CatAPI.ENDPOINT_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
         val retrofitFactApi = Retrofit.Builder()
             .baseUrl(FactAPI.ENDPOINT_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
         this.dogAPI = retrofitDogApi.create(DogAPI::class.java)
+        this.catAPI = retrofitCatApi.create(CatAPI::class.java)
         this.factAPI = retrofitFactApi.create(FactAPI::class.java)
 
     }
@@ -45,7 +56,7 @@ object ApiInteraction {
 
     }
 
-    fun loadBreedInfo(name: String, onSuccess: (List<BreedInfo>) -> Unit, onError: (Throwable) -> Unit){
+    fun loadDogBreedInfo(name: String, onSuccess: (List<DogBreedInfo>) -> Unit, onError: (Throwable) -> Unit){
 
         if(name.isEmpty()){
             return
@@ -56,13 +67,35 @@ object ApiInteraction {
 
     }
 
-    fun loadBreedImage(id: String, onSuccess: (List<BreedImage>) -> Unit, onError: (Throwable) -> Unit){
+    fun loadCatBreedInfo(name: String, onSuccess: (List<CatBreedInfo>) -> Unit, onError: (Throwable) -> Unit){
+
+        if(name.isEmpty()){
+            return
+        }
+
+        val getBreedInfoRequest = catAPI.getBreedInfo(name)
+        runCallOnBackgroundThread(getBreedInfoRequest, onSuccess, onError)
+
+    }
+
+    fun loadDogBreedImage(id: String, onSuccess: (List<DogBreedImage>) -> Unit, onError: (Throwable) -> Unit){
 
         if(id.isEmpty()){
             return
         }
 
         val getBreedImageUrlRequest = dogAPI.getBreedImageURL(URLEncoder.encode(id, "utf-8"), "small")
+        runCallOnBackgroundThread(getBreedImageUrlRequest, onSuccess, onError)
+
+    }
+
+    fun loadCatBreedImage(id: String, onSuccess: (List<CatBreedImage>) -> Unit, onError: (Throwable) -> Unit){
+
+        if(id.isEmpty()){
+            return
+        }
+
+        val getBreedImageUrlRequest = catAPI.getBreedImageURL(URLEncoder.encode(id, "utf-8"), "small")
         runCallOnBackgroundThread(getBreedImageUrlRequest, onSuccess, onError)
 
     }

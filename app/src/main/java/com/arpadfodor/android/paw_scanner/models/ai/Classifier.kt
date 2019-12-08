@@ -172,8 +172,10 @@ abstract class Classifier{
                 (rhs.confidence).compareTo(lhs.confidence)
             })
 
+        //Get the labels in the order of the network's output
         val labels = LabelsManager.getIdWithNames()
 
+        //Fill PriorityQueue with Recognitions
         for (i in labels.indices){
             pq.add(
                 Recognition(

@@ -16,10 +16,10 @@ interface DogAPI {
 
     @Headers("x-api-key: $DOG_API_KEY")
     @GET(BREED_SEARCH)
-    fun getBreedInfo(@Query("q") name: String): Call<List<BreedInfo>>
+    fun getBreedInfo(@Query("q") name: String): Call<List<DogBreedInfo>>
 
     @Headers("x-api-key: $DOG_API_KEY")
     @GET(IMAGE_SEARCH)
-    fun getBreedImageURL(@Query("breed_id") id: String, @Query("size") size: String): Call<List<BreedImage>>
+    fun getBreedImageURL(@Query("breed_id") id: String, @Query("size") size: String): Call<List<DogBreedImage>>
 
 }

@@ -185,22 +185,22 @@ object BitmapProcessor {
             if (applyRotation % 90 != 0) {
             }
 
-            // Translate so center of image is at origin.
+            // Translate so center of image is at origin
             matrix.postTranslate(-srcWidth / 2.0f, -srcHeight / 2.0f)
 
             // Rotate around origin
             matrix.postRotate(applyRotation.toFloat())
         }
 
-        // Account for the already applied rotation, if any, and then determine how
-        // much scaling is needed for each axis.
+        // Account for the already applied rotation, if any, and then determine how much scaling is needed for each axis
         val transpose = (abs(applyRotation) + 90) % 180 == 0
 
         val inWidth = if (transpose) srcHeight else srcWidth
         val inHeight = if (transpose) srcWidth else srcHeight
 
-        // Apply scaling if necessary.
+        // Apply scaling if necessary
         if (inWidth != dstWidth || inHeight != dstHeight) {
+
             val scaleFactorX = dstWidth / inWidth.toFloat()
             val scaleFactorY = dstHeight / inHeight.toFloat()
 
@@ -210,13 +210,14 @@ object BitmapProcessor {
                 val scaleFactor = max(scaleFactorX, scaleFactorY)
                 matrix.postScale(scaleFactor, scaleFactor)
             } else {
-                // Scale exactly to fill dst from src.
+                // Scale exactly to fill dst from src
                 matrix.postScale(scaleFactorX, scaleFactorY)
             }
+
         }
 
         if (applyRotation != 0) {
-            // Translate back from origin centered reference to destination frame.
+            // Translate back from origin centered reference to destination frame
             matrix.postTranslate(dstWidth / 2.0f, dstHeight / 2.0f)
         }
 
@@ -305,6 +306,14 @@ object BitmapProcessor {
         return exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
     }
 
+    /**
+     * Returns the orientation of the inspected image from Exif metadata
+     * Thanks to some manufacturers (Samsung), Exif orientation read is not reliable
+     *
+     * @param croppedBitmap     The input image which has been cropped
+     *
+     * @return Bitmap           The Bitmap format required by the model
+     */
     fun resizedBitmapToInferenceResolution(croppedBitmap: Bitmap, classifierInputSize: Size): Bitmap{
 
         val cropToFrameTransform = Matrix()
@@ -321,7 +330,7 @@ object BitmapProcessor {
             classifierInputSize.width,
             classifierInputSize.height,
             0,
-            //maintain aspects ratio
+            //maintain aspect ratio
             true
         )
 

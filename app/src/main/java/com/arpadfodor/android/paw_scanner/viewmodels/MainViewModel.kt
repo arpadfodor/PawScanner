@@ -409,6 +409,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         recognizeLoadedImage()
     }
 
+    /**
+     * Executes recognition if prerequisites are met
+     *
+     * @param bitmap        Bitmap to evaluate
+     */
     fun recognizeLiveImage(bitmap: Bitmap?){
 
         bitmap?: return
@@ -430,6 +435,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     }
 
+    /**
+     * Executes recognition if prerequisites are met
+     */
     private fun recognizeLoadedImage(){
 
         if(!isInferenceFinished || loadedImage.value == null){

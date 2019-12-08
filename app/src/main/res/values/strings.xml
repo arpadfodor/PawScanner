@@ -3,8 +3,8 @@
 <!DOCTYPE resources [
     <!ENTITY appName "Paw Scanner">
     <!ENTITY appId "925630375777">
-    <!ENTITY appVersion "v0.36">
-    <!ENTITY appDate "05/12/2019">
+    <!ENTITY appVersion "v0.37">
+    <!ENTITY appDate "08/12/2019">
     <!ENTITY adMobAppId "ca-app-pub-3940256099942544~3347511713">
     <!ENTITY adMobBannerId "ca-app-pub-3940256099942544/6300978111">
     ]>
@@ -81,6 +81,7 @@
         \n
         Breed info by\n
         TheDogApi\n
+        TheCatApi\n
         Some Random Api\n
         Wikipedia\n
         \n
@@ -121,8 +122,8 @@
 
     <string name="title_breed_info">Detailed info</string>
     <string name="title_select_breed">Select breed</string>
-    <string name="breed_info">
-         Full name: %1$s\n
+    <string name="breed_info_dog">
+        Full name: %1$s\n
         \n
         Breed group: %2$s\n
         \n
@@ -131,9 +132,28 @@
         Height: %4$s centimeters\n
         Life span: %5$s\n
         \n
-        Personality: %6$s\n
+        Description: %6$s\n
         \n
         Bred for: %7$s.
+    </string>
+    <string name="breed_info_cat">
+        Full name: %1$s\n
+        \n
+        Origin: %2$s\n
+        \n
+        Average properties\n
+        Weight: %3$s kilograms\n
+        Life span: %4$s years\n
+        Adaptability: %5$s\n
+        Energy level: %6$s\n
+        Social needs: %7$s\n
+        Friendliness with children: %8$s\n
+        Friendliness with strangers: %9$s\n
+        Friendliness with dogs: %10$s\n
+        \n
+        Description: %11$s\n
+        \n
+        Temperament: %12$s.
     </string>
     <string name="cat_info_text">
         Family: Felidae\n

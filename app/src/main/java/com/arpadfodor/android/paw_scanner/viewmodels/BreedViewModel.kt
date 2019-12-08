@@ -9,12 +9,8 @@ import androidx.lifecycle.MutableLiveData
 import com.arpadfodor.android.paw_scanner.R
 import com.arpadfodor.android.paw_scanner.models.TextToSpeechModel
 import com.arpadfodor.android.paw_scanner.models.ai.LabelsManager
-import com.arpadfodor.android.paw_scanner.models.api.ApiInteraction
-import com.arpadfodor.android.paw_scanner.models.api.BreedImage
-import com.arpadfodor.android.paw_scanner.models.api.BreedInfo
-import com.arpadfodor.android.paw_scanner.models.api.Fact
+import com.arpadfodor.android.paw_scanner.models.api.*
 import com.bumptech.glide.Glide
-import java.util.*
 
 class BreedViewModel(application: Application) : AndroidViewModel(application){
 
@@ -27,14 +23,14 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
     var onlineImageEnabled = false
 
     /*
-     * Breed name
+     * Is selector displayed flag
      */
     val isSelectorDisplayed: MutableLiveData<Boolean> by lazy {
         MutableLiveData<Boolean>()
     }
 
     /*
-     * Breed name
+     * Breed Id and name pairs
      */
     val currentBreed: MutableLiveData<Pair<String, String>> by lazy {
         MutableLiveData<Pair<String, String>>()
@@ -129,35 +125,41 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
         factText.postValue("")
         image.postValue(placeholderImage)
 
-        val currentBreed = currentBreed.value?:return
+        val currentBreedLocal = currentBreed.value
 
-        when {
-            currentBreed.second.toLowerCase(Locale.getDefault()) == "human" -> {
+        if(currentBreedLocal == null || currentBreedLocal.first.isEmpty() || currentBreedLocal.second.isEmpty()){
+            return
+        }
+
+        when(getAnimalTypePrefixFromId(currentBreedLocal.first)) {
+
+            ApiInteraction.HUMAN_PREFIX -> {
 
                 generalInfoTitle.postValue(app.getString(R.string.title_general, "Human"))
                 generalInfo.postValue(app.getString(R.string.human_info_text))
-                loadImageFromAssets(currentBreed.first)
+                loadImageFromAssets(currentBreedLocal.first)
 
                 isBreedTextViewContainerGone.postValue(true)
                 isFactTextViewContainerGone.postValue(true)
 
             }
-            currentBreed.second.toLowerCase(Locale.getDefault()) == "cat" -> {
+            ApiInteraction.CAT_PREFIX -> {
 
                 generalInfoTitle.postValue(app.getString(R.string.title_general, "Cat"))
                 generalInfo.postValue(app.getString(R.string.cat_info_text))
-                loadImageFromAssets(currentBreed.first)
+                ApiInteraction.loadCatBreedInfo(currentBreedLocal.second, onSuccess = this::showCatBreedInfo, onError = this::showTextLoadError)
                 loadCatFact()
+                breedInfo.postValue(app.getString(R.string.loading))
 
-                isBreedTextViewContainerGone.postValue(true)
+                isBreedTextViewContainerGone.postValue(false)
                 isFactTextViewContainerGone.postValue(false)
 
             }
-            else -> {
+            ApiInteraction.DOG_PREFIX -> {
 
                 generalInfoTitle.postValue(app.getString(R.string.title_general, "Dog"))
                 generalInfo.postValue(app.getString(R.string.dog_info_text))
-                ApiInteraction.loadBreedInfo(currentBreed.second, onSuccess = this::showBreedInfo, onError = this::showTextLoadError)
+                ApiInteraction.loadDogBreedInfo(currentBreedLocal.second, onSuccess = this::showDogBreedInfo, onError = this::showTextLoadError)
                 loadDogFact()
                 breedInfo.postValue(app.getString(R.string.loading))
 
@@ -165,12 +167,24 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
                 isFactTextViewContainerGone.postValue(false)
 
             }
+
         }
 
     }
 
-    private fun loadImageByBreedApiId(id: String){
-        ApiInteraction.loadBreedImage(id, onSuccess = this::showBreedImage, onError = this::showImageLoadError)
+    private fun loadImageByBreedApiId(animalPrefix: Int, apiId: String){
+
+        when(animalPrefix){
+
+            ApiInteraction.DOG_PREFIX -> {
+                ApiInteraction.loadDogBreedImage(apiId, onSuccess = this::showDogBreedImage, onError = this::showImageLoadError)
+            }
+            ApiInteraction.CAT_PREFIX -> {
+                ApiInteraction.loadCatBreedImage(apiId, onSuccess = this::showCatBreedImage, onError = this::showImageLoadError)
+            }
+
+        }
+
     }
 
     fun loadCatFact(){
@@ -181,27 +195,33 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
         ApiInteraction.loadDogFact(onSuccess = this::showFact, onError = this::showFactLoadError)
     }
 
-    private fun showBreedInfo(info: List<BreedInfo>) {
+    private fun showDogBreedInfo(info: List<DogBreedInfo>) {
 
+        val currentBreedLocal = currentBreed.value?:return
         val breedInfoText: String
 
         if(info.isNotEmpty()){
 
-            breedInfoText = app.getString(R.string.breed_info, info[0].name, info[0].breed_group,
-                info[0].weight.metric, info[0].height.metric, info[0].life_span,
-                info[0].temperament, info[0].bred_for)
+            breedInfoText = app.getString(R.string.breed_info_dog,
+                info[0].name,
+                info[0].breed_group,
+                info[0].weight.metric,
+                info[0].height.metric,
+                info[0].life_span,
+                info[0].temperament,
+                info[0].bred_for)
 
             if(onlineImageEnabled){
-                loadImageByBreedApiId(info[0].id.toString())
+                loadImageByBreedApiId(getAnimalTypePrefixFromId(currentBreedLocal.first), info[0].id.toString())
             }
             else{
-                loadImageFromAssets(currentBreed.value?.first?:return)
+                loadImageFromAssets(currentBreedLocal.first)
             }
 
         }
         else{
-            breedInfoText = app.getString(R.string.api_data_empty, currentBreed.value?.second)
-            loadImageFromAssets(currentBreed.value?.first?:return)
+            breedInfoText = app.getString(R.string.api_data_empty, currentBreedLocal.second)
+            loadImageFromAssets(currentBreedLocal.first)
         }
 
         breedInfoTitle.postValue(app.getString(R.string.title_breed_specific))
@@ -209,7 +229,78 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
 
     }
 
-    private fun showBreedImage(data: List<BreedImage>) {
+    private fun showCatBreedInfo(info: List<CatBreedInfo>) {
+
+        val currentBreedLocal = currentBreed.value?:return
+        val breedInfoText: String
+
+        if(info.isNotEmpty()){
+
+            breedInfoText = app.getString(R.string.breed_info_cat,
+                info[0].name,
+                info[0].origin,
+                info[0].weight.metric,
+                info[0].life_span,
+                convertNumberScaleToText(info[0].adaptability),
+                convertNumberScaleToText(info[0].energy_level),
+                convertNumberScaleToText(info[0].social_needs),
+                convertNumberScaleToText(info[0].child_friendly),
+                convertNumberScaleToText(info[0].stranger_friendly),
+                convertNumberScaleToText(info[0].dog_friendly),
+                info[0].description,
+                info[0].temperament)
+
+            if(onlineImageEnabled){
+                loadImageByBreedApiId(getAnimalTypePrefixFromId(currentBreedLocal.first), info[0].id.toString())
+            }
+            else{
+                loadImageFromAssets(currentBreedLocal.first)
+            }
+
+        }
+        else{
+            breedInfoText = app.getString(R.string.api_data_empty, currentBreedLocal.second)
+            loadImageFromAssets(currentBreedLocal.first)
+        }
+
+        breedInfoTitle.postValue(app.getString(R.string.title_breed_specific))
+        breedInfo.postValue(breedInfoText)
+
+    }
+
+    private fun showDogBreedImage(data: List<DogBreedImage>) {
+
+        if(data.isNotEmpty()){
+
+            //load breed data from API
+            val loaderThread = Thread(Runnable {
+
+                try{
+
+                    val loadedImage = Glide.with(app.applicationContext)
+                        .asBitmap()
+                        .load(data[0].url)
+                        .placeholder(R.drawable.paw_scanner)
+                        .error(R.drawable.paw_scanner)
+                        .submit()
+                        .get()
+
+                    image.postValue(loadedImage)
+
+                }
+                catch (e: Error){}
+
+            })
+            loaderThread.start()
+
+        }
+        else{
+            loadImageFromAssets(currentBreed.value?.first?:return)
+        }
+
+    }
+
+    private fun showCatBreedImage(data: List<CatBreedImage>) {
 
         if(data.isNotEmpty()){
 
@@ -355,6 +446,38 @@ class BreedViewModel(application: Application) : AndroidViewModel(application){
 
     fun setCurrentBreed(element: Pair<String, String>){
         currentBreed.postValue(element)
+    }
+
+    fun getAnimalTypePrefixFromId(id: String): Int{
+        return id[2].toString().toInt()
+    }
+
+    fun convertNumberScaleToText(value: Int): String{
+
+        var result = ""
+
+        when(value){
+
+            1 ->{
+                result = "low"
+            }
+            2 ->{
+                result = "below average"
+            }
+            3 ->{
+                result = "normal"
+            }
+            4 ->{
+                result = "above average"
+            }
+            5 ->{
+                result = "high"
+            }
+
+        }
+
+        return result
+
     }
 
     fun pause() {
