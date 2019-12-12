@@ -1,6 +1,6 @@
 package com.arpadfodor.android.paw_scanner.views.additional
 
-import android.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable

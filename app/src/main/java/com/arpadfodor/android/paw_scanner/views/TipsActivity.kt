@@ -2,6 +2,7 @@ package com.arpadfodor.android.paw_scanner.views
 
 import android.graphics.Typeface
 import android.os.Bundle
+import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.WindowManager
 import android.widget.*
@@ -315,13 +316,15 @@ class TipsActivity : AppCompatActivity() {
 
     private fun buildContainer(): LinearLayout{
 
+        val themedContext = ContextThemeWrapper(this, R.style.CardElement)
+
         val verticalMargin = resources.getDimension(R.dimen.card_vertical_margin).toInt()
         val horizontalMargin = resources.getDimension(R.dimen.card_horizontal_margin).toInt()
 
         val params = TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT)
         params.setMargins(horizontalMargin, verticalMargin, horizontalMargin, 0)
 
-        val layout = LinearLayout(this)
+        val layout = LinearLayout(themedContext)
         layout.layoutParams = params
         layout.orientation = LinearLayout.VERTICAL
         layout.background = getDrawable(R.drawable.card_background)

@@ -58,7 +58,6 @@
         </activity>
 
         <service android:name=".viewmodels.services.InferenceService" />
-        <service android:name=".viewmodels.services.LiveInferenceService" />
 
         <meta-data
             android:name="com.google.android.gms.games.APP_ID"

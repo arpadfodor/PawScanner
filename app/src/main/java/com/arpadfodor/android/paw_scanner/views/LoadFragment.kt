@@ -1,6 +1,6 @@
 package com.arpadfodor.android.paw_scanner.views
 
-import android.app.Activity
+import androidx.appcompat.app.AppCompatActivity
 import android.content.Intent
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
@@ -123,7 +123,7 @@ class LoadFragment : Fragment(), View.OnClickListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 
         // Result code is RESULT_OK only if the user has selected an Image
-        if (resultCode == Activity.RESULT_OK) {
+        if (resultCode == AppCompatActivity.RESULT_OK) {
 
             when (requestCode) {
                 GALLERY_REQUEST_CODE -> {

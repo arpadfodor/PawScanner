@@ -149,7 +149,6 @@ class AutoFitPreviewBuilder private constructor(
     /** Helper function that fits a camera preview into the given [TextureView] */
     private fun updateTransform(textureView: TextureView?, rotation: Int?, newBufferDimens: Size,
                                 newViewFinderDimens: Size) {
-        // This should not happen anyway, but now the linter knows
         textureView ?: return
 
         if (rotation == viewFinderRotation &&
@@ -235,7 +234,7 @@ class AutoFitPreviewBuilder private constructor(
         }
 
         /**
-         * Main entrypoint for users of this class: instantiates the adapter and returns an instance
+         * Main entry point for users of this class: instantiates the adapter and returns an instance
          * of [Preview] which automatically adjusts in size and rotation to compensate for
          * config changes.
          */

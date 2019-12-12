@@ -113,11 +113,14 @@ class RecognitionViewModel(application: Application) : AndroidViewModel(applicat
 
             when(breedToLoad.getAnimalTypePrefix()){
 
-                ApiInteraction.DOG_PREFIX ->{
-                    ApiInteraction.loadDogBreedInfo(breedToLoad.title, onSuccess = this::loadDogBreedImage, onError = this::showError)
+                ApiInteraction.HUMAN_PREFIX -> {
+                    loadImageFromAssets(breedToLoad.id)
                 }
                 ApiInteraction.CAT_PREFIX ->{
                     ApiInteraction.loadCatBreedInfo(breedToLoad.title, onSuccess = this::loadCatBreedImage, onError = this::showError)
+                }
+                ApiInteraction.DOG_PREFIX ->{
+                    ApiInteraction.loadDogBreedInfo(breedToLoad.title, onSuccess = this::loadDogBreedImage, onError = this::showError)
                 }
 
             }

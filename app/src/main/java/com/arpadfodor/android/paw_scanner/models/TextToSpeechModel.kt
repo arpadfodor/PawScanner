@@ -28,8 +28,10 @@ object TextToSpeechModel{
 
     }
 
-    /*
+    /**
      * Start text to speech
+     *
+     * @param textToBeSpoken
      */
     fun speak(textToBeSpoken: String){
         requestCounter++

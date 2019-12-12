@@ -3,13 +3,13 @@
 <!DOCTYPE resources [
     <!ENTITY appName "Paw Scanner">
     <!ENTITY appId "925630375777">
-    <!ENTITY appVersion "v0.37">
-    <!ENTITY appDate "08/12/2019">
+    <!ENTITY appVersion "v0.39">
+    <!ENTITY appDate "12/12/2019">
     <!ENTITY adMobAppId "ca-app-pub-3940256099942544~3347511713">
     <!ENTITY adMobBannerId "ca-app-pub-3940256099942544/6300978111">
     ]>
-<!--test adMobAppId "ca-app-pub-3940256099942544~3347511713"-->
-<!--test adMobBannerId "ca-app-pub-3940256099942544/6300978111"-->
+    <!--test adMobAppId "ca-app-pub-3940256099942544~3347511713"-->
+    <!--test adMobBannerId "ca-app-pub-3940256099942544/6300978111"-->
 
 <resources>
 
@@ -67,6 +67,7 @@
         Release date:\n
         &appDate;\n
         \n
+        \n
         Images by:\n
         Elias Schäfer\n
         Sinisa Maric\n
@@ -79,7 +80,8 @@
         skeeze\n
         from Pixabay\n
         \n
-        Breed info by\n
+        \n
+        Breed info by:\n
         TheDogApi\n
         TheCatApi\n
         Some Random Api\n
@@ -88,14 +90,11 @@
         \n
         AI is powered by Keras/TensorFlow\n
         \n
+        \n
         Dataset Reference:\n
-        \n
-        Aditya Khosla, Nityananda Jayadevaprakash, Bangpeng Yao and Li Fei-Fei. Novel dataset for Fine-Grained Image Categorization. First Workshop on Fine-Grained Visual Categorization (FGVC), IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2011.\n
-        \n
-        J. Deng, W. Dong, R. Socher, L.-J. Li, K. Li and L. Fei-Fei, ImageNet: A Large-Scale Hierarchical Image Database. IEEE Computer Vision and Pattern Recognition (CVPR), 2009.\n
-        \n
-        \n
-        You can report a bug or send a message by clicking on the corresponding buttons - although application crash events are automatically sent.\n
+        Stanford Dogs Dataset\n
+        Cats and Dogs Breeds\n
+        cropped_dog_breeds from kaggle\n
     </string>
 
     <string name="tips_full_body">Try to capture the full body of the creature. At least the head should be visible.</string>
@@ -103,7 +102,7 @@
     <string name="tips_blurred_sharp">Also, capture sharp images to make details visible.</string>
     <string name="tips_dark_clear">Ensure good lighting for high contrast.</string>
     <string name="tips_vertical_horizontal">Try to maintain proper image orientation.</string>
-    <string name="tips_many_one">Strive to have only one creature at the same time to recognize. This reduces recognition uncertainty.</string>
+    <string name="tips_many_one">Strive to have only one animal at the same time to recognize. This reduces recognition uncertainty.</string>
 
     <string name="title_camera_settings">Camera settings</string>
     <string name="setting_image_preference">Image preference</string>
@@ -114,8 +113,8 @@
     <string name="label_black">Black</string>
     <string name="label_white">White</string>
     <string name="setting_online_image">Breed image source</string>
-    <string name="label_disable_online_image">Use app images only</string>
-    <string name="label_enable_online_image">Download higher resolution if available (increases network traffic)</string>
+    <string name="label_disable_online_image">Use offline images only</string>
+    <string name="label_enable_online_image">Online (increases network traffic)</string>
 
     <string name="review_app">Review app</string>
     <string name="report_bug">Report a bug</string>
@@ -147,9 +146,11 @@
         Adaptability: %5$s\n
         Energy level: %6$s\n
         Social needs: %7$s\n
-        Friendliness with children: %8$s\n
-        Friendliness with strangers: %9$s\n
-        Friendliness with dogs: %10$s\n
+        \n
+        Friendliness with\n
+        children: %8$s\n
+        strangers: %9$s\n
+        dogs: %10$s\n
         \n
         Description: %11$s\n
         \n
