@@ -1,8 +1,8 @@
-# PawScanner
+# Paw Scanner
 
 ## Real Time Image Recognition with Deep Learning and Android application
 
-This is the repository of the PawScanner Android application, which can classify dog & cat breeds and humans.
+This is the repository of the Paw Scanner Android application, which can classify dog & cat breeds and humans.
 
 
 
