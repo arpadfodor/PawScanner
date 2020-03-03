@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE resources [
+    <!ENTITY appName "Paw Scanner">
+    <!ENTITY appId "925630375777">
+    <!ENTITY appVersion "v0.39">
+    <!ENTITY appDate "12/12/2019">
+    <!ENTITY adMobAppId "ca-app-pub-3940256099942544~3347511713">
+    <!ENTITY adMobBannerId "ca-app-pub-3940256099942544/6300978111">
+    ]>
+    <!--test adMobAppId "ca-app-pub-3940256099942544~3347511713"-->
+    <!--test adMobBannerId "ca-app-pub-3940256099942544/6300978111"-->
+
+<resources>
+
+    <string name="app_name">&appName;</string>
+    <string name="app_id">&appId;</string>
+    <string name="app_version">&appVersion;</string>
+    <string name="app_date">&appDate;</string>
+    <string name="app_ad_id">&adMobAppId;</string>
+    <string name="app_banner_id">&adMobBannerId;</string>
+
+    <string name="title_home">Live</string>
+    <string name="title_history">History</string>
+    <string name="title_load">Load</string>
+    <string name="title_settings">Settings</string>
+    <string name="title_about">About</string>
+    <string name="title_tips">Tips</string>
+    <string name="title_breed">Breeds</string>
+    <string name="title_fact">Facts</string>
+    <string name="title_recognition_details">Recognition details</string>
+
+    <string name="predictions">Predictions\n</string>
+    <string name="prediction_chart_title">Possible breed mix [%]</string>
+    <string name="human">human</string>
+    <string name="human_but_text">A %1$s, but looks like a(n) %2$s</string>
+    <string name="result_text">%1$s recognized</string>
+    <string name="category_others">others</string>
+    <string name="title_inference_duration">Inference duration</string>
+    <string name="inference_duration_value">%1$d [ms]</string>
+    <string name="prediction_top_title">Top %1$s predictions</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="positive_button">OK</string>
+    <string name="negative_button">Cancel</string>
+
+    <string name="confirm_exit">Confirm exit</string>
+    <string name="confirm_exit_description">Are you sure you want to exit?</string>
+    <string name="camera_error">Camera error occurred</string>
+
+    <string name="tts_recognition_element">%1$s. %2$s percent. </string>
+    <string name="tts_too_weak_recognition_start_text">All predictions are below %1$s percent, but here is the highest: </string>
+    <string name="tts_singular_recognition_start_text">The prediction is </string>
+    <string name="tts_plural_recognitions_start_text">The predictions are the following. </string>
+    <string name="tts_element_order">Number %1$s: %2$s</string>
+    <string name="tts_if_mixed_text">If the recognized creature is a mixed breed, it is likely to be a mixture of the mentioned breeds. </string>
+
+    <string name="text_about">
+        &appName;\n
+        &appVersion;\n
+        \n
+        Created by Arpad Fodor\n
+        github.com/arpadfodor\n
+        \n
+        Release date:\n
+        &appDate;\n
+        \n
+        \n
+        Images by:\n
+        Elias Schäfer\n
+        Sinisa Maric\n
+        Pixaline\n
+        OpenClipart-Vectors\n
+        Free-Photos\n
+        GraphicMama-team\n
+        huoadg5888\n
+        gdakaska\n
+        skeeze\n
+        from Pixabay\n
+        \n
+        \n
+        Breed info by:\n
+        TheDogApi\n
+        TheCatApi\n
+        Some Random Api\n
+        Wikipedia\n
+        \n
+        \n
+        AI is powered by Keras/TensorFlow\n
+        \n
+        \n
+        Dataset Reference:\n
+        Stanford Dogs Dataset\n
+        Cats and Dogs Breeds\n
+        cropped_dog_breeds from kaggle\n
+    </string>
+
+    <string name="tips_full_body">Try to capture the full body of the creature. At least the head should be visible.</string>
+    <string name="tips_corner_fullscreen">The creature should fill the image so more details are visible and the background is less distracting.</string>
+    <string name="tips_blurred_sharp">Also, capture sharp images to make details visible.</string>
+    <string name="tips_dark_clear">Ensure good lighting for high contrast.</string>
+    <string name="tips_vertical_horizontal">Try to maintain proper image orientation.</string>
+    <string name="tips_many_one">Strive to have only one animal at the same time to recognize. This reduces recognition uncertainty.</string>
+
+    <string name="title_camera_settings">Camera settings</string>
+    <string name="setting_image_preference">Image preference</string>
+    <string name="label_nice_image">Better images</string>
+    <string name="label_fast_process">Faster image processing</string>
+    <string name="title_network_settings">Network settings</string>
+    <string name="setting_shutter_color_preference">Shutter color</string>
+    <string name="label_black">Black</string>
+    <string name="label_white">White</string>
+    <string name="setting_online_image">Breed image source</string>
+    <string name="label_disable_online_image">Use offline images only</string>
+    <string name="label_enable_online_image">Online (increases network traffic)</string>
+
+    <string name="review_app">Review app</string>
+    <string name="report_bug">Report a bug</string>
+
+    <string name="title_breed_info">Detailed info</string>
+    <string name="title_select_breed">Select breed</string>
+    <string name="breed_info_dog">
+        Full name: %1$s\n
+        \n
+        Breed group: %2$s\n
+        \n
+        Average properties\n
+        Weight: %3$s kilograms\n
+        Height: %4$s centimeters\n
+        Life span: %5$s\n
+        \n
+        Description: %6$s\n
+        \n
+        Bred for: %7$s.
+    </string>
+    <string name="breed_info_cat">
+        Full name: %1$s\n
+        \n
+        Origin: %2$s\n
+        \n
+        Average properties\n
+        Weight: %3$s kilograms\n
+        Life span: %4$s years\n
+        Adaptability: %5$s\n
+        Energy level: %6$s\n
+        Social needs: %7$s\n
+        \n
+        Friendliness with\n
+        children: %8$s\n
+        strangers: %9$s\n
+        dogs: %10$s\n
+        \n
+        Description: %11$s\n
+        \n
+        Temperament: %12$s.
+    </string>
+    <string name="cat_info_text">
+        Family: Felidae\n
+        Order: Carnivora\n
+        \n
+        Average properties\n
+        Life span: 2 - 16 years (In the wild)\n
+        Gestation period: 58 – 67 days\n
+        Daily sleep: 12 – 16 hours\n
+        \n
+        Cats are small, carnivorous (meat-eating) mammals. Domestic cats are often called house cats when kept as indoor pets.\n
+        \n
+        Cats have been domesticated for nearly 10,000 years. They are one of the most popular pets in the world. Cats were probably first kept because they ate mice, and this is still their main task in farms throughout the world. Later they were kept because they are friendly and good companions.\n
+        \n
+        A cat is sometimes called a kitty. A young cat is called a kitten.\n
+        \n
+        The word \'cat\' is also used for other felines. Felines are usually called either big cats or small cats. The big, wild cats are well known: lions, tigers, leopards, jaguars, pumas, and cheetahs. There are small, wild cats in most parts of the world, such as the lynx in northern Europe. The big cats and wild cats are not tame, and can be dangerous.
+    </string>
+    <string name="dog_info_text">
+        Family: Canidae\n
+        Order: Carnivora\n
+        \n
+        Average properties\n
+        Life span: 10 - 13 years\n
+        Gestation period: 58 – 68 days\n
+        \n
+        The domestic dog is the most widely abundant terrestrial carnivorous (meat-eating) mammal. The dog and the extant gray wolf are sister groups as modern wolves are not closely related to the wolves that were first domesticated, which implies that the direct ancestor of the dog is extinct. The dog was the first species to be domesticated and has been selectively bred over millennia for various behaviors, sensory capabilities, and physical attributes.\n
+        \n
+        Their long association with humans has led dogs to be uniquely attuned to human behavior and they are able to thrive on a starch-rich diet that would be inadequate for other carnivorous species. Dogs vary widely in shape, size and colors. They perform many roles for humans, such as hunting, herding, pulling loads, protection, assisting police and military, companionship and, more recently, aiding disabled people and therapeutic roles. This influence on human society has given them the sobriquet of "man's best friend".
+    </string>
+    <string name="human_info_text">
+        Family: Hominidae\n
+        Order: Primates\n
+        \n
+        Average properties\n
+        Life span: 79 years\n
+        Speed: 45 km/h (Maximum, Running)\n
+        \n
+        Homo sapiens is the only extant human species. The name is Latin for "wise man".\n
+        \n
+        Humans began to exhibit evidence of behavioral modernity around 50,000 years ago, and in several waves of migration, they ventured out of Africa and populated most of the world. The spread of humans has profoundly affected much of the biosphere and millions of species worldwide. Advantages that explain this evolutionary success include a larger brain with a well-developed neocortex, prefrontal cortex and temporal lobes, which enable advanced abstract reasoning, language, problem solving, sociality, and culture through social learning. Humans use tools more frequently and effectively than any other animal; and are the only extant species to build fires, cook food, clothe themselves, and create and use numerous other technologies and arts.\n
+        \n
+        Humans uniquely use such systems of symbolic communication as language and art to express themselves and exchange ideas, and also organize themselves into purposeful groups. Humans create complex social structures composed of many cooperating and competing groups, from families and kinship networks to political states. Social interactions between humans have established an extremely wide variety of values, social norms, and rituals, which together undergird human society. Curiosity and the human desire to understand and influence the environment and to explain and manipulate phenomena (or events) have motivated humanity\'s development of science, philosophy, mythology, religion, anthropology, and numerous other fields of knowledge.\n
+        \n
+        Though most of human existence has been sustained by hunting and gathering in band societies, increasingly many human societies transitioned to sedentary agriculture approximately some 10,000 years ago, domesticating plants and animals, thus enabling the growth of civilization. These human societies subsequently expanded, establishing various forms of government, religion, and culture around the world, and unifying people within regions to form states and empires. The rapid advancement of scientific and medical understanding in the 19th and 20th centuries permitted the development of fuel-driven technologies and increased lifespans, causing the human population to rise exponentially. The global human population was estimated to be near 7.7 billion in 2019.
+    </string>
+    <string name="internet_needed">Internet connection is needed to get %1$s details.</string>
+    <string name="api_data_empty">Cannot find info about %1$s.</string>
+    <string name="loading">Loading</string>
+    <string name="fact">%1$s</string>
+    <string name="internet_needed_to_fact">Internet connection is required to get a fact.</string>
+    <string name="fact_get_help">You can get a fact by clicking on the buttons.</string>
+    <string name="title_breed_specific">Breed specific</string>
+    <string name="title_general">%1$ss in general</string>
+    <string name="did_you_know">Did you know?</string>
+
+</resources>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_breeds"
+        android:icon="@drawable/logo_breeds"
+        android:title="@string/title_breed" />
+
+    <item
+        android:id="@+id/nav_fact"
+        android:icon="@drawable/logo_fact"
+        android:title="@string/title_fact" />
+
+    <item
+        android:id="@+id/nav_tips"
+        android:icon="@drawable/logo_help"
+        android:title="@string/title_tips" />
+
+    <item
+        android:id="@+id/nav_about"
+        android:icon="@drawable/logo_info"
+        android:title="@string/title_about" />
+
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/logo_settings"
+        android:title="@string/title_settings" />
+
+</menu>

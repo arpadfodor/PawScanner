@@ -1,0 +1,4 @@
+Model: mobilenet_v2_saved_at_2019-12-09-17_51_05_accuracy_07050
+File size: 9.21 MB
+Input: (224, 224, 3), type: DT_FLOAT - channels_last RGB - Pixel values must be normalized (between 0 and 1)
+Output: (158), type: DT_FLOAT - Use labels.txt to interpret output indices

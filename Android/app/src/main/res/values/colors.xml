@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#33333D</color>
+    <color name="colorPrimaryDark">#26282F</color>
+    <color name="colorAccent">#5f2600</color>
+    <color name="colorSecondaryButton">#DFFFFF</color>
+    <color name="colorNormalButton">#459389</color>
+    <color name="colorGray">#33333D</color>
+    <color name="colorBlack">#000000</color>
+    <color name="colorTransparentGray">#B333333D</color>
+    <color name="colorText">#DFFFFF</color>
+    <color name="colorListRow">#373741</color>
+</resources>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="PREFERENCE_KEY_IMAGE_PREFERENCE">image_preference</string>
+    <string name="PREFERENCE_KEY_ONLINE_IMAGE">online_image</string>
+    <string name="PREFERENCE_KEY_SHUTTER_COLOR">shutter_color</string>
+
+    <string name="KEY_INFERENCE_TIME">inference-time</string>
+    <string name="KEY_NUM_OF_RECOGNITIONS">number-of-recognitions</string>
+    <string name="KEY_IMAGE_BYTE_ARRAY">image-byte-array</string>
+    <string name="KEY_RECOGNITION_ID">recognition-id-%1$d</string>
+    <string name="KEY_RECOGNITION_TITLE">recognition-title-%1$d</string>
+    <string name="KEY_RECOGNITION_CONFIDENCE">recognition-confidence-%1$d</string>
+    <string name="KEY_BREED_ID">breed-id</string>
+    <string name="KEY_BREED_TITLE">breed-title</string>
+
+</resources>

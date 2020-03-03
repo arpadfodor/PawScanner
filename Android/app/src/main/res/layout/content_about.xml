@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".views.AboutActivity"
+    tools:showIn="@layout/activity_about">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        style="@style/CardElementParent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabBugReport"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:backgroundTint="@color/colorSecondaryButton"
+            app:srcCompat="@drawable/logo_bug_report"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:backgroundTint="@color/colorSecondaryButton"
+            app:srcCompat="@drawable/logo_rate_review"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <ImageView
+            android:id="@+id/ivAboutLogo"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:paddingTop="@dimen/nav_header_vertical_spacing"
+            android:paddingBottom="@dimen/nav_header_vertical_spacing"
+            app:srcCompat="@drawable/paw_scanner_small"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/fabBugReport"
+            app:layout_constraintEnd_toStartOf="@+id/fabMessage"/>
+
+        <LinearLayout
+            style="@style/CardElement"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/llAboutInfo"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@+id/ivAboutLogo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <TextView
+                style="@style/BodyParagraph"
+                android:id="@+id/tvAbout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/text_about"
+                android:textColor="@color/colorText"
+                android:textAlignment="center" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>
